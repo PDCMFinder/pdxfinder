@@ -2,9 +2,13 @@ package org.pdxfinder.dataloaders.updog;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
+import org.pdxfinder.dataloaders.updog.tablevalidation.OmicValidationRuleset;
+import org.pdxfinder.dataloaders.updog.tablevalidation.PdxValidationRuleset;
+import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
@@ -60,17 +64,28 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        if (CollectionUtils.isNotEmpty(validationErrors))
-            log.debug(validationErrors.toString());
-        else log.debug("There were no validation errors raised, great!");
+        reportAnyErrors(validationErrors);
 
         if (!validateOnly) {
             createPdxObjects(combinedTableSet);
         }
     }
 
+    private void reportAnyErrors(List<ValidationError> validationErrors) {
+        if (CollectionUtils.isNotEmpty(validationErrors))
+            for (ValidationError error : validationErrors) {
+                log.error(error.verboseMessage());
+            }
+        else
+            log.info("There were no validation errors raised, great!");
+    }
+
+    private boolean hasNoValidationErrors(List<ValidationError> errors) {
+        return CollectionUtils.isEmpty(errors);
+    }
+
     private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
-        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna}/*.tsv");
+        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna,expression}/*.tsv");
         return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
     }
 
@@ -88,10 +103,10 @@ public class Updog {
         Map<String, Table> tableSet,
         Set<String> omicTables,
         String provider
-    ){
+    ) {
         TableSetSpecification omicSpecifications = TableSetSpecification.create();
         for (String tableName : omicTables) {
-            merge(omicSpecifications, new OmicValidationRuleset().generateForOmicTable(tableName, provider));
+            omicSpecifications =  omicSpecifications.merge(OmicValidationRuleset.generateFor(tableName, provider));
         }
 
         TableSetSpecification combinedValidationRuleset = merge(
@@ -114,7 +129,7 @@ public class Updog {
             mergedTableSetSpecifications.addRequiredColumns(tss.getRequiredColumns());
             mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
             mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
-            mergedTableSetSpecifications.addHasRelations(tss.getHasRelations());
+            mergedTableSetSpecifications.addRelations(tss.getRelations());
         }
         return mergedTableSetSpecifications;
     }

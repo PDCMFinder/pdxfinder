@@ -145,34 +145,6 @@ public class DomainObjectCreatorTest extends BaseTest {
     }
 
 
-    @Test
-    public void Given_DataTable_When_LoadDomainObjectsIsCalled_Then_CorrectObjectsInMap(){
-
-        when(dataImportService.getProviderGroup(
-            anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(providerGroup);
-        when(dataImportService.getAccessibilityGroup(anyString(), anyString()))
-            .thenReturn(accessibilityGroup);
-        when(dataImportService.createPatient("patient 1", providerGroup, "female", "", "ethnicity"))
-            .thenReturn(testPatient);
-        when(dataImportService.savePatient(testPatient))
-            .thenReturn(testPatient);
-
-        when(dataImportService.getSuggestedMarker(
-            anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(getSuggestedMarker());
-
-        domainObjectCreator.loadDomainObjects(getTestPdxDataTables());
-
-        Patient patient = (Patient)domainObjectCreator.getDomainObject("patient", "patient 1");
-
-        Assert.assertNotNull(patient);
-        Assert.assertNotNull(patient.getLastSnapshot());
-        Assert.assertNotNull(patient.getLastSnapshot().getSamples());
-        Assert.assertNotNull(domainObjectCreator.getDomainObject("model", "model 1"));
-        Assert.assertNull(domainObjectCreator.getDomainObject("dummy key", "dummy id"));
-    }
-
 
     public static Map<String, Table> getTestPdxDataTables(){
 

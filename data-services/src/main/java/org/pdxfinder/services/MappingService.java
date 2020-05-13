@@ -88,27 +88,31 @@ public class MappingService {
         container = new MappingContainer();
     }
 
+    public String getDiagnosisMappingKey(String dataSource, String diagnosis, String originTissue, String tumorType){
 
+        String mapKey = MappingEntityType.diagnosis.get() + "__" + dataSource + "__" + diagnosis + "__" + originTissue + "__" + tumorType;
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
+        return mapKey;
+    }
+
+    public String getTreatmentMappingKey(String dataSource, String treatmentName){
+
+        String mapKey = MappingEntityType.treatment.get() + "__" + dataSource + "__" + treatmentName;
+        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
+        return  mapKey;
+    }
 
     public MappingEntity getDiagnosisMapping(String dataSource, String diagnosis, String originTissue, String tumorType) {
 
         if (!INITIALIZED) loadRules("json");
-
-        String mapKey = MappingEntityType.diagnosis.get() + "__" + dataSource + "__" + diagnosis + "__" + originTissue + "__" + tumorType;
-
-        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
-
+        String mapKey = getDiagnosisMappingKey(dataSource, diagnosis, originTissue, tumorType);
         return container.getEntityById(mapKey);
     }
 
     public MappingEntity getTreatmentMapping(String dataSource, String treatmentName) {
 
         if (!INITIALIZED) loadRules("json");
-
-        String mapKey = MappingEntityType.treatment.get() + "__" + dataSource + "__" + treatmentName;
-
-        mapKey = mapKey.replaceAll("[^a-zA-Z0-9 _-]", "").toLowerCase();
-
+        String mapKey = getTreatmentMappingKey(dataSource, treatmentName);
         return container.getEntityById(mapKey);
     }
 
@@ -766,6 +770,10 @@ public class MappingService {
         }
     }
 
+    public void purgeMappingDatabase(){
+        log.warn("Deleting H2 database and all its {} mapping data", mappingEntityRepository.findAll().size());
+        mappingEntityRepository.deleteAll();
+    }
 
     public List<MappingEntity> loadMappingsFromFile(String jsonFile) {
 
@@ -789,7 +797,6 @@ public class MappingService {
 
 
     public void readArchive(String entityType) {
-
 
         String jsonKey = "mappings";
 

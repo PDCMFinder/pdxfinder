@@ -139,7 +139,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             return Optional.of(workbook);
 
         } catch (IOException e) {
-            log.error("There was a problem accessing the file: {}", e);
+            log.error("There was a problem accessing the file: {}", file, e);
         }
         return Optional.empty();
     }
@@ -208,7 +208,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
      */
     private void createDataSourceGroup() {
 
-        //TODO: this data has to come from the spreadsheet, I am using constants for now
 
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
@@ -1045,8 +1044,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 // Transcriptomics
                 if(transcriptomicData.exists()){
-                    log.info("Loading transcriptomics for {}", modelId);
-                    loadOmicData(modelCreation, ds, "transcriptomics", providerDataRootDir);
+                    log.info("Loading expression for  {}",modelId);
+                    loadOmicData(modelCreation, ds, "expression", providerDataRootDir);
                 }
 
 

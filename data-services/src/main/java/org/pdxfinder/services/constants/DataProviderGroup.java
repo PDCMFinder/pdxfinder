@@ -7,7 +7,8 @@ import java.util.List;
 public enum DataProviderGroup {
     All,
     EurOPDX,
-    UPDOG;
+    UPDOG,
+    CustomLoaders;
 
 
     public static List<DataProvider> getProvidersFrom(DataProviderGroup group) {
@@ -24,7 +25,8 @@ public enum DataProviderGroup {
                 DataProvider.UOC_BC,
                 DataProvider.UOM_BC,
                 DataProvider.VHIO_BC,
-                DataProvider.VHIO_CRC
+                DataProvider.VHIO_CRC,
+                DataProvider.NKI
         ));
 
         map.put(DataProviderGroup.UPDOG, Arrays.asList(
@@ -39,7 +41,17 @@ public enum DataProviderGroup {
                 DataProvider.UOC_BC,
                 DataProvider.UOM_BC,
                 DataProvider.VHIO_BC,
-                DataProvider.VHIO_CRC
+                DataProvider.VHIO_CRC,
+                DataProvider.DFCI_CPDM,
+                DataProvider.NKI
+        ));
+
+        map.put(DataProviderGroup.CustomLoaders, Arrays.asList(
+                DataProvider.JAX,
+                DataProvider.PDXNet_MDAnderson,
+                DataProvider.PDXNet_HCI_BCM,
+                DataProvider.PDXNet_Wistar_MDAnderson_Penn,
+                DataProvider.PDXNet_WUSTL
         ));
 
         return map.get(group);

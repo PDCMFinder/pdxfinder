@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 
 @Component
 @Command(name = "indexer",
+
     description = "The PDX Finder indexer command calls various data operations on the application." +
         " Run `[COMMAND] --help` or `help [COMMAND]` for specific usage information.",
     mixinStandardHelpOptions = true,
@@ -29,6 +30,7 @@ import java.util.concurrent.Callable;
         CommandLine.HelpCommand.class
     }
 )
+
 @Order(value = -100)
 public class FinderCommandLine implements Callable<Integer> {
 
@@ -43,6 +45,7 @@ public class FinderCommandLine implements Callable<Integer> {
         description = "Loads and transforms data into the PDX Finder",
         mixinStandardHelpOptions = true,
         exitCodeOnExecutionException = 34)
+
     static class Load implements Callable<Integer> {
 
         Logger log = LoggerFactory.getLogger(Load.class);
@@ -55,11 +58,16 @@ public class FinderCommandLine implements Callable<Integer> {
             required = true,
             description = "Path of the PDX Finder data directory " +
                 "(default: [${DEFAULT-VALUE}], set in application.properties)")
+
         private File dataDirectory;
 
         @Option(names = {"-c", "--cache"},
                 description = "Clear cached data and reload, including NCIT ontology terms, etc.")
         private boolean loadCacheRequested;
+
+        @Option(names = {"-m", "--mapping"},
+                description = "Delete mapping database content, and reload from mapping file")
+        private boolean initializeMappingDB;
 
         @Option(names = {"-k", "--keep-db"},
                 description = "Skips clearing of the database before loading new data.")
@@ -70,14 +78,18 @@ public class FinderCommandLine implements Callable<Integer> {
         private boolean validateOnlyRequested;
 
         @Option(names = {"-p", "--post-load"},
-                description = "Implement Post data loading Steps", required=false)
+                description = "Implement Post data loading Steps", required = false)
         private boolean postLoadRequested;
 
-        @Option(names = { "--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required=false, hidden=true)
+        @Option(names = {"--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required = false, hidden = true)
         private String springDataNeo4jUri;
 
-        @Option(names = { "--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location", required=false, hidden=true)
+        @Option(names = {"--db-refresh"}, paramLabel = "Neo4j DB Delete and ReInitialize", description = "clear off database and intialize cache before loading new data.", required = false, hidden = true)
+        private String debReload;
+
+        @Option(names = {"--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location", required = false, hidden = true)
         private String springDatasourceUrl;
+
 
         @ArgGroup(multiplicity = "0..1")
         Exclusive datasetRequested = new Exclusive();
@@ -110,12 +122,13 @@ public class FinderCommandLine implements Callable<Integer> {
             List<DataProvider> providersRequested = getListOfRequestedProviders();
 
             finderLoader.run(
-                providersRequested,
-                dataDirectory,
-                validateOnlyRequested,
-                loadCacheRequested,
-                keepDatabaseRequested,
-                postLoadRequested
+                    providersRequested,
+                    dataDirectory,
+                    validateOnlyRequested,
+                    loadCacheRequested,
+                    keepDatabaseRequested,
+                    postLoadRequested,
+                    initializeMappingDB
             );
             return 0;
         }
@@ -131,10 +144,8 @@ public class FinderCommandLine implements Callable<Integer> {
             );
 
             if (dataProviders.isPresent()) {
-
                 return Arrays.asList(dataProviders.get());
             } else if (dataProviderGroup.isPresent()) {
-
                 return DataProviderGroup.getProvidersFrom(dataProviderGroup.get());
             } else {
                 return new ArrayList<>();
@@ -144,13 +155,14 @@ public class FinderCommandLine implements Callable<Integer> {
         @Override
         public String toString() {
             return new StringJoiner("\n", Load.class.getSimpleName() + "[\n", "\n]")
-                .add("dataDirectory=" + dataDirectory)
-                .add("clearCacheRequested=" + loadCacheRequested)
-                .add("keepDatabaseRequested=" + keepDatabaseRequested)
-                .add("datasetRequested=" + getListOfRequestedProviders())
-                .toString();
+                    .add("dataDirectory=" + dataDirectory)
+                    .add("clearCacheRequested=" + loadCacheRequested)
+                    .add("keepDatabaseRequested=" + keepDatabaseRequested)
+                    .add("datasetRequested=" + getListOfRequestedProviders())
+                    .toString();
         }
     }
+
 
     @Component
     @Order(value = -100)
@@ -166,6 +178,7 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(
                 names = {"-d", "--data-dir"},
                 description = "Path of the PDX Finder data directory " +
+
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
@@ -184,6 +197,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     names = {"-a", "--all"},
                     description = "Export all providers data." +
                             " Warning: do to large provider datasets this can be computationally intensive")
+
             private boolean loadAll;
 
             public String getProvider() {
@@ -283,6 +297,7 @@ public class FinderCommandLine implements Callable<Integer> {
                 exclusiveArguments.getCbioDataType(),
                     exclusiveArguments.getEntrezToHugo()
             );
+
             return 0;
         }
 

@@ -26,7 +26,7 @@ public class LinkSamplesToNCITTerms {
     private DataImportService dataImportService;
     private MappingService mappingService;
 
-    private Map<String, Set<MissingMapping>> missingMappings;
+    private Map<String, MissingMapping> missingMappings;
     private Set<String> missingTerms;
 
     @Autowired
@@ -96,7 +96,8 @@ public class LinkSamplesToNCITTerms {
                 if(me == null){
 
                     MissingMapping mm = new MissingMapping(dataSource, diagnosis, originTissue, tumorType);
-                    insertMissingMapping(diagnosis, mm);
+                    String mapKey = mappingService.getDiagnosisMappingKey(dataSource, diagnosis, originTissue, tumorType);
+                    insertMissingMapping(mapKey, mm);
 
                 }
                  else {
@@ -136,20 +137,7 @@ public class LinkSamplesToNCITTerms {
     private void insertMissingMapping(String id, MissingMapping mm) {
 
         if (!this.missingMappings.containsKey(id)) {
-            //log.info("No mapping found for "+id);
-            Set<MissingMapping> lmm = new HashSet<>();
-            try {
-                lmm.add(mm);
-                this.missingMappings.put(id, lmm);
-            }
-            catch (Exception e){
-                log.error(mm.toString());
-            }
-
-
-        } else {
-
-            this.missingMappings.get(id).add(mm);
+            this.missingMappings.put(id, mm);
         }
     }
 
@@ -157,15 +145,14 @@ public class LinkSamplesToNCITTerms {
     private void printAndSaveMissingMappings() {
 
         log.warn("Couldn't map samples with the following details(" + this.missingMappings.size() + "): ");
-        for (Set<MissingMapping> mms : this.missingMappings.values()) {
 
-            for (MissingMapping mm : mms) {
+        for(Map.Entry<String, MissingMapping> entry : missingMappings.entrySet()){
 
-                log.warn("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
-
-                mappingService.saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
-            }
+            MissingMapping mm = entry.getValue();
+            System.out.println("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
+            mappingService.saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
         }
+
 
     }
 
