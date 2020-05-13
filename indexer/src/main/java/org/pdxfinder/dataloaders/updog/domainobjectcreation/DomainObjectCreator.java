@@ -799,6 +799,55 @@ public class DomainObjectCreator {
         return primarySite;
     }
 
+    private void persistNodes(String patientId, String modelId){
+
+        persistPatient(patientId);
+        persistModel(modelId);
+    }
+
+    private void persistPatient(String patientId){
+
+        try {
+            Iterator<Map.Entry<String, Object>> iter = domainObjects.get(PATIENTS).entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, Object> entry = iter.next();
+                Patient patient = (Patient) entry.getValue();
+
+                if(patient.getExternalId().equals(patientId)){
+                    for (PatientSnapshot ps : patient.getSnapshots()) {
+                        for (Sample patientSample : ps.getSamples())
+                            encodeMolecularDataFor(patientSample);
+                    }
+                    dataImportService.savePatient(patient);
+                    iter.remove();
+                }
+            }
+        }
+        catch(Exception e){
+            log.error("Exception when saving patient {}",patientId);
+        }
+
+    }
+
+    private void persistModel(String modelId){
+
+        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Object> entry = iter.next();
+            ModelCreation model = (ModelCreation) entry.getValue();
+
+            if(model.getSourcePdxId().equals(modelId)){
+                if (model.hasSpecimens())
+                    for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
+
+                log.debug("Saving model {}", (model.getSourcePdxId()));
+                dataImportService.saveModelCreation(model);
+                iter.remove();
+            }
+        }
+    }
+
+    //these methods will become obsolete once batch load is enabled
     private void persistNodes() {
         persistPatients();
         persistModels();
@@ -825,22 +874,6 @@ public class DomainObjectCreator {
         catch(Exception e){
             log.error("Exception when saving patient {}",patientId);
         }
-
-/*
-        Map<String, Object> patients = domainObjects.get(PATIENTS);
-        for (Object pat : patients.values()) {
-            Patient patient = (Patient) pat;
-            for(PatientSnapshot ps: patient.getSnapshots()){
-                for(Sample patientSample : ps.getSamples())
-                    encodeMolecularDataFor(patientSample);
-            }
-            dataImportService.savePatient(patient);
-            patient = null;
-        }
-        domainObjects.get(PATIENTS).clear();
-
-
- */
     }
 
     public void persistModels(){
