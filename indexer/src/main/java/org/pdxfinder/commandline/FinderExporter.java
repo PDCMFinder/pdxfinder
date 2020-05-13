@@ -1,5 +1,7 @@
 package org.pdxfinder.commandline;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.DataImportService;
@@ -31,12 +33,12 @@ public class FinderExporter {
         this.utilityService = utilityService;
         this.dataImportService = dataImportService;
     }
-    public void run(File dataDirectory,String provider,boolean loadAll) throws IOException {
+    public void run(File dataDirectory, String provider, boolean loadAll) throws IOException {
         resolveRootDir(dataDirectory);
         if(loadAll){
             exportAllGroups(rootDir);
         }
-        else if (provider != null && !provider.isEmpty()) {
+        else if (StringUtils.isNotEmpty(provider)) {
             export(rootDir, provider);
         }
     }
