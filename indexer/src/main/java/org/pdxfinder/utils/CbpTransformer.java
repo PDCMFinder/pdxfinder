@@ -90,7 +90,7 @@ public class CbpTransformer {
                 row.add(notSpecified);
                 row.add(notSpecified);
                 row.add(notSpecified);
-                row.add(omicTransformationService.ncbiGeneIdtoHgncSymbol(String.valueOf(f.get("entrezGeneId"))));
+                row.add(omicTransformationService.ncbiGeneIdtoHgncSymbol(String.valueOf(f.get(entrezGeneId))));
                 addBlanksToList(row, 9);
                 row.add(f.get("chr").toString());
                 row.add(f.get("startPosition").toString());
@@ -119,8 +119,8 @@ public class CbpTransformer {
             row.add(notSpecified);
             row.add(notSpecified);
             addBlanksToList(row,3);
-            row.add(omicTransformationService.ncbiGeneIdtoHgncSymbol(String.valueOf(f.get("entrezGeneId"))));
-            row.add(f.get("entrezGeneId").toString());
+            row.add(omicTransformationService.ncbiGeneIdtoHgncSymbol(String.valueOf(f.get(entrezGeneId))));
+            row.add(f.get(entrezGeneId).toString());
             addBlanksToList(row, 6);
             row.add(f.get("alteration").toString());
             addBlanksToList(row, 3);
