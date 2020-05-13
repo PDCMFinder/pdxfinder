@@ -4,24 +4,27 @@ import org.pdxfinder.graph.dao.Marker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-@Service
+@Component
 public class OmicTransformationService {
 
     private final static Logger log = LoggerFactory.getLogger(OmicTransformationService.class);
-
     private DataImportService dataImportService;
-    private Map<String, String> geneIdCache = new HashMap<>();
 
     @Autowired
-    public OmicTransformationService(DataImportService dataImportService){
+    OmicTransformationService(DataImportService dataImportService){
         this.dataImportService = dataImportService;
     }
+
+
+    private Map<String, String> geneIdCache = new HashMap<>();
+
 
     public String ncbiGeneIdtoHgncSymbol(String ncbiGene) {
         String hgncSymbol = geneIdCache.get(ncbiGene);

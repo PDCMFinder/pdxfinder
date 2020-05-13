@@ -5,6 +5,7 @@ import joptsimple.OptionSet;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ public class SubmitToUSI implements CommandLineRunner{
 
     String jsonToSubmit;
 
-
+    @Autowired
     public SubmitToUSI(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
     }

@@ -9,6 +9,9 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -20,13 +23,12 @@ import java.nio.file.Files;
 /*
  * Created by csaba on 02/10/2019.
  */
-
+@Service
 public class UniversalDataExporter {
 
     private static final Logger log = LoggerFactory.getLogger(UniversalDataExporter.class);
 
     protected UtilityService utilityService;
-
     protected DataImportService dataImportService;
 
     protected String templateDir;
@@ -51,9 +53,7 @@ public class UniversalDataExporter {
     private static String notSpecified = "Not Specified";
     private static String patientOrigin = "patient";
 
-    public UniversalDataExporter() {
-    }
-
+    @Autowired
     public UniversalDataExporter(DataImportService dataImportService, UtilityService utilityService) {
 
         this.dataImportService = dataImportService;

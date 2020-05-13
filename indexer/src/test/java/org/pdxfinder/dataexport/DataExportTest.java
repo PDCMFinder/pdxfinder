@@ -1,17 +1,16 @@
 package org.pdxfinder.dataexport;
 
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,27 +21,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class DataExportTest extends BaseTest {
 
-
-    @MockBean
+    @Mock
     private DataImportService dataImportService;
-    @MockBean
-    protected UtilityService utilityService;
+
+    @InjectMocks
+    protected UniversalDataExporter universalDataExporter;
 
     Group providerGroup;
-    UniversalDataExporter universalDataExporter;
 
     @Before
     public void setUp() {
-
         providerGroup = Group.createProviderGroup("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
-
-        universalDataExporter = new UniversalDataExporter(dataImportService, utilityService);
-        //universalDataExporter.init("", providerGroup);
     }
 
     @Test
@@ -159,30 +152,6 @@ public class DataExportTest extends BaseTest {
 
         Assert.assertEquals("s123", samplePlatformDescription.get(0).get(1));
         Assert.assertEquals("xs123", samplePlatformDescription.get(1).get(1));
-
-    }
-
-    @Test
-    public void Given_ModelsWithOmic_When_GetOmicSheetsAreCalled_Then_DataIsInRowOne(){
-
-        when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation()))
-          .thenReturn(getModelListForTest());
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "mutation"))
-          .thenReturn(getModelListForTest().get(0));
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "copy number alteration"))
-          .thenReturn(getModelListForTest().get(0));
-
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initOmicData();
-
-        List<List<String>> mutationData = universalDataExporter.getMutationSheetDataExport();
-        List<List<String>> cnaData = universalDataExporter.getCnaSheetDataExport();
-
-        Assert.assertEquals("m123", mutationData.get(0).get(1));
-        Assert.assertEquals("markersymbol", mutationData.get(0).get(6));
-
-        Assert.assertEquals("m123", cnaData.get(0).get(1));
-        Assert.assertEquals("markersymbol", cnaData.get(0).get(6));
 
     }
 
@@ -329,27 +298,12 @@ public class DataExportTest extends BaseTest {
 
         modelCreationList.add(model);
 
-
-        //setting up mutation data
-        MarkerAssociation ma = new MarkerAssociation();
-        MolecularData md = new MolecularData();
-        md.setAminoAcidChange("aminoacidchange");
-        Marker m = new Marker("markersymbol", "markername");
-        md.setMarker(m.getHgncSymbol());
-        ma.addMolecularData(md);
-        molecularCharacterization.addMarkerAssociation(ma);
-
         //setting up cna data
         MolecularCharacterization molecularCharacterization2 = new MolecularCharacterization();
         molecularCharacterization2.setType("copy number alteration");
         molecularCharacterization2.setPlatform(platform);
-        MarkerAssociation ma2 = new MarkerAssociation();
         MolecularData md2 = new MolecularData();
         md2.setCnaCopyNumberStatus("cnaStatus");
-        Marker m2 = new Marker("markersymbol", "markername");
-        md2.setMarker(m2.getHgncSymbol());
-        ma2.addMolecularData(md2);
-        molecularCharacterization2.addMarkerAssociation(ma2);
         xenoSample.addMolecularCharacterization(molecularCharacterization2);
 
         return modelCreationList;

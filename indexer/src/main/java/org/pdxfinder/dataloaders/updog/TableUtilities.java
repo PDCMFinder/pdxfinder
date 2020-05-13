@@ -29,6 +29,7 @@ public final class TableUtilities {
     }
 
     public static Table readTsv(File file) throws IOException {
+        System.out.println(String.format("DEBUG file %s", file));
         CsvReadOptions.Builder builder = CsvReadOptions
             .builder(file)
             .sample(false)

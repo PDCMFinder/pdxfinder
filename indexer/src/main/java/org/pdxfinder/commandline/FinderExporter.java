@@ -18,19 +18,22 @@ import java.util.List;
 @Component
 public class FinderExporter {
 
+    UniversalDataExporter downDog;
+    private UtilityService utilityService;
+    private DataImportService dataImportService;
+
+    @Autowired
+    FinderExporter(UtilityService utilityService, DataImportService dataImportService, UniversalDataExporter universalDataExporter){
+        this.utilityService = utilityService;
+        this.dataImportService = dataImportService;
+        this.downDog = universalDataExporter;
+    }
+
     @Value("${data-dir}")
     private String defaultDirectory;
     private File rootDir;
     private static final Logger log = LoggerFactory.getLogger(FinderExporter.class);
 
-    private UtilityService utilityService;
-    private DataImportService dataImportService;
-
-    @Autowired
-    FinderExporter(UtilityService utilityService, DataImportService dataImportService){
-        this.utilityService = utilityService;
-        this.dataImportService = dataImportService;
-    }
     public void run(File dataDirectory,String provider,boolean loadAll) throws IOException {
         resolveRootDir(dataDirectory);
         if(loadAll){
