@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +13,7 @@ import java.util.Map;
 @Component
 public class OmicTransformationService {
 
-    private final static Logger log = LoggerFactory.getLogger(OmicTransformationService.class);
+    private static final Logger log = LoggerFactory.getLogger(OmicTransformationService.class);
     private DataImportService dataImportService;
 
     @Autowired
@@ -34,7 +33,7 @@ public class OmicTransformationService {
             if (marker != null && marker.getHgncSymbol() != null && !marker.getHgncSymbol().isEmpty()) {
                 hgncSymbol = marker.getHgncSymbol();
                 geneIdCache.put(ncbiGene, hgncSymbol);
-            } else { log.warn(String.format("No marker found for NCBI gene Id %s Cannot generate Hgnc symbol", ncbiGene)); }
+            } else { log.warn("No marker found for NCBI gene Id {} Cannot generate Hgnc symbol", ncbiGene); }
         }
         return hgncSymbol;
     }

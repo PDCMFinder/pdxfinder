@@ -10,7 +10,6 @@ import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -545,6 +544,8 @@ public class UniversalDataExporter {
                         rowData.add(md.getGenomeAssembly());
                         rowData.add(mc.getPlatform().getName());
                         break;
+                    default:
+                        throw new IllegalArgumentException("Inappropriate Molecular data type passed");
                 }
                 sheetData.add(rowData);
             }
@@ -585,7 +586,7 @@ public class UniversalDataExporter {
 
         try(FileWriter fileWriter = new FileWriter(omicTsvDir)) {
             if (exportSheet != null) {
-                copyHeadersFromSheetToTsv(xlsxTemplate, exportSheet, fileWriter);
+                copyHeadersFromSheetToTsv(xlsxTemplate,fileWriter);
                 writeDataToTsv(xlsxTemplate, exportSheet, fileWriter);
             }
         } catch(Exception e) {
@@ -594,7 +595,7 @@ public class UniversalDataExporter {
     }
 
 
-    private void copyHeadersFromSheetToTsv(Sheet xlsxTemplate, List<List<String>> exportSheet, FileWriter fileWriter) throws IOException {
+    private void copyHeadersFromSheetToTsv(Sheet xlsxTemplate, FileWriter fileWriter) throws IOException {
 
         for (int j = 0; j < xlsxTemplate.getRow(0).getLastCellNum(); j++) {
             Cell cell;
@@ -916,7 +917,7 @@ public class UniversalDataExporter {
                     }
                 }
             }
-        } else System.out.printf(String.format("No specimen found for model %s \n", model.getId()));
+        } else log.debug("No specimen found for model {} %n", model.getId());
     }
 
 

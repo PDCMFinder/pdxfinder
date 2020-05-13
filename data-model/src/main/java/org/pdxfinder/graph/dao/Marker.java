@@ -25,7 +25,7 @@ public class Marker {
 
     String ensemblGeneId;
     String ncbiGeneId;
-    String uniprotId;               // e.g For human KRAS : P01116
+    String uniprotId;// e.g For human KRAS : P01116
 
     @Index
     Set<String> prevSymbols;

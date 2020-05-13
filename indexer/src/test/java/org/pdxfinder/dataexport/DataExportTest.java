@@ -9,8 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
+import org.pdxfinder.services.DataImportService;;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

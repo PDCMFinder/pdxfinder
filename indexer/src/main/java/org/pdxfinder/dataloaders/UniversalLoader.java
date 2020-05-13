@@ -1045,7 +1045,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 // Transcriptomics
                 if(transcriptomicData.exists()){
-                    log.info("Loading transcriptomics for "+modelId);
+                    log.info("Loading transcriptomics for {}", modelId);
                     loadOmicData(modelCreation, ds, "transcriptomics", providerDataRootDir);
                 }
 

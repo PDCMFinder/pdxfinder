@@ -39,7 +39,7 @@ public class LoadMarkers {
         String symbol;
         String hgncId;
         String ensemblId;
-        String[] entrezId;
+        String ncbiId;
 
 
         int rows = 0;
@@ -86,9 +86,9 @@ public class LoadMarkers {
                     }
 
                     if (rowData.length > 7 && rowData[7] != null && !rowData[7].isEmpty()) {
-                        entrezId= rowData[7].split(", ");
+                        ncbiId= rowData[7];
                     } else {
-                        entrezId = new String[0];
+                        ncbiId = "";
                     }
 
                     if (rowData.length > 9 && rowData[9] != null && !rowData[9].isEmpty()) {
@@ -99,33 +99,30 @@ public class LoadMarkers {
 
                     //put it in the hashmap with all of its prev symbols
 
-                    if (!symbol.isEmpty()) {
+                    Marker m = new Marker();
+                    m.setHgncSymbol(symbol);
 
-                        Marker m = new Marker();
-                        m.setHgncSymbol(symbol);
-
-                        if (!ensemblId.isEmpty()) {
-                            m.setEnsemblGeneId(ensemblId);
-                        }
-                        if (!hgncId.isEmpty()) {
-                            m.setHgncId(hgncId);
-                        }
-
-                        if (synonyms.length > 0) {
-
-                            m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
-                        }
-
-                        if (prevSymbols.length > 0) {
-
-                            m.setPrevSymbols(new HashSet<>(Arrays.asList(prevSymbols)));
-                        }
-
-                        dataImportService.saveMarker(m);
-
-                    } else {
-                        log.error("Empty symbol found in row {} ", rows);
+                    if (!ensemblId.isEmpty()) {
+                        m.setEnsemblGeneId(ensemblId);
                     }
+                    if (!hgncId.isEmpty()) {
+                        m.setHgncId(hgncId);
+                    }
+
+                    if (!ncbiId.isEmpty())
+                        m.setNcbiGeneId(ncbiId);
+
+                    if (synonyms.length > 0) {
+
+                        m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
+                    }
+
+                    if (prevSymbols.length > 0) {
+
+                        m.setPrevSymbols(new HashSet<>(Arrays.asList(prevSymbols)));
+                    }
+
+                    dataImportService.saveMarker(m);
 
                     if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
 

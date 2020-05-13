@@ -3,13 +3,10 @@ package org.pdxfinder.utils;
 
 import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.graph.dao.Group;
-import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -40,6 +37,7 @@ public class CbpTransformer {
     private static String notSpecified = "Not Specified";
     private static String patientId = "patientId";
     private static String sampleId = "sampleId";
+    private static String entrezGeneId = "EntrezGeneId";
 
     public enum cbioType {
         MUT,
@@ -62,9 +60,9 @@ public class CbpTransformer {
     }
 
     public void convertListOfEntrez(List<String> entrezIds){
-        entrezIds.forEach(e -> {
-            log.info(omicTransformationService.ncbiGeneIdtoHgncSymbol(e));
-        });
+        entrezIds.forEach(e ->
+            log.info(omicTransformationService.ncbiGeneIdtoHgncSymbol(e))
+        );
     }
 
     private void cbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, cbioType dataType){
