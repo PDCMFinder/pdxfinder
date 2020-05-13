@@ -1,9 +1,4 @@
 /**
- * Created by csaba on 12/05/2017.
- */
-
-
-/**
  * Checks the filters and collects the parameters that are selected, t
  * hen constructs the url and redirects the user to that url
  */
@@ -48,38 +43,38 @@ function redirectPage(webFacetSections) {
     var twoParamUnlinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
     twoParamUnlinkedFilters.forEach(function (filterComponent) {
 
-            options2List = filterComponent.options2;
-            componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
-            componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
-            urlKey = filterComponent.urlParam;
+        options2List = filterComponent.options2;
+        componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+        componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
+        urlKey = filterComponent.urlParam;
 
-            for (var i = 0; i < 19; i++) {
+        for (var i = 0; i < 19; i++) {
 
-                var component1Choice = jQuery("#" + componentId1 + i);
-                var component2Choices = jQuery("#" + componentId2 + i);
+            var component1Choice = jQuery("#" + componentId1 + i);
+            var component2Choices = jQuery("#" + componentId2 + i);
 
-                if (component1Choice.val() != null && component1Choice.val() != "NULL") {
+            if (component1Choice.val() != null && component1Choice.val() != "NULL") {
 
-                    for (var j = 0; j < component2Choices.val().length; j++) {
+                for (var j = 0; j < component2Choices.val().length; j++) {
 
-                        if (!no_parameters) {
-                            url = url + "&";
-                        }
+                    if (!no_parameters) {
+                        url = url + "&";
+                    }
 
-                        if (options2List.length == component2Choices.val().length) {
+                    if (options2List.length == component2Choices.val().length) {
 
-                            url += urlKey + "=" + component1Choice.val() + "___ALL";
-                            no_parameters = false;
-                            break;
-                        } else {
-                            url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j].replace(/^\s+|\s+$/g, '');
-                            no_parameters = false;
+                        url += urlKey + "=" + component1Choice.val() + "___ALL";
+                        no_parameters = false;
+                        break;
+                    } else {
+                        url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j].replace(/^\s+|\s+$/g, '');
+                        no_parameters = false;
 
-                        }
                     }
                 }
-
             }
+
+        }
     });
 
 
@@ -147,7 +142,7 @@ function redirectPage(webFacetSections) {
 
 
                 if (!no_parameters) {
-                        url = url + "&";
+                    url = url + "&";
                 }
 
 
@@ -479,14 +474,14 @@ function getMolecularDataTable(clickedLink, clickedData){
 
     var url = "/data/getmoleculardata/"+id;
 
-    var $targetDiv = jQuery('#variationTableData');
-    $targetDiv.empty();
+    var targetDiv = jQuery('#variationTableData');
+    targetDiv.empty();
 
     $('#preLoader').show();
 
     fetch(url)
         .then(response => response.json())
-        .then(json => displayMolecularDataTable(json, titlecomp))
+        .then(jsonData => displayMolecularDataTable(jsonData, titlecomp))
         .catch(error => console.log(error))
 
 }
@@ -495,51 +490,49 @@ function getMolecularDataTable(clickedLink, clickedData){
 
 function displayMolecularDataTable(tableData, clickedData){
 
-    console.log("Headers length:"+tableData["tableHeaders"].length);
+    let fullData = tableData.molecularDataRows;
+    var dataVisibility = tableData.visible;
 
-    var $targetDiv = jQuery('#variationTableData');
+    var targetDiv = jQuery('#variationTableData');
+    var table = jQuery('<table id="molcharDataTable" class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs"/>');
+    var thead = jQuery('<thead/>');
+    var theadRow = jQuery('<tr>');
+    var tbody = jQuery('<tbody />');
 
-    var $table = jQuery('<table id="molcharDataTable" class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs"/>');
-    var $thead = jQuery('<thead/>');
-    var $theadRow = jQuery('<tr>');
-    var $tbody = jQuery('<tbody />');
+    if (dataVisibility === true){
 
-    //add headers to table
-    for(var i=0; i<tableData["tableHeaders"].length;i++){
+        let oneData = fullData[0];
+        let tableHeaders = Object.keys(oneData);
 
-        var $th = jQuery('<th>'+tableData["tableHeaders"][i]+'</th>');
-        $theadRow.append($th);
-    }
+        //add headers to table
+        for(var i=0; i<tableHeaders.length;i++){
+            var $th = jQuery(`<th> ${tableHeaders[i]} </th>`);
+            theadRow.append($th);
+        }
 
-    
-    //add datarows to table
-    var rowCount = tableData["tableRows"].length;
-    var tableHeaderDataSize = tableData["tableHeaders"].length;
-    var dataVisibility = tableData["visible"];
-
-    for(var j=0; j<rowCount; j++){
-
-        if (tableHeaderDataSize == 1){
-            $tr = jQuery('<tr class="tabs-title" style="float:none; font-weight: bold; font-size: 37px; color: #06369d;">/');
-        }else {
+        //add datarows to table
+        var rowCount = fullData.length;
+        var tableHeaderDataSize = tableHeaders.length;
+        for(var j=0; j<rowCount; j++){
             $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
-        }
 
-        for(var k=0; k<tableData["tableRows"][j].length; k++){
-            console.log("Rows "+tableData["tableRows"][j].length);
-            $tr.append("<td>"+tableData["tableRows"][j][k]+"</td>");
+            tableHeaders.forEach((tableHeader, count) => {
+                console.log(`Rows ${fullData[j].length}`);
+                $tr.append(`<td> ${fullData[j][tableHeader]} </td>`);
+            });
+            tbody.append($tr);
         }
-        
-        $tbody.append($tr);
+        thead.append(theadRow);
+        table.append(thead);
+        table.append(tbody);
+        targetDiv.append(table);
+        customizeDatatable('molcharDataTable', clickedData[4]);
+    }else {
+
+        let report = `<b style="margin-top: 15px; font-size: 13px; color: #06369d;"> ${tableData.reports[0]} </b> `
+        targetDiv.append(report);
+        $('#download-data').hide();
     }
-    $thead.append($theadRow);
-    $table.append($thead);
-    $table.append($tbody);
-    $targetDiv.append($table);
-
-
-    customizeDatatable('molcharDataTable', clickedData[4]);
-
 
     $("#omicDataCount").html(rowCount);
     $("#clickedSampleId").html(clickedData[0]);
@@ -547,16 +540,8 @@ function displayMolecularDataTable(tableData, clickedData){
     $("#clickedTumorType").html(clickedData[2]);
     $("#clickedPassage").html(clickedData[3]);
     $("#clickedTech").html(clickedData[4]);
-
     $('#hrTitle').attr('data-content', clickedData[4]);
-
     $('#preLoader').hide();
-
-    if (dataVisibility == false) {
-        $('#download-data').hide();
-    }
-
-
 }
 
 

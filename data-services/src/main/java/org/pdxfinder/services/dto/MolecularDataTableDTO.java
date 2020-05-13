@@ -1,48 +1,46 @@
 package org.pdxfinder.services.dto;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import java.util.List;
 
-/*
- * Created by csaba on 13/03/2019.
- */
+
+@JsonPropertyOrder({
+        "molecularDataRows",
+        "visible",
+        "reports",
+})
 public class MolecularDataTableDTO {
 
-
-    private List<String> tableHeaders;
-
-    private List<List<String>> tableRows;
-
-    private boolean isVisible;
+    private List<MolecularDataRowDTO> molecularDataRows;
+    private boolean visible;
+    private List<String> reports;
 
     public MolecularDataTableDTO() {
-        tableHeaders = new ArrayList<>();
-        tableRows = new ArrayList<>();
-        isVisible = true;
+        visible = true;
     }
 
-
-    public List<String> getTableHeaders() {
-        return tableHeaders;
+    public List<MolecularDataRowDTO> getMolecularDataRows() {
+        return molecularDataRows;
     }
 
-    public void setTableHeaders(List<String> tableHeaders) {
-        this.tableHeaders = tableHeaders;
+    public void setMolecularDataRows(List<MolecularDataRowDTO> molecularDataRows) {
+        this.molecularDataRows = molecularDataRows;
     }
 
-    public List<List<String>> getTableRows() {
-        return tableRows;
-    }
-
-    public void setTableRows(List<List<String>> tableRows) {
-        this.tableRows = tableRows;
-    }
-
-    public boolean isVisible() {
-        return isVisible;
+    public boolean getVisible() {
+        return visible;
     }
 
     public void setVisible(boolean visible) {
-        isVisible = visible;
+        this.visible = visible;
+    }
+
+    public List<String> getReports() {
+        return reports;
+    }
+
+    public void setReports(List<String> reports) {
+        this.reports = reports;
     }
 }

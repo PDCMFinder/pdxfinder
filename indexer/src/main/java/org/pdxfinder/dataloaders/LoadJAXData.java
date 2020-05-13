@@ -220,6 +220,13 @@ public class LoadJAXData extends LoaderBase {
         specimen.setEngraftmentSite(engraftmentSite);
         specimen.setEngraftmentType(engraftmentType);
 
+        if(specimen.getSample() == null){
+            Sample xenoSample = new Sample();
+            xenoSample.setSourceSampleId(dto.getModelID());
+            specimen.setSample(xenoSample);
+            dto.getModelCreation().addRelatedSample(xenoSample);
+        }
+
         dto.getModelCreation().addSpecimen(specimen);
         dataImportService.saveSpecimen(specimen);
 

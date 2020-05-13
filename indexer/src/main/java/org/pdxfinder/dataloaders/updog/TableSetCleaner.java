@@ -26,6 +26,9 @@ public class TableSetCleaner {
     }
 
     public Map<String, Table> cleanTreatmentTables(Map<String, Table> treatmentTableSet) {
-        return TableSetUtilities.removeHeaderRowsIfPresent(treatmentTableSet);
+        treatmentTableSet = TableSetUtilities.removeProviderNameFromFilename(treatmentTableSet);
+        treatmentTableSet = TableSetUtilities.removeHeaderRowsIfPresent(treatmentTableSet);
+        TableSetUtilities.removeDescriptionColumn(treatmentTableSet);
+        return treatmentTableSet;
     }
 }

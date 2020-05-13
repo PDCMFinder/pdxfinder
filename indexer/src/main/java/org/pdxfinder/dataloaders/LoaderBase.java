@@ -230,7 +230,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 step11LoadBreastMarkers();
             }
             catch (Exception e){
-                log.error("Exception occured in loaderbase: {}",e);
+                log.error("Exception occurred in loaderbase", e);
             }
 
         }
@@ -307,10 +307,15 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), providerDS.getAbbreviation(), passage);
                 specimen.setHostStrain(bs);
 
-                if (ds.equals("wustl")){
+                if(specimen.getSample() == null){
                     Sample mouseSample = new Sample();
+                    mouseSample.setSourceSampleId(dto.getModelID());
                     specimen.setSample(mouseSample);
                     dto.getModelCreation().addRelatedSample(mouseSample);
+                }
+
+                if (ds.equals("wustl")){
+
 
                     if (dto.getImplantationSiteStr().contains(";")) {
                         String[] parts = dto.getImplantationSiteStr().split(";");
@@ -324,14 +329,8 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 EngraftmentType it = dataImportService.getImplantationType(dto.getImplantationtypeStr());
                 specimen.setEngraftmentType(it);
 
-                if (ds.equals("wustl")){
-                    dto.getModelCreation().addSpecimen(specimen);
-                }
 
-                if (ds.equals("mdAnderson")) {
-                    specimen.setSample(dto.getPatientSample());
-                    dataImportService.saveSpecimen(specimen);
-                }
+                dto.getModelCreation().addSpecimen(specimen);
 
             }
             dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl

@@ -13,9 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 
 
-/**
- * Created by abayomi on 25/07/2019.
- */
 @Repository
 public interface MappingEntityRepository extends JpaRepository<MappingEntity, Long> {
 

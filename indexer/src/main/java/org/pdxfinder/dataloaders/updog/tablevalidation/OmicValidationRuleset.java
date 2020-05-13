@@ -1,19 +1,15 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.tablevalidation;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.pdxfinder.dataloaders.updog.TableSetUtilities;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class OmicValidationRuleset extends ValidationRuleCreator {
 
-
-    OmicValidationRuleset() { }
-
-    private Set<Pair<String, String>> createColumns(String tableName) {
-        Set<Pair<String, String>> tableColumns = new HashSet<>();
+    private static Set<ColumnReference> createColumns(String tableName) {
+        Set<ColumnReference> columnReferences = new HashSet<>();
         if (tableName.contains("cna")) {
             Arrays.asList(
                 "model_id",
@@ -35,7 +31,7 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
                 "gistic_value",
                 "picnic_value",
                 "genome_assembly"
-            ).forEach(s -> tableColumns.add(Pair.of(tableName, s)));
+            ).forEach(s -> columnReferences.add(ColumnReference.of(tableName, s)));
         }
         if (tableName.contains("mut")) {
             Arrays.asList(
@@ -66,7 +62,7 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
                 "variation_id",
                 "genome_assembly",
                 "platform"
-            ).forEach(s -> tableColumns.add(Pair.of(tableName, s)));
+            ).forEach(s -> columnReferences.add(ColumnReference.of(tableName, s)));
         }
         if (tableName.contains("cyto")) {
             Arrays.asList(
@@ -75,15 +71,44 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
                 "passage",
                 "host_strain_nomenclature",
                 "model_id",
-                "marker_name",
+                "symbol",
                 "marker_status",
                 "essential_or_additional_marker",
                 "platform",
                 "protocol_file_name",
                 "result_file_name"
-            ).forEach(s -> tableColumns.add(Pair.of(tableName, s)));
+            ).forEach(s -> columnReferences.add(ColumnReference.of(tableName, s)));
         }
-        return tableColumns;
+        if (tableName.contains("expression")) {
+            Arrays.asList(
+                "sample_id",
+                "sample_origin",
+                "passage",
+                "host_strain_nomenclature",
+                "model_id",
+                "chromosome",
+                "strand",
+                "seq_start_position",
+                "seq_end_position",
+                "symbol",
+                "ucsc_gene_id",
+                "ncbi_gene_id",
+                "ensembl_gene_id",
+                "ensembl_transcript_id",
+                "rnaseq_coverage",
+                "rnaseq_fpkm",
+                "rnaseq_tpm",
+                "rnaseq_count",
+                "affy_hgea_probe_id",
+                "affy_hgea_expression_value",
+                "illumina_hgea_probe_id",
+                "illumina_hgea_expression_value",
+                "z_score",
+                "genome_assembly",
+                "platform"
+            ).forEach(s -> columnReferences.add(ColumnReference.of(tableName, s)));
+        }
+        return columnReferences;
     }
 
     @Override
@@ -91,19 +116,19 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
         return TableSetSpecification.create();
     }
 
-    public TableSetSpecification generateForOmicTable(String tableName, String provider) {
-        Set<Pair<String, String>> tableColumns = createColumns(tableName);
+     public static TableSetSpecification generateFor(String tableName, String provider) {
+        Set<ColumnReference> tableColumns = createColumns(tableName);
 
-        Set<Pair<String, String>> modelColumns = matchingColumnsFromAnyTable(tableColumns, "model_id");
-        Set<Pair<String, String>> sampleColumns = matchingColumnsFromAnyTable(tableColumns, "sample_");
-        Set<Pair<String, String>> hostStrainColumns = matchingColumnsFromAnyTable(tableColumns, "host_strain");
-        Set<Pair<String, String>> passageColumns = matchingColumnsFromAnyTable(tableColumns, "passage");
-        Set<Pair<String, String>> symbolColumns = matchingColumnsFromAnyTable(tableColumns, "symbol");
+        Set<ColumnReference> modelColumns = matchingColumnsFromAnyTable(tableColumns, "model_id");
+        Set<ColumnReference> sampleColumns = matchingColumnsFromAnyTable(tableColumns, "sample_");
+        Set<ColumnReference> hostStrainColumns = matchingColumnsFromAnyTable(tableColumns, "host_strain");
+        Set<ColumnReference> passageColumns = matchingColumnsFromAnyTable(tableColumns, "passage");
+        Set<ColumnReference> symbolColumns = matchingColumnsFromAnyTable(tableColumns, "symbol");
 
-        Set<Pair<String, String>> essentialCytogeneticsColumns = matchingColumnsFromTable(tableColumns, "cyto",
+        Set<ColumnReference> essentialCytogeneticsColumns = matchingColumnsFromTable(tableColumns, "cyto",
             new String[]{"marker_", "essential_or_additional_marker", "platform"});
 
-        Set<Pair<String, String>> essentialColumns = TableSetUtilities.concatenate(
+        Set<ColumnReference> essentialColumns = TableSetUtilities.concatenate(
             modelColumns,
             sampleColumns,
             hostStrainColumns,
@@ -112,9 +137,14 @@ public class OmicValidationRuleset extends ValidationRuleCreator {
             essentialCytogeneticsColumns
         );
 
+        Relation relations = Relation.between(
+            ColumnReference.of("metadata-model.tsv", "model_id"),
+            ColumnReference.of(tableName, "model_id"));
+
         return TableSetSpecification.create()
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
+            .addRelations(relations)
             .setProvider(provider);
     }
 
