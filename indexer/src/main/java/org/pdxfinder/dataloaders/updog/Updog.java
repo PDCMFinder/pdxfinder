@@ -67,7 +67,7 @@ public class Updog {
         reportAnyErrors(validationErrors);
 
         if (!validateOnly) {
-            createPdxObjects(combinedTableSet);
+            domainObjectCreator.loadDomainObjects(combinedTableSet, updogProviderDirectory);
         }
     }
 
@@ -115,10 +115,6 @@ public class Updog {
         );
         combinedValidationRuleset.setProvider(provider);
         return validator.validate(tableSet, combinedValidationRuleset);
-    }
-
-    private void createPdxObjects(Map<String, Table> tableSet){
-        domainObjectCreator.loadDomainObjects(tableSet);
     }
 
     static TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
