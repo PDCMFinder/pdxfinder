@@ -150,6 +150,10 @@ public class CreateDataProjections implements ApplicationContextAware{
 
             ModelCreation model = dataImportService.findModelByMolChar(mc);
 
+            if(model == null){
+                log.error("Molchar {} with type {} is not linked to a sample! ",mc.getId(), mc.getType());
+                continue;
+            }
             Long modelId = model.getId();
 
             String platformName = "Not Specified";
@@ -361,6 +365,10 @@ public class CreateDataProjections implements ApplicationContextAware{
         for(MolecularCharacterization mc:cnaMolchars) {
 
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
+            if(model == null){
+                log.error("Molchar {} with type {} is not linked to a sample! ",mc.getId(), mc.getType());
+                continue;
+            }
             Long modelId = model.getId();
 
             Set<String> mas = mc.getMarkers();
