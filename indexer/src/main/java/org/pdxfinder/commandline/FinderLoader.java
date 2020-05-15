@@ -234,8 +234,6 @@ public class FinderLoader {
 
         log.info("Running Post load Steps ...");
 
-        if (providers.contains(DataProvider.CRL))
-            loadAdditionalDatasets.run();
 
         if (CollectionUtils.isNotEmpty(providers) || postLoadRequested) {
             linkSamplesToNCITTerms.run();
