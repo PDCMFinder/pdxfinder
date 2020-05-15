@@ -20,6 +20,10 @@ public interface SpecimenRepository extends Neo4jRepository<Specimen, Long> {
 
     Specimen findByExternalId(@Param("externalId") String externalId);
 
+    @Query("MATCH (sp:Specimen) WHERE sp.externalId = {externalId} " +
+            "OPTIONAL MATCH (sp)-[sfrm:SAMPLED_FROM]-(msamp:Sample)-[cb:CHARACTERIZED_BY]-(mc:MolecularCharacterization) " +
+            "RETURN sp, sfrm, msamp, cb, mc")
+    Specimen findByExternalIdWithMolecularCharacterizations(@Param("externalId") String externalId);
 
     @Query("MATCH (mod:ModelCreation)--(spec:Specimen) " +
             "WHERE mod.dataSource = {dataSource} " +
