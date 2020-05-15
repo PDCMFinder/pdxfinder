@@ -47,7 +47,7 @@ public class UpdogTest {
         when(this.tableSetCleaner.cleanPdxTables(any())).thenReturn(EMPTY_TABLESET);
         when(this.tableSetCleaner.cleanOmicsTables(any())).thenReturn(EMPTY_TABLESET);
         when(this.validator.validate(any(), any())).thenReturn(EMPTY_ERROR_LIST);
-        doNothing().when(this.domainObjectCreator).loadDomainObjects(any());
+        doNothing().when(this.domainObjectCreator).loadDomainObjects(any(), any());
     }
 
     @Test public void run_whenCalled_readInAllPdxFiles() {
@@ -72,7 +72,7 @@ public class UpdogTest {
 
     @Test public void run_whenCalled_objectsCreated() {
         updog.run(Paths.get("provider/dir"), "Provider", false);
-        verify(this.domainObjectCreator).loadDomainObjects(any());
+        verify(this.domainObjectCreator).loadDomainObjects(any(), any());
         verifyNoMoreInteractions(this.domainObjectCreator);
     }
 

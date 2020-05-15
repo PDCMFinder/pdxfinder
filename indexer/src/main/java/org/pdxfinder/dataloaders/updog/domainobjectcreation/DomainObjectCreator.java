@@ -3,6 +3,7 @@ package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.dataloaders.updog.Reader;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,6 +24,7 @@ public class DomainObjectCreator {
     private GroupCreator groupCreator;
     private PatientCreator patientCreator;
     private ModelCreationCreator modelCreationCreator;
+    private Reader reader;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     Map<String, Table> pdxDataTables;
@@ -43,16 +46,18 @@ public class DomainObjectCreator {
         DataImportService dataImportService,
         GroupCreator groupCreator,
         PatientCreator patientCreator,
-        ModelCreationCreator modelCreationCreator
+        ModelCreationCreator modelCreationCreator,
+        Reader reader
     ) {
         this.dataImportService = dataImportService;
         this.groupCreator = groupCreator;
         this.patientCreator = patientCreator;
         this.modelCreationCreator = modelCreationCreator;
+        this.reader = reader;
         domainObjects = new HashMap<>();
     }
 
-    public void loadDomainObjects(Map<String, Table> pdxDataTables) {
+    public void loadDomainObjects(Map<String, Table> pdxDataTables, Path targetDirectory) {
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
 
         this.pdxDataTables = pdxDataTables;
@@ -66,15 +71,13 @@ public class DomainObjectCreator {
         createTreatmentData(pdxDataTables);
         createDrugDosingData(pdxDataTables);
 
-        /*
         //read one omic file, add molchar data to domain object
-        List<Path> omicFiles = reader.getOmicFilePaths();
-        for(Path p: omicFiles) {
-            Table omicTable = reader.readOneOmic(p);
-            String dataType = reader.getDataType(p);
+        List<Path> omicFiles = reader.getOmicFilePaths(targetDirectory);
+        for(Path omicFile: omicFiles) {
+            Table omicTable = reader.readOmicTable(omicFile);
+            String dataType = reader.getOmicDataType(omicFile);
             createMolecularData(omicTable, dataType);
         }
-        */
 
 
 
