@@ -820,8 +820,8 @@ public class DataImportService {
         patientSnapshotRepository.save(ps);
     }
 
-    public void saveMolecularCharacterization(MolecularCharacterization mc) {
-        molecularCharacterizationRepository.save(mc);
+    public MolecularCharacterization saveMolecularCharacterization(MolecularCharacterization mc) {
+        return molecularCharacterizationRepository.save(mc);
     }
 
     public void saveQualityAssurance(QualityAssurance qa) {
