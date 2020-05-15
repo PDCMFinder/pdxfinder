@@ -87,13 +87,13 @@ public class Reader {
     }
 
     public String getOmicDataType(Path path) {
-        if (path.toString().contains("cyto")) {
+        if (path.toString().contains("/cyto/")) {
             return "cytogenetics";
-        } else if (path.toString().contains("mut")) {
+        } else if (path.toString().contains("/mut/")) {
             return "mutation";
-        } else if (path.toString().contains("cna")) {
+        } else if (path.toString().contains("/cna/")) {
             return "copy number alteration";
-        } else if (path.toString().contains("expression")) {
+        } else if (path.toString().contains("/expression/")) {
             return "expression";
         } else {
             throw new IllegalArgumentException("No recognised omic data type in file path {}");
