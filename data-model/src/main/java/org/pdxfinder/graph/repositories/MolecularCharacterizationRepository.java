@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface to the molecular characterization experiments done
@@ -68,5 +69,8 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "WHERE ID(mc) = {id} " +
             "RETURN sum(mAss.dataPoints) ")
     int findAssociationsNumberById(@Param("id") MolecularCharacterization mc);
+
+    @Query("MATCH (mc:MolecularCharacterization) WHERE id(mc) IN {ids} RETURN mc")
+    Set<MolecularCharacterization> findByIds(@Param("ids")Set<Long> ids);
 
 }

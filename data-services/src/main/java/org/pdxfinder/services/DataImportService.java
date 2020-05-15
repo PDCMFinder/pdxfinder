@@ -645,6 +645,11 @@ public class DataImportService {
         return molecularCharacterizationRepository.findAllByDataSource(dataSource);
     }
 
+    public Set<MolecularCharacterization> getMolcharsById(Set<Long> ids){
+
+        return molecularCharacterizationRepository.findByIds(ids);
+    }
+
     public Sample getHumanSample(String sampleId, String dataSource){
 
 
