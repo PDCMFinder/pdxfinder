@@ -55,11 +55,6 @@ public class UpdogTest {
         verify(this.reader).readAllTsvFilesIn(any(), any());
     }
 
-    @Test public void run_whenCalled_readInAllOmicsFiles() {
-        updog.run(Paths.get("provider/dir"), "Provider", false);
-        verify(this.reader).readAllOmicsFilesIn(any(), any());
-    }
-
     @Test public void run_whenCalled_readInAllTreatmentFiles() {
         updog.run(Paths.get("provider/dir"), "Provider", false);
         verify(this.reader).readAllTreatmentFilesIn(any(), any());

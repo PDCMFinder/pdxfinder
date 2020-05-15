@@ -1,6 +1,7 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
 import org.pdxfinder.dataloaders.updog.TSV;
+import org.pdxfinder.dataloaders.updog.TableSetCleaner;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.dataloaders.updog.Reader;
@@ -20,11 +21,13 @@ import java.util.stream.Collectors;
 public class DomainObjectCreator {
 
     private Map<String, Map<String, Object>> domainObjects;
+    private Map<String, Set<Long>> sampleMolcharMap;
     private DataImportService dataImportService;
     private GroupCreator groupCreator;
     private PatientCreator patientCreator;
     private ModelCreationCreator modelCreationCreator;
     private Reader reader;
+    private TableSetCleaner tableSetCleaner;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     Map<String, Table> pdxDataTables;
@@ -47,14 +50,17 @@ public class DomainObjectCreator {
         GroupCreator groupCreator,
         PatientCreator patientCreator,
         ModelCreationCreator modelCreationCreator,
-        Reader reader
+        Reader reader,
+        TableSetCleaner tableSetCleaner
     ) {
         this.dataImportService = dataImportService;
         this.groupCreator = groupCreator;
         this.patientCreator = patientCreator;
         this.modelCreationCreator = modelCreationCreator;
         this.reader = reader;
+        this.tableSetCleaner = tableSetCleaner;
         domainObjects = new HashMap<>();
+        sampleMolcharMap = new HashMap<>();
     }
 
     public void loadDomainObjects(Map<String, Table> pdxDataTables, Path targetDirectory) {
@@ -75,49 +81,18 @@ public class DomainObjectCreator {
         List<Path> omicFiles = reader.getOmicFilePaths(targetDirectory);
         for(Path omicFile: omicFiles) {
             Table omicTable = reader.readOmicTable(omicFile);
+            omicTable = tableSetCleaner.cleanOmicsTable(omicTable);
             String dataType = reader.getOmicDataType(omicFile);
             createMolecularData(omicTable, dataType);
+            persistMolecularData();
         }
 
-
-
-        /*
-        //Persist data per patient, remove domain objects afterwards
-        Map<String, Set<String>> patientToModelsMap = getPatientsToModels(pdxDataTables.get("metadata-sample.tsv"));
-        Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
-
-        for(Map.Entry<String, Set<String>> entry:patientToModelsMap.entrySet()){
-            String patientId = entry.getKey();
-            for(String modelId:entry.getValue()){
-                Map<String, Table> omicDataTables = getOmicForModel(providerGroup.getAbbreviation(), modelId);
-                createOmicData(omicDataTables);
-                persistModel(modelId);
-            }
-            persistPatient(patientId);
-        }
-
-        */
-        createOmicData(pdxDataTables);
         persistNodes();
+        sampleMolcharMap.entrySet().forEach(entry->{
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+        });
     }
 
-    public Map<String, Set<String>> getPatientsToModels(Table sampleTable){
-        Map<String, Set<String>> patientToModelsMap = new HashMap<>();
-        for (Row row : sampleTable) {
-            String patientId = row.getString(TSV.Metadata.patient_id.name());
-            String modelId = row.getString(TSV.Metadata.model_id.name());
-
-            if(patientToModelsMap.containsKey(patientId)){
-                patientToModelsMap.get(patientId).add(modelId);
-            }
-            else{
-                Set<String> models = new HashSet<>();
-                models.add(modelId);
-                patientToModelsMap.put(patientId, models);
-            }
-        }
-        return patientToModelsMap;
-    }
 
     public void callCreators(Map<String, Table> tableSet) {
         Group provider = patientCreator.createDependencies(tableSet);
@@ -835,58 +810,55 @@ public class DomainObjectCreator {
         return primarySite;
     }
 
-    private void persistNodes(String patientId, String modelId){
-
-        persistPatient(patientId);
-        persistModel(modelId);
-    }
-
-    private void persistPatient(String patientId){
-
-        try {
-            Iterator<Map.Entry<String, Object>> iter = domainObjects.get(PATIENTS).entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<String, Object> entry = iter.next();
-                Patient patient = (Patient) entry.getValue();
-
-                if(patient.getExternalId().equals(patientId)){
-                    for (PatientSnapshot ps : patient.getSnapshots()) {
-                        for (Sample patientSample : ps.getSamples())
-                            encodeMolecularDataFor(patientSample);
-                    }
-                    dataImportService.savePatient(patient);
-                    iter.remove();
-                }
-            }
-        }
-        catch(Exception e){
-            log.error("Exception when saving patient {}",patientId);
-        }
-
-    }
-
-    private void persistModel(String modelId){
+    private void persistMolecularData(){
 
         Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String,Object> entry = iter.next();
             ModelCreation model = (ModelCreation) entry.getValue();
+            //persist molchar data for patient sample
+            Sample patientSample = model.getSample();
+            String patientSampleKey = model.getSourcePdxId()+ "__patient";
+            encodeMolecularDataFor(patientSample, patientSampleKey);
 
-            if(model.getSourcePdxId().equals(modelId)){
-                if (model.hasSpecimens())
-                    for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
-
-                log.debug("Saving model {}", (model.getSourcePdxId()));
-                dataImportService.saveModelCreation(model);
-                iter.remove();
-            }
+            //persist molchar data for xenograft sample(s)
+            if (model.hasSpecimens())
+                for (Specimen s : model.getSpecimens()) {
+                    String passage = s.getPassage();
+                    String hostStrain = s.getHostStrain().getSymbol();
+                    String xenoSampleKey = model.getSourcePdxId()+"__xenograft__"+passage+"__"+hostStrain;
+                    encodeMolecularDataFor(s.getSample(), xenoSampleKey);
+                }
         }
     }
 
-    //these methods will become obsolete once batch load is enabled
+
+
     private void persistNodes() {
+
+        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Object> entry = iter.next();
+            ModelCreation model = (ModelCreation) entry.getValue();
+            //persist molchar data for patient sample
+            Sample patientSample = model.getSample();
+            String patientSampleKey = model.getSourcePdxId()+ "__patient";
+            linkMolcharDataToSample(patientSample, patientSampleKey);
+
+            //persist molchar data for xenograft sample(s)
+            if (model.hasSpecimens())
+                for (Specimen s : model.getSpecimens()) {
+                    String passage = s.getPassage();
+                    String hostStrain = s.getHostStrain().getSymbol();
+                    String xenoSampleKey = model.getSourcePdxId()+"__xenograft__"+passage+"__"+hostStrain;
+                    linkMolcharDataToSample(s.getSample(), xenoSampleKey);
+                }
+            dataImportService.saveModelCreation(model);
+        }
+
         persistPatients();
-        persistModels();
+
+
     }
 
     public void persistPatients(){
@@ -899,10 +871,6 @@ public class DomainObjectCreator {
                 Map.Entry<String, Object> entry = iter.next();
                 Patient patient = (Patient) entry.getValue();
                 patientId = patient.getExternalId();
-                for (PatientSnapshot ps : patient.getSnapshots()) {
-                    for (Sample patientSample : ps.getSamples())
-                        encodeMolecularDataFor(patientSample);
-                }
                 dataImportService.savePatient(patient);
                 iter.remove();
             }
@@ -912,39 +880,20 @@ public class DomainObjectCreator {
         }
     }
 
-    public void persistModels(){
 
-        log.info("Persisiting models");
-
-        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String,Object> entry = iter.next();
-            ModelCreation model = (ModelCreation) entry.getValue();
-            if (model.hasSpecimens())
-                for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
-
-            log.debug("Saving model {}", (model.getSourcePdxId()));
-            dataImportService.saveModelCreation(model);
-
-            iter.remove();
+    private void linkMolcharDataToSample(Sample sample, String sampleKey){
+        sampleKey = sampleKey.replaceAll("[^A-Za-z0-9 _-]", "");
+        if(sampleMolcharMap.containsKey(sampleKey)) {
+            Set<Long> molcharIds = sampleMolcharMap.get(sampleKey);
+            Set<MolecularCharacterization> molchars = dataImportService.getMolcharsById(molcharIds);
+            sample.setMolecularCharacterizations(molchars);
         }
+        else{
+            //log.error("Molchar not found for: "+sampleKey);
 
-/*
-        Map<String, Object> models = domainObjects.get(MODELS);
-        for (Object modelObject : models.values()) {
-            ModelCreation model = (ModelCreation) modelObject;
-            if (model.hasSpecimens())
-                for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
-
-            log.debug("Saving model {}", (model.getSourcePdxId()));
-            dataImportService.saveModelCreation(model);
-            model = null;
         }
-        domainObjects.get(MODELS).clear();
-
-
- */
     }
+
 
     public void addDomainObject(String key1, String key2, Object object) {
         if (domainObjects.containsKey(key1)) {
@@ -964,23 +913,53 @@ public class DomainObjectCreator {
         }
     }
 
-    private void encodeMolecularDataFor(Specimen specimen) {
-        if (specimen.getSample() != null)
-            encodeMolecularDataFor(specimen.getSample());
-    }
 
-    private void encodeMolecularDataFor(Sample sample) {
-        if (sample.hasMolecularCharacterizations())
-            for (MolecularCharacterization mc : sample.getMolecularCharacterizations()) encodeMolecularDataFor(mc);
-    }
+    private void encodeMolecularDataFor(Sample sample, String sampleKey) {
 
+        try {
+            if (sample.hasMolecularCharacterizations()) {
+
+                Iterator<MolecularCharacterization> iter = sample.getMolecularCharacterizations().iterator();
+                while (iter.hasNext()) {
+                    encodeMolecularDataFor(iter.next(), sampleKey);
+                    iter.remove();
+                }
+            }
+        }
+        catch(Exception e){
+            log.error("Exception with key "+sampleKey);
+        }
+    }
     private void encodeMolecularDataFor(MolecularCharacterization mc) {
         if (mc.hasMarkerAssociations()) {
             mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
             mc.getFirstMarkerAssociation().encodeMolecularData();
+        }
+    }
+
+    private void encodeMolecularDataFor(MolecularCharacterization mc, String sampleKey) {
+        if (mc.hasMarkerAssociations()) {
+            mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
+            mc.getFirstMarkerAssociation().encodeMolecularData();
+        }
+
+        Long molcharId = dataImportService.saveMolecularCharacterization(mc).getId();
+        addIdToSampleMolcharMap(sampleKey, molcharId);
+    }
+
+    private void addIdToSampleMolcharMap(String sampleKey, Long molcharId){
+        sampleKey = sampleKey.replaceAll("[^A-Za-z0-9 _-]", "");
+        if(sampleMolcharMap.containsKey(sampleKey)){
+            sampleMolcharMap.get(sampleKey).add(molcharId);
+        }
+        else{
+            Set<Long> s = new HashSet();
+            s.add(molcharId);
+            sampleMolcharMap.put(sampleKey, s);
 
         }
     }
+
 
     private TreatmentProtocol getTreatmentProtocol(Row row){
 
@@ -1041,8 +1020,5 @@ public class DomainObjectCreator {
         return null;
     }
 
-    private String getMolecularTypeKey(String s){
-        return "";
-    }
 
 }

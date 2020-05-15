@@ -16,10 +16,7 @@ import javax.annotation.Nonnull;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class Updog {
@@ -53,14 +50,15 @@ public class Updog {
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = tableSetCleaner.cleanPdxTables(pdxTableSet);
 
-        omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        omicsTableSet = tableSetCleaner.cleanOmicsTables(omicsTableSet);
+        //omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
+        //omicsTableSet = tableSetCleaner.cleanOmicsTables(omicsTableSet);
+        omicsTableSet = new HashMap<>();
 
         treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
         treatmentTableSet = tableSetCleaner.cleanTreatmentTables(treatmentTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
-        combinedTableSet.putAll(omicsTableSet);
+        //combinedTableSet.putAll(omicsTableSet);
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
