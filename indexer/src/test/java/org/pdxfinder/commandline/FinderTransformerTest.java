@@ -56,7 +56,7 @@ public class FinderTransformerTest extends BaseTest {
                 null,
                 null,
                 tempFile,
-                "MUT",
+                cbioType.MUT,
                 null);
         final ArgumentCaptor<File> actualExportDir = ArgumentCaptor.forClass(File.class);
         final ArgumentCaptor<File> actualTemplateDir = ArgumentCaptor.forClass(File.class);
@@ -79,7 +79,7 @@ public class FinderTransformerTest extends BaseTest {
                 null,
                 null,
                 tempFile,
-                "GISTIC",
+                cbioType.GISTIC,
                 null);
         verify(cbpTransformer).exportCBP(
                 any(File.class),
@@ -101,7 +101,7 @@ public class FinderTransformerTest extends BaseTest {
                 overrideTemplate,
                 overrideExport,
                 tempFile,
-                "GISTIC",
+                cbioType.GISTIC,
                 null);
         verify(cbpTransformer).exportCBP(
                 eq(overrideExport),

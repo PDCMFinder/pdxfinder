@@ -6,7 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -22,6 +27,26 @@ public class OmicTransformationService {
     }
 
     private Map<String, String> geneIdCache = new HashMap<>();
+
+    public void convertListOfNcbiToHgnc(List<String> geneList){
+        BufferedWriter out;
+        try {
+            FileWriter fstream = new FileWriter("ncbiToHugoAccesions", true);
+            out = new BufferedWriter(fstream);
+            BufferedWriter finalOut = out;
+            geneList.forEach(g ->
+                    {
+                        try {
+                            finalOut.write(ncbiGeneIdtoHgncSymbol(g));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+            );
+        } catch(IOException e){
+            log.error("Failure opening output file %n {}", e.toString());
+        }
+    }
 
     public String ncbiGeneIdtoHgncSymbol(String ncbiGene) {
         String hgncSymbol = geneIdCache.get(ncbiGene);

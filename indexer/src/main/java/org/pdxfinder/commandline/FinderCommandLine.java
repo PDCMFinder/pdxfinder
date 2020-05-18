@@ -2,6 +2,7 @@ package org.pdxfinder.commandline;
 
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataProviderGroup;
+import org.pdxfinder.utils.CbpTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,16 +79,16 @@ public class FinderCommandLine implements Callable<Integer> {
         private boolean validateOnlyRequested;
 
         @Option(names = {"-p", "--post-load"},
-                description = "Implement Post data loading Steps", required = false)
+                description = "Implement Post data loading Steps")
         private boolean postLoadRequested;
 
-        @Option(names = {"--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", required = false, hidden = true)
+        @Option(names = {"--spring.data.neo4j.uri"}, paramLabel = "Neo4j DB Directory", description = "Embedded Neo4j Database location", hidden = true)
         private String springDataNeo4jUri;
 
-        @Option(names = {"--db-refresh"}, paramLabel = "Neo4j DB Delete and ReInitialize", description = "clear off database and intialize cache before loading new data.", required = false, hidden = true)
+        @Option(names = {"--db-refresh"}, paramLabel = "Neo4j DB Delete and ReInitialize", description = "clear off database and intialize cache before loading new data.", hidden = true)
         private String debReload;
 
-        @Option(names = {"--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location", required = false, hidden = true)
+        @Option(names = {"--spring.datasource.url"}, paramLabel = "H2 DB Directory", description = "Embedded H2 Database location",  hidden = true)
         private String springDatasourceUrl;
 
 
@@ -178,7 +179,6 @@ public class FinderCommandLine implements Callable<Integer> {
         @Option(
                 names = {"-d", "--data-dir"},
                 description = "Path of the PDX Finder data directory " +
-
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
@@ -272,7 +272,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     names = {"-c","-cbio"},
                     description = "Transform Cbioportal Json into PdxFinder Templates for ingest into the finder." +
                         " Only arguments supported 'mut' or 'gistic' ")
-            private String cbioType;
+            private CbpTransformer.cbioType cbioType;
 
             @Option(
                     names = {"-entrez2hugo"},
@@ -280,7 +280,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     split = " ")
             private List<String> entrezToHugo;
 
-            public String getCbioDataType() {
+            public CbpTransformer.cbioType getCbioDataType() {
                 return cbioType;
             }
             public List<String> getEntrezToHugo() { return entrezToHugo;}

@@ -47,7 +47,8 @@ public class CbpTransformer {
     public void exportCBP(File exportDir,File templateDir, File pathToJson, cbioType dataType) throws IOException {
 
         if (doesFileNotExist(exportDir) || doesFileNotExist(templateDir) || doesFileNotExist(pathToJson)) {
-            throw new IOException("A string argument passed to the exportCBP does not point to an existing file.");
+            throw new IOException(String.format("A string argument passed to the exportCBP does not point to an existing file." +
+                    "%s %n %s %n %s %n", exportDir, templateDir, pathToJson));
         }
             Group jsonGroup = createGroupWithJsonsFilename(pathToJson.getAbsolutePath());
 
@@ -57,12 +58,6 @@ public class CbpTransformer {
             universalDataExporter.setDs(jsonGroup);
             universalDataExporter.setTemplateDir(templateDir.getAbsolutePath());
             universalDataExporter.export(exportDir.getAbsolutePath());
-    }
-
-    public void convertListOfEntrez(List<String> entrezIds){
-        entrezIds.forEach(e ->
-            log.info(omicTransformationService.ncbiGeneIdtoHgncSymbol(e))
-        );
     }
 
     private void cbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, cbioType dataType){

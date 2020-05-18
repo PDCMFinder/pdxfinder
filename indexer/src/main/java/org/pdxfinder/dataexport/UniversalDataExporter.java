@@ -569,7 +569,7 @@ public class UniversalDataExporter {
                     sheet.getRow(rowIndex).createCell(columnIndex);
 
 
-                    Cell cell = null;
+                    Cell cell;
                     try {
                         cell = sheet.getRow(rowIndex).getCell(columnIndex);
                         cell.setCellValue(data.get(i).get(j));
@@ -582,7 +582,7 @@ public class UniversalDataExporter {
         }
     }
 
-    public void readSheetAndWriteOmicTsvFile(Sheet xlsxTemplate, List<List<String>> exportSheet, String omicTsvDir) throws IOException {
+    public void readSheetAndWriteOmicTsvFile(Sheet xlsxTemplate, List<List<String>> exportSheet, String omicTsvDir) {
 
         try(FileWriter fileWriter = new FileWriter(omicTsvDir)) {
             if (exportSheet != null) {
@@ -611,17 +611,14 @@ public class UniversalDataExporter {
     }
 
     private void writeDataToTsv(Sheet sheet, List<List<String>> data, FileWriter fileWriter) throws IOException {
-        for (int i = 0; i < data.size(); i++) {
-            int rowIndex = i;
-            for (int j = 0; j < data.get(i).size(); j++) {
-                int columnIndex = j;
+        for (int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
+            for (int columnIndex = 0; columnIndex < data.get(rowIndex).size(); columnIndex++) {
                 try {
-                    fileWriter.append(data.get(i).get(j));
+                    fileWriter.append(data.get(rowIndex).get(columnIndex));
                     fileWriter.append("\t");
-                } catch (Exception e) {
+                } catch (IOException e) {
                     log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
                 }
-
             }
             fileWriter.append("\n");
         }
@@ -630,7 +627,7 @@ public class UniversalDataExporter {
 
     private String getPubmedIDs(ModelCreation model){
 
-        StringBuilder pubmedIDs = new StringBuilder("");
+        StringBuilder pubmedIDs = new StringBuilder();
 
         if(model.getGroups() != null){
 
@@ -741,7 +738,7 @@ public class UniversalDataExporter {
         }
     }
 
-    private void getExternalUrlData(LinkedHashMap map, Collection<ExternalUrl> urls){
+    private void getExternalUrlData(LinkedHashMap<String, String> map, Collection<ExternalUrl> urls){
 
         map.put("contactEmail",  "");
         map.put("contactName",  "");
@@ -917,7 +914,7 @@ public class UniversalDataExporter {
                     }
                 }
             }
-        } else log.debug("No specimen found for model {} %n", model.getId());
+        } else log.error("No specimens found for model {}", model.getId());
     }
 
 
