@@ -63,7 +63,7 @@ public class FinderCommandLineTest extends BaseTest {
     }
 
     @Test public void givenTransform_When_exportAllisCalled_Then_callsTransformer() throws IOException {
-        String[] args = {"--data-dir=path/", "-c=mut"};
+        String[] args = {"--data-dir=path/", "-c=MUT"};
         int exitCode = new CommandLine(transform).execute(args);
         assertEquals(0, exitCode);
         verify(this.finderTransformer).run(
@@ -82,12 +82,12 @@ public class FinderCommandLineTest extends BaseTest {
         int exitCode = new CommandLine(transform).execute(args);
         assertEquals(0, exitCode);
         verify(this.finderTransformer).run(
-                any(null),
+                any(),
                 eq(null),
                 eq(null),
                 any(File.class),
-                any(null),
-                any(null)
+                any(),
+                any()
         );
         verifyNoMoreInteractions(this.finderTransformer);
     }
