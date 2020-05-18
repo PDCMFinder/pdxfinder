@@ -208,7 +208,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
      */
     private void createDataSourceGroup() {
 
-        //TODO: this data has to come from the spreadsheet, I am using constants for now
 
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
@@ -777,14 +776,18 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             String platformTag = "";
 
-            if(molCharType.equals("mutation")){
-                platformTag = "_mut";
-            }
-            else if(molCharType.equals("copy number alteration")){
-                platformTag = "_cna";
-            }
-            else if(molCharType.equals("expression")){
-                platformTag = "_exp";
+            switch(molCharType) {
+                case "mutation" :
+                    platformTag = "_mut";
+                    break;
+                case "copy number alteration" :
+                    platformTag = "_cna";
+                    break;
+                case "expression" :
+                    platformTag = "_expr";
+                    break;
+                default:
+                    break;
             }
 
 
@@ -1041,7 +1044,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 // Transcriptomics
                 if(transcriptomicData.exists()){
-                    log.info("Loading expression for "+modelId);
+                    log.info("Loading expression for  {}",modelId);
                     loadOmicData(modelCreation, ds, "expression", providerDataRootDir);
                 }
 

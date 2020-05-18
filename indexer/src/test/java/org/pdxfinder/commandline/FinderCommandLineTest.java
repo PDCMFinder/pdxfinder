@@ -25,6 +25,9 @@ public class FinderCommandLineTest extends BaseTest {
     @Mock private FinderTransformer finderTransformer;
     @InjectMocks private FinderCommandLine.Transform transform;
 
+    @Mock private FinderExporter finderExporter;
+    @InjectMocks private FinderCommandLine.Export export;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -35,7 +38,7 @@ public class FinderCommandLineTest extends BaseTest {
         );
     }
 
-    @Test public void load_givenLoadOnlyMinimal_callsLoader() {
+    @Test public void givenLoadOnlyMinimal_LoaderIsCalled() {
         String[] args = {"--only=Test_Minimal", "--data-dir=path/", "--keep-db"};
         int exitCode = new CommandLine(load).execute(args);
         assertEquals(0, exitCode);
@@ -47,7 +50,7 @@ public class FinderCommandLineTest extends BaseTest {
         verifyNoMoreInteractions(this.finderLoader);
     }
 
-    @Test public void load_givenLoadAll_callsLoader() {
+    @Test public void givenLoadAll_callsLoader() {
         String[] args = {"--group=All", "--data-dir=path/", "--keep-db"};
         int exitCode = new CommandLine(load).execute(args);
         assertEquals(0, exitCode);
@@ -59,23 +62,45 @@ public class FinderCommandLineTest extends BaseTest {
         verifyNoMoreInteractions(this.finderLoader);
     }
 
-    @Test public void load_givenTransform_When_exportAllisCalled_Then_callsTransformer() throws IOException {
-        String[] args = {"--data-dir=path/", "--all"};
+    @Test public void givenTransform_When_exportAllisCalled_Then_callsTransformer() throws IOException {
+        String[] args = {"--data-dir=path/", "-c=MUT"};
         int exitCode = new CommandLine(transform).execute(args);
         assertEquals(0, exitCode);
         verify(this.finderTransformer).run(
                 any(File.class),
-                any(null),
-                anyBoolean()
+                any(),
+                any(),
+                any(File.class),
+                any(),
+                any()
         );
         verifyNoMoreInteractions(this.finderTransformer);
     }
 
-    @Test public void load_givenTransform_WhenTwoExclusiveArgumentsArepassed_Then_ReturnNonZeroExit() throws IOException {
+    @Test public void givenTransform_When_cbioPortalIsCalled_Then_callsTransformer() throws IOException {
+        String[] args = {"-c=MUT", "-f=/tmp"};
+        int exitCode = new CommandLine(transform).execute(args);
+        assertEquals(0, exitCode);
+        verify(this.finderTransformer).run(
+                any(),
+                eq(null),
+                eq(null),
+                any(File.class),
+                any(),
+                any()
+        );
+        verifyNoMoreInteractions(this.finderTransformer);
+    }
+
+
+    @Test public void givenTransform_WhenTwoExclusiveArgumentsArepassed_Then_ReturnNonZeroExit() {
         String[] args = {"--data-dir=path/", "--export=test", "--all"};
         int exitCode = new CommandLine(transform).execute(args);
         assertNotEquals(0,exitCode);
     }
+
+
+
 
 
 }
