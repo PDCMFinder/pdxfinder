@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -41,98 +42,32 @@ public class LoadMarkers {
         String ensemblId;
         String ncbiId;
 
-
         int rows = 0;
-
+        String line;
+        BufferedReader reader = downloadDataFromURL(dataURL);
         try {
-
-            URL url = new URL(dataURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            if (conn.getResponseCode() != 200) {
-                log.error("Failed : HTTP error code : {}", conn.getResponseCode());
-            }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-            String line;
             while ((line = reader.readLine()) != null) {
                 //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENTREZ_ID ENSEMBL_ID
-                //HGNC ID[0]	Approved symbol[1]	Approved name[2]	Status[3]	Previous symbols[4]	Synonyms[5]	Accession numbers[6]	RefSeq IDs[7]	Name synonyms[8]	Ensembl gene ID[9]
+                //HGNC ID[0]	Approved symbol[1]	Approved name[2]	Status[3]	Previous symbols[4]	Synonyms[5]
+                // Accession numbers[6]	RefSeq IDs[7]	Name synonyms[8]	Ensembl gene ID[9] NcbiGeneId[10]
                 rowData = line.split("\t");
-                //rowData[1] = symbol, if it is not empty and if it is not a withdrawn symbol
-                if (rowData[1] != null && !rowData[1].isEmpty()) {
+                symbol = parseHugoFile(rowData, 1);
+                if (!symbol.equals("")) {
 
-                    symbol = rowData[1];
+                    hgncId = parseHugoFile(rowData, 0);
+                    prevSymbols = parseHugoFile(rowData, 4).split(",");
+                    synonyms = parseHugoFile(rowData, 5).split(",");
+                    ensemblId = parseHugoFile(rowData, 9);
+                    ncbiId = parseHugoFile(rowData, 10);
 
-                    if (rowData[0] != null && !rowData[0].isEmpty()) {
-                        hgncId = rowData[0];
-                    } else {
-                        hgncId = "";
-                    }
-
-                    if (rowData.length > 4 && rowData[4] != null && !rowData[4].isEmpty()) {
-                        prevSymbols = rowData[4].split(", ");
-                    } else {
-                        prevSymbols = new String[0];
-                    }
-
-                    if (rowData.length > 5 && rowData[5] != null && !rowData[5].isEmpty()) {
-                        synonyms = rowData[5].split(", ");
-                    } else {
-                        synonyms = new String[0];
-                    }
-
-                    if (rowData.length > 7 && rowData[7] != null && !rowData[7].isEmpty()) {
-                        ncbiId= rowData[7];
-                    } else {
-                        ncbiId = "";
-                    }
-
-                    if (rowData.length > 9 && rowData[9] != null && !rowData[9].isEmpty()) {
-                        ensemblId = rowData[9];
-                    } else {
-                        ensemblId = "";
-                    }
-
-                    //put it in the hashmap with all of its prev symbols
-
-                    Marker m = new Marker();
-                    m.setHgncSymbol(symbol);
-
-                    if (!ensemblId.isEmpty()) {
-                        m.setEnsemblGeneId(ensemblId);
-                    }
-                    if (!hgncId.isEmpty()) {
-                        m.setHgncId(hgncId);
-                    }
-
-                    if (!ncbiId.isEmpty())
-                        m.setNcbiGeneId(ncbiId);
-
-                    if (synonyms.length > 0) {
-
-                        m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
-                    }
-
-                    if (prevSymbols.length > 0) {
-
-                        m.setPrevSymbols(new HashSet<>(Arrays.asList(prevSymbols)));
-                    }
-
+                    Marker m = createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols);
                     dataImportService.saveMarker(m);
-
                     if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
-
                 }
-
                 rows++;
             }
-
         } catch (Exception e) {
-            log.warn(e.getMessage());
+            log.error("{} %n Error wall parsing HGNC file", e.getMessage());
             log.error(Arrays.toString(rowData));
         }
 
@@ -150,4 +85,55 @@ public class LoadMarkers {
         log.info(" {} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
 
     }
+
+    private BufferedReader downloadDataFromURL(String dataURL){
+        BufferedReader reader = null;
+        try{
+            URL url = new URL(dataURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            if (conn.getResponseCode() != 200) {
+                log.error("Failed : HTTP error code : {}", conn.getResponseCode());
+            }
+            reader = new BufferedReader(new InputStreamReader(
+                    (conn.getInputStream())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return reader;
+    }
+
+    private Marker createMarker(String symbol, String ensemblId, String hgncId, String ncbiId, String[] synonyms, String[] prevSymbols) {
+        Marker m = new Marker();
+        m.setHgncSymbol(symbol);
+        if (!ensemblId.isEmpty()) {
+            m.setEnsemblGeneId(ensemblId);
+        }
+        if (!hgncId.isEmpty()) {
+            m.setHgncId(hgncId);
+        }
+        if (!ncbiId.isEmpty())
+            m.setNcbiGeneId(ncbiId);
+        if (synonyms.length > 0) {
+            m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
+        }
+        if (prevSymbols.length > 0) {
+            m.setPrevSymbols(new HashSet<>(Arrays.asList(prevSymbols)));
+        }
+        return m;
+    }
+
+    private String parseHugoFile(String[] rowData, int column){
+        String cellValue = "";
+        if (cellIsNotEmptyAndIsCorrectLen(rowData, column)) {
+            cellValue = rowData[column];
+        }
+        return cellValue;
+    }
+
+    private boolean cellIsNotEmptyAndIsCorrectLen(String[] rowData, int column){
+        return rowData.length > column && rowData[column] != null && !rowData[column].isEmpty();
+    }
+
 }

@@ -21,20 +21,21 @@ public class OmicTransformationService {
         this.dataImportService = dataImportService;
     }
 
-
     private Map<String, String> geneIdCache = new HashMap<>();
-
 
     public String ncbiGeneIdtoHgncSymbol(String ncbiGene) {
         String hgncSymbol = geneIdCache.get(ncbiGene);
         if (hgncSymbol == null) {
-            Marker marker = dataImportService.getMarkerbyNcbiGeneId(hgncSymbol);
-
-            if (marker != null && marker.getHgncSymbol() != null && !marker.getHgncSymbol().isEmpty()) {
+            Marker marker = dataImportService.getMarkerbyNcbiGeneId(ncbiGene);
+            if (isMarkerSymbolNullOrEmpty(marker)) {
                 hgncSymbol = marker.getHgncSymbol();
                 geneIdCache.put(ncbiGene, hgncSymbol);
             } else { log.warn("No marker found for NCBI gene Id {} Cannot generate Hgnc symbol", ncbiGene); }
         }
         return hgncSymbol;
+    }
+
+    private Boolean isMarkerSymbolNullOrEmpty(Marker marker){
+        return marker.getHgncSymbol() != null && !marker.getHgncSymbol().isEmpty();
     }
 }
