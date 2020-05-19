@@ -148,7 +148,8 @@ public class TSV {
         host_strain_nomenclature,
         molecular_characterisation_type,
         platform,
-        internal_protocol_url
+        internal_protocol_url,
+        raw_data_file
 
     }
 
