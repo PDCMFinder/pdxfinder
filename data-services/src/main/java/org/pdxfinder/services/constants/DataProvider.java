@@ -8,6 +8,7 @@ public enum DataProvider {
     JAX("JAX"),
     PDXNet_MDAnderson("PDXNet-MDAnderson"),
     PDMR("PDMR"),
+    PDMR_XDOG("PDMR-XDOG"),
     PDXNet_Wistar_MDAnderson_Penn("PDXNet-Wistar-MDAnderson-Penn"),
     PDXNet_WUSTL("PDXNet-WUSTL"),
     CRL("CRL"),

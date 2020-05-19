@@ -37,7 +37,7 @@ public class Validator {
         checkRequiredTablesPresent(tableSet, tableSetSpecification);
         if (CollectionUtils.isNotEmpty(validationErrors)) {
             log.error(
-                "Not all required tables where present for {}. Aborting further validation",
+                "Not all required tables where present forNot all required tables where present for {}. Aborting further validation",
                 tableSetSpecification.getProvider());
             return validationErrors;
         }
