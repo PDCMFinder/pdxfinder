@@ -12,6 +12,8 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 
 import static org.mockito.Mockito.doReturn;
@@ -48,7 +50,7 @@ public class LoadMarkerTest extends BaseTest {
 
 
     @Test
-    public void given_MarkerDataUrl_When_LoadGenesInvoked_Then_saveMarkers() {
+    public void given_MarkerDataUrl_When_LoadGenesInvoked_Then_saveMarkers() throws IOException {
 
         // given
         String markerDataUrl = DataUrl.HUGO_FILE_URL.get();
@@ -62,7 +64,7 @@ public class LoadMarkerTest extends BaseTest {
     }
 
     @Test
-    public void given_WrongUrl_When_LoadGenesInvokedWithMalformedURL_then_noMarkerIsSaved() {
+    public void given_WrongUrl_When_LoadGenesInvokedWithMalformedURL_then_noMarkerIsSaved() throws IOException {
 
         // given
         String malformedGeneURL = "genemaes.org";

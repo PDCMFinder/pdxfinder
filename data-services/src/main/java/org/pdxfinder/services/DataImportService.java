@@ -1634,4 +1634,7 @@ public class DataImportService {
     }
 
 
+    public Marker getMarkerbyNcbiGeneId(String ncbiGene) {
+        return markerRepository.findByNcbiGeneId(ncbiGene);
+    }
 }
