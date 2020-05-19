@@ -313,7 +313,7 @@ public class DetailsService {
             mde.setDataAvailableLabel(mc.getPlatform().getName());
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
-
+            mde.setRawDataUrl(patientSample.getRawDataUrl());
 
             if (mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
                     || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()) {
@@ -370,7 +370,7 @@ public class DetailsService {
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
                     mde.setRawDataLabel("Not available");
                     mde.setMolcharId(mc.getId().toString());
-
+                    mde.setRawDataUrl(xenoSample.getRawDataUrl());
                     int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
                     if (assocData == 0) {

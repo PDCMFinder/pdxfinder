@@ -303,6 +303,8 @@ public class DomainObjectCreator {
             String sampleOrigin = row.getString(TSV.SamplePlatform.sample_origin.name());
             String platformName = row.getString(TSV.SamplePlatform.platform.name());
             String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
+            String rawDataUrl = row.getString(TSV.SamplePlatform.raw_data_file.name());
+
             Sample sample = null;
 
             if (sampleOrigin.equals(PATIENTS)) {
@@ -311,6 +313,7 @@ public class DomainObjectCreator {
                 sample = getOrCreateSpecimen(row).getSample();
             }
             if (sample == null) throw new NullPointerException();
+            sample.setRawDataUrl(rawDataUrl);
             getOrCreateMolecularCharacterization(sample, platformName, molCharType);
         }
     }

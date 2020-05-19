@@ -37,6 +37,8 @@ public class Sample {
     public Boolean normalTissue;
     private String dataSource;
 
+    private String rawDataUrl;
+
     @Relationship(type="MAPPED_TO")
     private SampleToOntologyRelationship sampleToOntologyRelationShip;
 
@@ -274,5 +276,13 @@ public class Sample {
 
     public void setDiagnosisNotes(String diagnosisNotes) {
         this.diagnosisNotes = diagnosisNotes;
+    }
+
+    public String getRawDataUrl() {
+        return rawDataUrl;
+    }
+
+    public void setRawDataUrl(String rawDataUrl) {
+        this.rawDataUrl = rawDataUrl;
     }
 }
