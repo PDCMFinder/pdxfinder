@@ -14,7 +14,6 @@ public class MolecularDataEntryDTO {
     private String platformUsedLabel;
     private String platformUsedUrl;
     private String rawDataLabel;
-    private String rawDataUrl;
 
     private String molcharId;
 
@@ -34,7 +33,6 @@ public class MolecularDataEntryDTO {
         this.platformUsedLabel = platformUsedLabel;
         this.platformUsedUrl = platformUsedUrl;
         this.rawDataLabel = rawDataLabel;
-        this.rawDataUrl = rawDataUrl;
     }
 
     public MolecularDataEntryDTO() {
@@ -102,14 +100,6 @@ public class MolecularDataEntryDTO {
 
     public void setRawDataLabel(String rawDataLabel) {
         this.rawDataLabel = rawDataLabel;
-    }
-
-    public String getRawDataUrl() {
-        return rawDataUrl;
-    }
-
-    public void setRawDataUrl(String rawDataUrl) {
-        this.rawDataUrl = rawDataUrl;
     }
 
     public String getHistology() {

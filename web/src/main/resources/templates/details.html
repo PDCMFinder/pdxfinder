@@ -866,7 +866,14 @@
                                                         </a>
                                                         <span th:if="${dataRow.platformUsedUrl == null && dataRow.platformUsedLabel != 'OncoKB Gene Panel'}" th:text="${dataRow.platformUsedLabel}"></span>
                                                     </td>
-                                                    <td th:text="${dataRow.rawDataLabel}"></td>
+                                                    <td>
+                                                        <a th:text="${dataRow.rawDataLabel}"
+                                                           style="..."
+                                                           th:onclick="'window.open(\'https://www.ebi.ac.uk/ena/data/view/'+${dataRow.rawDataLabel}+'\')'">
+                                                            ...
+                                                        </a>
+                                                        <span th:if="${dataRow.rawDataLabel == null}" th:text="'Not Available'" ></span>
+                                                    </td>
                                                 </tr>
 
                                                 </tbody>
@@ -1175,7 +1182,7 @@
     "creator": {"@type": "Organization","name": "PDX Finder"},
     "dateCreated": "2018",
     "dateModified": "2018",
-    "citation": "https://doi.org/10.1101/291443",
+    "citation": "https://doi.org/10.1101/291443"
 }
 
 

@@ -1,6 +1,7 @@
 package org.pdxfinder.services;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
@@ -313,7 +314,8 @@ public class DetailsService {
             mde.setDataAvailableLabel(mc.getPlatform().getName());
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
-            mde.setRawDataUrl(patientSample.getRawDataUrl());
+            mde.setRawDataLabel(patientSample.getRawDataUrl());
+            mde.setMolcharId(mc.getId().toString());
 
             if (mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
                     || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()) {
@@ -338,8 +340,6 @@ public class DetailsService {
             } else {
                 mde.setIsVisible("NO");
             }
-            mde.setRawDataLabel("Not available");
-            mde.setMolcharId(mc.getId().toString());
 
             if (patientSample.getSourceSampleId() != null)
                 mdeDTO.add(mde);
@@ -350,7 +350,6 @@ public class DetailsService {
         List<Specimen> specimens = specimenRepository.findAllWithMolcharDataByModel(pdx);
 
         for (Specimen sp : specimens) {
-
 
             if (sp.getSample() != null) {
 
@@ -368,9 +367,8 @@ public class DetailsService {
                     mde.setDataAvailableUrl("");
                     mde.setPlatformUsedLabel(mc.getPlatform().getName());
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
-                    mde.setRawDataLabel("Not available");
+                    mde.setRawDataLabel(xenoSample.getRawDataUrl());
                     mde.setMolcharId(mc.getId().toString());
-                    mde.setRawDataUrl(xenoSample.getRawDataUrl());
                     int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
                     if (assocData == 0) {
@@ -387,25 +385,14 @@ public class DetailsService {
                     }
                     //if (xenoSample.getSourceSampleId() != null)
                     mdeDTO.add(mde);
-
                 }
-
-
             }
-
-
         }
-
         dto.setMolecularDataRows(mdeDTO);
         dto.setMolecularDataEntrySize(mdeDTO.size());
         dto.setDataTypes(dataTypes);
         return dto;
-        //getModelDetails(dataSource, modelId, 0, 15000, "", "", "");
     }
-
-
-
-
 
     public MolecularDataTableDTO getMolecularDataTable(String id){
 
