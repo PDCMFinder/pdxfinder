@@ -26,12 +26,11 @@ public class UniversalDataExtractor {
 
     private List<List<String>> patientSheetDataExport;
     private List<List<String>> sampleSheetDataExport;
-    private List<List<String>> patientTreatmentSheetDataExport;
     private List<List<String>> modelSheetDataExport;
-    private List<List<String>> pdxModelValidationSheetDataExport;
-    private List<List<String>> samplePlatformDescriptionSheetDataExport;
+    private List<List<String>> modelValidationSheetDataExport;
     private List<List<String>> sharingAndContactSheetDataExport;
     private List<List<String>> loaderRelatedDataSheetDataExport;
+    private List<List<String>> samplePlatformDescriptionSheetDataExport;
     private List<List<String>> drugDosingSheetDataExport;
 
     private List<List<String>> mutationSheetDataExport;
@@ -51,20 +50,32 @@ public class UniversalDataExtractor {
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
     }
-
-    public void extract(ExportSheets sheets, boolean isHarmonized){
-
+    public void init(ExportSheets sheets, boolean isHarmonized){
         this.sheets = sheets;
         this.ds = sheets.getGroup();
         this.isHarmonized = isHarmonized;
 
         patientSheetDataExport = sheets.get(TSV.metadataSheetNames.patient.name());
         sampleSheetDataExport = sheets.get(TSV.metadataSheetNames.sample.name());
+        modelSheetDataExport = sheets.get(TSV.metadataSheetNames.model.name());
+        modelValidationSheetDataExport = sheets.get(TSV.metadataSheetNames.model_validation.name());
+        sharingAndContactSheetDataExport = sheets.get(TSV.metadataSheetNames.sharing.name());
+        loaderRelatedDataSheetDataExport = sheets.get(TSV.metadataSheetNames.loader.name());
 
+        samplePlatformDescriptionSheetDataExport = sheets.get(TSV.providerFileNames.sampleplatform.name());
+
+        drugDosingSheetDataExport = sheets.get(TSV.providerFileNames.drugdosing.name());
+        mutationSheetDataExport = sheets.get(TSV.providerFileNames.mut.name());
+        cnaSheetDataExport = sheets.get(TSV.providerFileNames.cna.name());
+        cytogeneticsSheetDataExport = sheets.get(TSV.providerFileNames.cytogenetics.name());
+        expressionSheetDataExport = sheets.get(TSV.providerFileNames.expression.name());
+    }
+
+    public void extract(){
         initPatientSheet();
         initSampleSheet();
-        initPdxModelDetails();
-        initPdxModelValidations();
+        initModelDetails();
+        initModelValidations();
         initSharingAndContact();
         initLoaderRelatedData();
         initSamplePlatformDescription();
@@ -177,7 +188,7 @@ public class UniversalDataExtractor {
         return modelId;
     }
 
-    public void initPdxModelDetails(){
+    public void initModelDetails(){
 
         List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
         for(ModelCreation model : models){
@@ -230,7 +241,7 @@ public class UniversalDataExtractor {
         return engraftmentType;
     }
 
-    public void initPdxModelValidations(){
+    public void initModelValidations(){
 
         List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
 
@@ -255,7 +266,7 @@ public class UniversalDataExtractor {
                     dataRow.add(passages);
                     dataRow.add(nomenclature);
 
-                    pdxModelValidationSheetDataExport.add(dataRow);
+                    modelValidationSheetDataExport.add(dataRow);
                 }
             }
         }
@@ -276,11 +287,8 @@ public class UniversalDataExtractor {
             Group projectGroup = getGroupByType(model, "Project");
 
             getGroupData(sharingAndContactRow, providerGroup, accessGroup, projectGroup);
-
             getExternalUrlData(sharingAndContactRow, model.getExternalUrls());
-
             insertSharingAndContactDataForModel(sharingAndContactRow);
-
         }
     }
 
@@ -295,7 +303,6 @@ public class UniversalDataExtractor {
     }
 
     public void initSamplePlatformDescription(){
-
 
         List<ModelCreation> models = dataImportService.findModelXenograftPlatformSampleByDS(ds.getAbbreviation());
 
@@ -477,7 +484,6 @@ public class UniversalDataExtractor {
     }
 
     private void insertModelSheetDataFromSpecimenMap(Map<String, ModelDetails> specimenMap, ModelCreation model){
-        modelSheetDataExport = sheets.get(TSV.metadataSheetNames.model.name());
 
         String modelId = model.getSourcePdxId();
         String pubmedIDs = getPubmedIDs(model);
@@ -625,7 +631,6 @@ public class UniversalDataExtractor {
 
     private void addPatientMolcharDataToSamplePlatform(ModelCreation model){
 
-        //get the patient sample related molchars first
         if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
 
             for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
@@ -659,20 +664,11 @@ public class UniversalDataExtractor {
     private void addXenoMolcharDataToSamplePlatform(ModelCreation model){
 
         if(Objects.nonNull(model.getSpecimens())){
-
             for(Specimen sp : model.getSpecimens()){
 
                 String passage = sp.getPassage();
-
-                String hostStrainName = "";
-                String hostStrainNomenclature = "";
-
-                if(Objects.nonNull(sp.getHostStrain())){
-                    hostStrainName = getHostStrainName(sp);
-                    hostStrainNomenclature = getHostStrainNomenclature(sp);
-                }
-
-
+                String hostStrainName = getHostStrainName(sp);
+                String hostStrainNomenclature = getHostStrainNomenclature(sp);
                 Sample sample = sp.getSample();
 
                 if(sample != null && sample.getMolecularCharacterizations() != null && !sample.getMolecularCharacterizations().isEmpty()){
@@ -743,10 +739,10 @@ public class UniversalDataExtractor {
     }
 
     private String getHostStrainName(Specimen sp){
-        return sp.getHostStrain().getName() == null?"":sp.getHostStrain().getName();
+        return sp.getHostStrain().getName() == null? ""  :sp.getHostStrain().getName();
     }
 
     private String getHostStrainNomenclature(Specimen sp){
-        return sp.getHostStrain().getSymbol() == null?"":sp.getHostStrain().getSymbol();
+        return sp.getHostStrain().getSymbol() == null? "" :sp.getHostStrain().getSymbol();
     }
 }

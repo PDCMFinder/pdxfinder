@@ -95,8 +95,8 @@ public class DataExportTest extends BaseTest {
           .thenReturn(getModelListForTest());
 
         universalDataExtractor.setDs(providerGroup);
-        universalDataExtractor.initPdxModelDetails();
-        universalDataExtractor.initPdxModelValidations();
+        universalDataExtractor.initModelDetails();
+        universalDataExtractor.initModelValidations();
 
         List<List<String>> pdxModelDetails = universalDataExtractor.getModelSheetDataExport();
         List<List<String>> pdxModelValidations = universalDataExtractor.getPdxModelValidationSheetDataExport();
