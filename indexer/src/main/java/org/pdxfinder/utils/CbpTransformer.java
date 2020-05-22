@@ -1,7 +1,7 @@
 package org.pdxfinder.utils;
 
 
-import org.pdxfinder.dataexport.UniversalDataExporter;
+import org.pdxfinder.dataexport.UniversalDataExtractor;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.services.UtilityService;
@@ -26,12 +26,12 @@ public class CbpTransformer {
 
     private UtilityService utilityService;
     private OmicTransformationService omicTransformationService;
-    private UniversalDataExporter universalDataExporter;
+    private UniversalDataExtractor universalDataExporter;
 
-    CbpTransformer(UtilityService utilityService, OmicTransformationService omicTransformationService, UniversalDataExporter universalDataExporter){
+    CbpTransformer(UtilityService utilityService, OmicTransformationService omicTransformationService, UniversalDataExtractor universalDataExtractor){
         this.utilityService = utilityService;
         this.omicTransformationService = omicTransformationService;
-        this.universalDataExporter = universalDataExporter;
+        this.universalDataExporter = universalDataExtractor;
     }
 
     private static String notSpecified = "Not Specified";

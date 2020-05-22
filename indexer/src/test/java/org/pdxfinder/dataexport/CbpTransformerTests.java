@@ -34,7 +34,7 @@ public class CbpTransformerTests extends BaseTest {
     @Mock
     private OmicTransformationService omicTransformationService;
     @Mock
-    private UniversalDataExporter universalDataExporter;
+    private UniversalDataExtractor universalDataExtractor;
 
     @InjectMocks
     private CbpTransformer cbpTransformer;
@@ -107,7 +107,7 @@ public class CbpTransformerTests extends BaseTest {
 
         cbpTransformer.exportCBP(exportFolder, templatesFolder, jsonDummy, mutDataType);
 
-        Mockito.verify(universalDataExporter, times(1)).export(exportFolder.getAbsolutePath());
+        Mockito.verify(universalDataExtractor, times(1)).export(exportFolder.getAbsolutePath());
     }
 }
 

@@ -28,7 +28,7 @@ public class DataExportTest extends BaseTest {
     private DataImportService dataImportService;
 
     @InjectMocks
-    protected UniversalDataExporter universalDataExporter;
+    protected UniversalDataExtractor universalDataExtractor;
 
     Group providerGroup;
 
@@ -43,15 +43,15 @@ public class DataExportTest extends BaseTest {
         when(dataImportService.findPatientsByGroup(providerGroup))
           .thenReturn(getPatientListForTest());
 
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initPatientData();
-        List<List<String>> patientData = universalDataExporter.getPatientSheetDataExport();
+        universalDataExtractor.setDs(providerGroup);
+        universalDataExtractor.initPatientSheet();
+        List<List<String>> patientData = universalDataExtractor.getPatientSheetDataExport();
 
         Assert.assertEquals("p123", patientData.get(0).get(0));
     }
 
     @Test
-    public void Given_PatientAndModelAndSample_When_PatientTumorSheetIsCalled_Then_PatientDataIsInRowOne(){
+    public void Given_PatientAndModelAndSample_When_PatientSampleSheetIsCalled_Then_PatientDataIsInRowOne(){
 
         Patient patient = new Patient("p123", "male", "", "", providerGroup);
         PatientSnapshot patientSnapshot = new PatientSnapshot();
@@ -81,11 +81,11 @@ public class DataExportTest extends BaseTest {
         when(dataImportService.findModelBySample(sample))
           .thenReturn(modelCreation);
 
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initPatientTumorAtCollection();
+        universalDataExtractor.setDs(providerGroup);
+        universalDataExtractor.initSampleSheet();
 
-        List<List<String>> patientTumorAtCollection = universalDataExporter.getPatientTumorSheetDataExport();
-        Assert.assertEquals("p123", patientTumorAtCollection.get(0).get(0));
+        List<List<String>> patientSampleSheet = universalDataExtractor.getSampleSheetDataExport();
+        Assert.assertEquals("p123", patientSampleSheet.get(0).get(0));
     }
 
     @Test
@@ -94,12 +94,12 @@ public class DataExportTest extends BaseTest {
         when( dataImportService.findModelsWithSpecimensAndQAByDS(providerGroup.getAbbreviation()))
           .thenReturn(getModelListForTest());
 
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initPdxModelDetails();
-        universalDataExporter.initPdxModelValidations();
+        universalDataExtractor.setDs(providerGroup);
+        universalDataExtractor.initPdxModelDetails();
+        universalDataExtractor.initPdxModelValidations();
 
-        List<List<String>> pdxModelDetails = universalDataExporter.getPdxModelSheetDataExport();
-        List<List<String>> pdxModelValidations = universalDataExporter.getPdxModelValidationSheetDataExport();
+        List<List<String>> pdxModelDetails = universalDataExtractor.getModelSheetDataExport();
+        List<List<String>> pdxModelValidations = universalDataExtractor.getPdxModelValidationSheetDataExport();
 
         Assert.assertEquals("m123", pdxModelDetails.get(0).get(0));
         Assert.assertEquals("hsname", pdxModelDetails.get(0).get(1));
@@ -115,10 +115,10 @@ public class DataExportTest extends BaseTest {
         when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation()))
           .thenReturn(getModelListForTest());
 
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initSharingAndContact();
+        universalDataExtractor.setDs(providerGroup);
+        universalDataExtractor.initSharingAndContact();
 
-        List<List<String>> sharingAndContact = universalDataExporter.getSharingAndContactSheetDataExport();
+        List<List<String>> sharingAndContact = universalDataExtractor.getSharingAndContactSheetDataExport();
 
         Assert.assertEquals("m123", sharingAndContact.get(0).get(0));
         Assert.assertEquals("Academia", sharingAndContact.get(0).get(1));
@@ -128,10 +128,10 @@ public class DataExportTest extends BaseTest {
     @Test
     public void Given_Provider_When_GetLoaderRelatedSheetIsCalled_Then_DataIsInRowOne(){
 
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initLoaderRelatedData();
+        universalDataExtractor.setDs(providerGroup);
+        universalDataExtractor.initLoaderRelatedData();
 
-        List<List<String>> loaderRelatedData = universalDataExporter.getLoaderRelatedDataSheetDataExport();
+        List<List<String>> loaderRelatedData = universalDataExtractor.getLoaderRelatedDataSheetDataExport();
 
         Assert.assertEquals("TG", loaderRelatedData.get(0).get(1));
 
@@ -144,10 +144,10 @@ public class DataExportTest extends BaseTest {
         when(dataImportService.findModelXenograftPlatformSampleByDS(providerGroup.getAbbreviation()))
           .thenReturn(getModelListForTest());
 
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initSamplePlatformDescription();
+        universalDataExtractor.setDs(providerGroup);
+        universalDataExtractor.initSamplePlatformDescription();
 
-        List<List<String>> samplePlatformDescription = universalDataExporter.getSamplePlatformDescriptionSheetDataExport();
+        List<List<String>> samplePlatformDescription = universalDataExtractor.getSamplePlatformDescriptionSheetDataExport();
 
         Assert.assertEquals("s123", samplePlatformDescription.get(0).get(1));
         Assert.assertEquals("xs123", samplePlatformDescription.get(1).get(1));
@@ -165,7 +165,7 @@ public class DataExportTest extends BaseTest {
         List<List<String>> data = new ArrayList<>();
         data.add(rowData);
 
-        universalDataExporter.updateSheetWithData(sheet1, data, 1, 1);
+        //universalDataExtractor.updateSheetWithData(sheet1, data, 1, 1);
 
         Assert.assertEquals("2", sheet1.getRow(0).getCell(1).getStringCellValue());
     }
@@ -182,18 +182,18 @@ public class DataExportTest extends BaseTest {
         List<String> genericColumn = new ArrayList<>();
         genericSheet.add(genericColumn);
 
-        universalDataExporter.setPatientSheetDataExport(genericSheet);
-        universalDataExporter.setPatientTumorSheetDataExport(genericSheet);
-        universalDataExporter.setPatientTreatmentSheetDataExport(genericSheet);
-        universalDataExporter.setPdxModelSheetDataExport(genericSheet);
-        universalDataExporter.setPdxModelValidationSheetDataExport(genericSheet);
-        universalDataExporter.setSamplePlatformDescriptionSheetDataExport(genericSheet);
-        universalDataExporter.setSharingAndContactSheetDataExport(genericSheet);
-        universalDataExporter.setCytogeneticsSheetDataExport(genericSheet);
-        universalDataExporter.setLoaderRelatedDataSheetDataExport(genericSheet);
-        universalDataExporter.setDrugDosingSheetDataExport(genericSheet);
-        universalDataExporter.setCnaSheetDataExport(genericSheet);
-        universalDataExporter.setMutationSheetDataExport(genericSheet);
+        universalDataExtractor.setPatientSheetDataExport(genericSheet);
+        universalDataExtractor.setSampleSheetDataExport(genericSheet);
+        universalDataExtractor.setPatientTreatmentSheetDataExport(genericSheet);
+        universalDataExtractor.setModelSheetDataExport(genericSheet);
+        universalDataExtractor.setPdxModelValidationSheetDataExport(genericSheet);
+        universalDataExtractor.setSamplePlatformDescriptionSheetDataExport(genericSheet);
+        universalDataExtractor.setSharingAndContactSheetDataExport(genericSheet);
+        universalDataExtractor.setCytogeneticsSheetDataExport(genericSheet);
+        universalDataExtractor.setLoaderRelatedDataSheetDataExport(genericSheet);
+        universalDataExtractor.setDrugDosingSheetDataExport(genericSheet);
+        universalDataExtractor.setCnaSheetDataExport(genericSheet);
+        universalDataExtractor.setMutationSheetDataExport(genericSheet);
 
         Workbook metaDataXlsx = new XSSFWorkbook();
         Workbook samplePlatformXlsx = new XSSFWorkbook();
@@ -214,10 +214,10 @@ public class DataExportTest extends BaseTest {
         cnaTemplateXlsx.write(new FileOutputStream(cnaTemplate.toFile()));
 
         try {
-            universalDataExporter.setTemplateDir("/tmp");
-            universalDataExporter.setDs(providerGroup);
-            universalDataExporter.initPatientData();
-            universalDataExporter.export("/tmp");
+            universalDataExtractor.setTemplateDir("/tmp");
+            universalDataExtractor.setDs(providerGroup);
+            universalDataExtractor.initPatientSheet();
+            //universalDataExtractor.export("/tmp");
         } finally {
 
             Files.delete(metaData);

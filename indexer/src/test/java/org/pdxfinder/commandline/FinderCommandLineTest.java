@@ -92,6 +92,30 @@ public class FinderCommandLineTest extends BaseTest {
         verifyNoMoreInteractions(this.finderTransformer);
     }
 
+    @Test public void givenTransformer_WhenOnlyExportIsPassed_ThenLoadAllandIsHarmonizedAreFalse() throws IOException {
+        String[] args = {"-a"};
+        int exitCode = new CommandLine(export).execute(args);
+        assertEquals(0, exitCode);
+        verify(this.finderExporter).run(
+                any(File.class),
+                any(String.class),
+                eq(true),
+                eq(false)
+        );
+    }
+
+    @Test public void givenTransformer_WhenExportAllandHarmonized_ThenLoadAllandIsHarmonizedAretrue() throws IOException {
+        String[] args = {"-a", "-o"};
+        int exitCode = new CommandLine(export).execute(args);
+        assertEquals(0, exitCode);
+        verify(this.finderExporter).run(
+                any(File.class),
+                any(String.class),
+                eq(true),
+                eq(true)
+        );
+    }
+
 
     @Test public void givenTransform_WhenTwoExclusiveArgumentsArepassed_Then_ReturnNonZeroExit() {
         String[] args = {"--data-dir=path/", "--export=test", "--all"};

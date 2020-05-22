@@ -271,6 +271,7 @@ public class DomainObjectCreator {
             String databaseUrl = row.getString(TSV.Metadata.database_url.name());
             String project = row.getString(TSV.Metadata.project.name());
 
+            System.out.println(modelId);
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
             if (modelCreation == null) throw new NullPointerException();
 

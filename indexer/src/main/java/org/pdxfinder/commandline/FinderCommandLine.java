@@ -182,6 +182,12 @@ public class FinderCommandLine implements Callable<Integer> {
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
 
+        @Option(
+                names = {"-o", "--harmonized"},
+                description = "Exports the NCIT ontology information"
+        )
+        private boolean isHarmonized;
+
         @ArgGroup(multiplicity = "0..1")
         Export.Exclusive datasetRequested = new Export.Exclusive();
         static class Exclusive{
@@ -199,8 +205,8 @@ public class FinderCommandLine implements Callable<Integer> {
 
             private boolean loadAll;
 
-            public DataProvider getProvider() {
-                return provider;
+            public String getProvider() {
+                return Objects.nonNull(provider) ? provider.toString() : "";
             }
 
             public boolean isLoadAll() {
@@ -209,7 +215,7 @@ public class FinderCommandLine implements Callable<Integer> {
         }
         @Override
         public Integer call() throws IOException {
-            finderExporter.run(dataDirectory, datasetRequested.provider.toString(), datasetRequested.isLoadAll());
+            finderExporter.run(dataDirectory, datasetRequested.getProvider(), datasetRequested.isLoadAll(), isHarmonized);
             return 0;
         }
 
@@ -219,6 +225,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     .add("dataDirectory=" + dataDirectory)
                     .add("Export provider" + datasetRequested.getProvider())
                     .add("Load all" + datasetRequested.isLoadAll())
+                    .add("Unharmonized" + isHarmonized)
                     .toString();
         }
     }

@@ -167,4 +167,52 @@ public class TSV {
         model_id
     }
 
+    public enum providerFileNames{
+        metadata,
+        sampleplatform,
+        cna,
+        mut,
+        expression,
+        patienttreatment,
+        cytogenetics,
+        drugdosing
+    }
+
+
+    public enum metadataSheetNames{
+        checklist,
+        patient,
+        sample,
+        model,
+        model_validation,
+        sharing,
+        loader
+    }
+
+    public enum numberOfMetadataSheets{
+        numberSheets(6);
+        public final int count;
+        numberOfMetadataSheets(int count) {
+            this.count = count;
+        }
+    }
+
+    public enum templateNames{
+        metadata_template("metadata_template.xlsx"),
+        sampleplatform_template("sampleplatform_template.xlsx"),
+        patienttreatment_template("patienttreatment_template.xlsx"),
+        cna_template("cna_template.xlsx"),
+        expression_template("expression_template.xlsx"),
+        cytogenetics_template("cytogenetics_template.xslx"),
+        mutation_template("mutation_template.xlsx"),
+        drugdosing_template("drugdosing_template.xlsx");
+
+        public final String fileName;
+
+        templateNames(String fileName) {
+            this.fileName = fileName;
+        }
+
+    }
+
 }

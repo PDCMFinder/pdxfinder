@@ -1,10 +1,11 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.lang3.StringUtils;
+import org.pdxfinder.dataexport.ExportSheets;
 import org.pdxfinder.dataexport.UniversalDataExporter;
+import org.pdxfinder.dataexport.UniversalDataExtractor;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,21 +25,23 @@ public class FinderExporter {
     private File rootDir;
     private static final Logger log = LoggerFactory.getLogger(FinderExporter.class);
 
-    private UtilityService utilityService;
     private DataImportService dataImportService;
+    private UniversalDataExtractor universalDataExtractor;
+    private UniversalDataExporter universalDataExporter;
 
     @Autowired
-    FinderExporter(UtilityService utilityService, DataImportService dataImportService){
-        this.utilityService = utilityService;
+    FinderExporter(DataImportService dataImportService, UniversalDataExtractor universalDataExtractor, UniversalDataExporter universalDataExporter){
         this.dataImportService = dataImportService;
+        this.universalDataExtractor = universalDataExtractor;
+        this.universalDataExporter = universalDataExporter;
     }
-    public void run(File dataDirectory, String provider, boolean loadAll) throws IOException {
+    public void run(File dataDirectory, String provider, boolean loadAll, boolean isHarmonized) throws IOException {
         resolveRootDir(dataDirectory);
         if(loadAll){
-            exportAllGroups(rootDir);
+            exportAllGroups(rootDir, isHarmonized);
         }
         else if (StringUtils.isNotEmpty(provider)) {
-            export(rootDir, provider);
+            export(rootDir, provider, isHarmonized);
         }
     }
 
@@ -52,26 +55,27 @@ public class FinderExporter {
         }
     }
 
-    public void exportAllGroups(File rootDir){
+    public void exportAllGroups(File rootDir, boolean isUnharmonized){
         List<Group> allProviders = dataImportService.getAllProviderGroups();
         allProviders.forEach(g -> {
             try {
-                export(rootDir, g.getAbbreviation());
+                export(rootDir, g.getAbbreviation(),isUnharmonized);
             } catch (IOException e) {
                 log.error(Arrays.toString(e.getStackTrace()));
             }
         });
     }
 
-    public void export(File rootDir, String dataSourceAbbrev) throws IOException {
+    public void export(File rootDir, String dataSourceAbbrev, boolean unharmonized) throws IOException {
         Group ds = dataImportService.findProviderGroupByAbbrev(dataSourceAbbrev);
         if(ds == null) {
             log.error("Datasource {} not found. ",dataSourceAbbrev);
             return;
         }
-        UniversalDataExporter downDog = new UniversalDataExporter(dataImportService, utilityService);
-        downDog.init(rootDir + "/template", ds);
-        downDog.export(rootDir + "/export");
+        ExportSheets xDogSheets = new ExportSheets();
+        xDogSheets.init(rootDir + "/template", ds);
+        universalDataExtractor.extract(xDogSheets, unharmonized);
+        universalDataExporter.export(rootDir + "/export", xDogSheets);
     }
 
     public void setDefaultDirectory(String defaultDirectory) {
