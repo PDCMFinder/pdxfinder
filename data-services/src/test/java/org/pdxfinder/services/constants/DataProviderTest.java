@@ -13,7 +13,7 @@ public class DataProviderTest extends BaseTest {
     @Test
     public void given_DataProviderEnumListCount_EnsureListIntegrity() {
 
-        final int DATA_PROVIDER_COUNT = 21;
+        final int DATA_PROVIDER_COUNT = 22;
 
         assertEquals(DATA_PROVIDER_COUNT, DataProvider.values().length);
     }
@@ -68,6 +68,8 @@ public class DataProviderTest extends BaseTest {
                 case DFCI_CPDM:
                     break;
                 case NKI:
+                    break;
+                case PDMR_XDOG:
                     break;
                 default:
                     message = String.format("%s %s", ASSERTION_ERROR, option);
