@@ -22,8 +22,7 @@ public class MolecularDataEntryDTO {
     private String isVisible;
 
     public MolecularDataEntryDTO(String sampleId, String sampleType, String engraftedTumorPassage, String dataAvailableLabel,
-                                 String dataAvailableUrl, String platformUsedLabel, String platformUsedUrl, String rawDataLabel,
-                                 String rawDataUrl) {
+                                 String dataAvailableUrl, String platformUsedLabel, String platformUsedUrl, String rawDataLabel) {
 
         this.sampleId = sampleId;
         this.sampleType = sampleType;

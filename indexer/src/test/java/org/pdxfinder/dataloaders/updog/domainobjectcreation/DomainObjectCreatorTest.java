@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.BaseTest;
+import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -16,6 +17,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+import tech.tablesaw.api.Row;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
@@ -37,6 +39,8 @@ public class DomainObjectCreatorTest extends BaseTest {
     private Group accessibilityGroup;
     private Patient testPatient;
     private ModelCreation testModel;
+    private static final String key1 = "model";
+    private static final String key2 = "MOCK_MODEL";
 
     private static final String FIRST = "first";
 
@@ -223,13 +227,15 @@ public class DomainObjectCreatorTest extends BaseTest {
 
         pdxDataTables.put(samplePlatform, Table.create(samplePlatform).addColumns(
                 StringColumn.create("sample_id", Collections.singletonList("sample 1")),
-                StringColumn.create("sample_origin", Collections.singletonList("patient")),
+                StringColumn.create("sample_origin", Collections.singletonList("xenograft")),
                 StringColumn.create("passage", Collections.singletonList("")),
-                StringColumn.create("model_id", Collections.singletonList("model 1")),
+                StringColumn.create("model_id", Collections.singletonList(key2)),
                 StringColumn.create("host_strain_name", Collections.singletonList("")),
                 StringColumn.create("host_strain_nomenclature", Collections.singletonList("")),
                 StringColumn.create("molecular_characterisation_type", Collections.singletonList("mutation")),
-                StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing"))
+                StringColumn.create("raw_data_file", Collections.singletonList("PRB00009")),
+                StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing")),
+                StringColumn.create("internal_protocol_url", Collections.singletonList("www.pdxFinder.org"))
         ));
 
         pdxDataTables.put(mutation, Table.create(mutation).addColumns(
@@ -327,4 +333,16 @@ public class DomainObjectCreatorTest extends BaseTest {
         verify(modelCreationCreator).create(any(), any(), any());
     }
 
+    @Test public void createSamplePlatformData_givenBlankSampleAlreadyExists_overwriteSample(){
+        ModelCreation mockModel = new ModelCreation();
+        Sample mockSample = new Sample();
+        Specimen mockSpecimen = new Specimen();
+        HostStrain mockHostStrain = new HostStrain("sample 1");
+        mockSpecimen.setHostStrain(mockHostStrain);
+        mockSpecimen.setSample(mockSample);
+        mockModel.setSample(mockSample);
+
+        domainObjectCreator.addDomainObject(key1, key2, mockModel);
+        domainObjectCreator.createSamplePlatformData(pdxDataTables);
+    }
 }

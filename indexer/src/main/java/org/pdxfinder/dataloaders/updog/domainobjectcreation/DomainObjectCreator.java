@@ -304,6 +304,7 @@ public class DomainObjectCreator {
             String platformName = row.getString(TSV.SamplePlatform.platform.name());
             String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
             String rawDataUrl = row.getString(TSV.SamplePlatform.raw_data_file.name());
+            String platformUrl = row.getString(TSV.SamplePlatform.internal_protocol_url.name());
 
             Sample sample = null;
 
@@ -314,7 +315,7 @@ public class DomainObjectCreator {
             }
             if (sample == null) throw new NullPointerException();
             sample.setRawDataUrl(rawDataUrl);
-            getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+            getOrCreateMolecularCharacterization(sample, platformName, molCharType, platformUrl);
         }
     }
 
@@ -464,7 +465,7 @@ public class DomainObjectCreator {
             log.error(sampleOrigin);
             throw new NullPointerException();}
 
-        return getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "");
     }
 
     private Set getMarkers(MarkerAssociation markerAssociation) {
@@ -518,19 +519,20 @@ public class DomainObjectCreator {
         return specimen;
     }
 
-    private MolecularCharacterization getOrCreateMolecularCharacterization(Sample sample, String platformName, String molCharType) {
+    private MolecularCharacterization getOrCreateMolecularCharacterization(Sample sample, String platformName,
+                                                                           String molCharType, String platformUrl) {
 
         MolecularCharacterization molecularCharacterization = sample.getMolecularCharacterization(molCharType, platformName);
         if (molecularCharacterization == null) {
             molecularCharacterization = new MolecularCharacterization();
             molecularCharacterization.setType(molCharType);
-            molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
+            molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType, platformUrl));
             sample.addMolecularCharacterization(molecularCharacterization);
         }
         return molecularCharacterization;
     }
 
-    private Platform getOrCreatePlatform(String platformName, String molCharType) {
+    private Platform getOrCreatePlatform(String platformName, String molCharType, String platformUrl) {
 
         Group providerGroup = (Group) getDomainObject(PROVIDER_GROUPS, FIRST);
         String platformId = molCharType + platformName;
@@ -539,6 +541,7 @@ public class DomainObjectCreator {
             platform = new Platform();
             platform.setGroup(providerGroup);
             platform.setName(platformName);
+            platform.setUrl(platformUrl);
             addDomainObject(PLATFORMS, platformId, platform);
         }
         return platform;

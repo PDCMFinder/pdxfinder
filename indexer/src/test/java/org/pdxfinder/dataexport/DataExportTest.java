@@ -195,6 +195,7 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setCnaSheetDataExport(genericSheet);
         universalDataExporter.setMutationSheetDataExport(genericSheet);
 
+
         Workbook metaDataXlsx = new XSSFWorkbook();
         Workbook samplePlatformXlsx = new XSSFWorkbook();
         Workbook mutationXlsx = new XSSFWorkbook();                                                           
