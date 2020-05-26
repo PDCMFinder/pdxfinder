@@ -415,10 +415,11 @@ public class UniversalDataExporter {
 
     private void initGenomicData(List<List<String>> sheetData, String molcharType){
 
+        //TODO, these queries could be optimized to reduce db interactions
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
 
-        for(ModelCreation m: models){ ModelCreation model = dataImportService.
-              findModelWithMolecularDataByDSAndIdAndMolcharType(
+        for(ModelCreation m: models){
+            ModelCreation model = dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
                   ds.getAbbreviation(),
                   m.getSourcePdxId(),
                   molcharType);
@@ -449,7 +450,7 @@ public class UniversalDataExporter {
                 molecularData = ma.decodeMolecularData();
             }
             catch(Exception e){
-                log.error("No molecular data");
+                log.error("No molecular data in Marker Association on Sample {}", sampleId);
                 molecularData = new ArrayList<>();
             }
             for(MolecularData md : molecularData){

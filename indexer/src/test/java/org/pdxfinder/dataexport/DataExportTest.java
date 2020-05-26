@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -31,6 +32,11 @@ public class DataExportTest extends BaseTest {
     protected UniversalDataExporter universalDataExporter;
 
     Group providerGroup;
+
+    private static final String ncbiId = "XR_929159.2";
+    private static final String biotype = "protien_coding";
+    private static final String codingSequenceChange = "3154G>A";
+    private static final String variantClass = "SNV";
 
     @Before
     public void setUp() {
@@ -151,6 +157,29 @@ public class DataExportTest extends BaseTest {
 
         Assert.assertEquals("s123", samplePlatformDescription.get(0).get(1));
         Assert.assertEquals("xs123", samplePlatformDescription.get(1).get(1));
+
+    }
+
+    @Test
+    public void Given_ModelwithMutationData_When_initGenomicDataIsCalled_Then_MutationDataIsInRowOne(){
+
+        List<ModelCreation> modelList = getModelListForTest();
+
+        when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
+                .thenReturn(modelList);
+
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
+                providerGroup.getAbbreviation(),"m123", "mutation"))
+                .thenReturn(modelList.get(0));
+
+        universalDataExporter.setDs(providerGroup);
+        universalDataExporter.initOmicData();
+        List<List<String>> mutationData = universalDataExporter.getMutationSheetDataExport();
+
+        Assert.assertTrue(mutationData.get(0).contains(ncbiId));
+        Assert.assertTrue(mutationData.get(0).contains(biotype));
+        Assert.assertTrue(mutationData.get(0).contains(codingSequenceChange));
+        Assert.assertTrue(mutationData.get(0).contains(variantClass));
 
     }
 
@@ -277,6 +306,17 @@ public class DataExportTest extends BaseTest {
         MolecularCharacterization molecularCharacterization = new MolecularCharacterization();
         molecularCharacterization.setType("mutation");
         molecularCharacterization.setTechnology("techtest");
+
+        MarkerAssociation ma = new MarkerAssociation();
+        ma.setMolecularDataString("[{\"biotype\": \"" + biotype + "\",\"codingSequenceChange\":\"" + codingSequenceChange + "\"," +
+                "\"variantClass\":\""+ variantClass + "\",\"codonChange\"" +
+                ":\"Gtt/Att\",\"aminoAcidChange\":\"E763*\",\"consequence\":\"\",\"functionalPrediction\":\"Nonsense_Mutation\"," +
+                "\"readDepth\":\"403\",\"alleleFrequency\":\"0.464\",\"chromosome\":\"5\",\"seqStartPosition\":\"112173578\"," +
+                "\"refAllele\":\"G\",\"altAllele\":\"T\",\"ucscGeneId\":\"\",\"ncbiGeneId\":\"" + ncbiId + "\",\"ncbiTranscriptId\":" +
+                "\"XR_929159.2\",\"existingVariations\":\"CM106354,COSM5010432\",\"genomeAssembly\":\"hg19\",\"nucleotideChange\"" +
+                ":\"\",\"marker\":\"APC\"}]");
+
+        molecularCharacterization.setMarkerAssociations(Collections.singletonList(ma));
         Platform platform = new Platform();
         platform.setName("platform");
         platform.setUrl("platformurl");

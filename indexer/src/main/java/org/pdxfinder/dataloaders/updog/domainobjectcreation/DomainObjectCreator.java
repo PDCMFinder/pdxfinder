@@ -434,7 +434,7 @@ public class DomainObjectCreator {
 
     private void createMolecularData(Table table, String molcharType){
 
-       MarkerAssociation markerAssociation = null;
+       MarkerAssociation markerAssociation;
         for (Row row : table) {
 
             if(row.getRowNumber() != 1){
