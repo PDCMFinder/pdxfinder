@@ -300,6 +300,8 @@ public class DomainObjectCreator {
         if (samplePlatformTable == null) return;
 
         for (Row row : samplePlatformTable) {
+
+            String sampleId = row.getString(TSV.SamplePlatform.sample_id.name());
             String sampleOrigin = row.getString(TSV.SamplePlatform.sample_origin.name());
             String platformName = row.getString(TSV.SamplePlatform.platform.name());
             String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
@@ -312,6 +314,9 @@ public class DomainObjectCreator {
                 sample = getPatientSample(row);
             } else if (sampleOrigin.equals("xenograft")) {
                 sample = getOrCreateSpecimen(row).getSample();
+                if (sample.getSourceSampleId().equals("")){
+                    sample.setSourceSampleId(sampleId);
+                }
             }
             if (sample == null) throw new NullPointerException();
             sample.setRawDataUrl(rawDataUrl);
@@ -451,6 +456,7 @@ public class DomainObjectCreator {
 
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
 
+        String sampleId = row.getString("sample_id");
         String sampleOrigin = row.getString("sample_origin");
         String platformName = row.getString(PLATFORMS);
         Sample sample = null;
@@ -459,6 +465,9 @@ public class DomainObjectCreator {
             sample = getPatientSample(row);
         } else if (sampleOrigin.equalsIgnoreCase("xenograft")) {
             sample = getOrCreateSpecimen(row).getSample();
+            if(sample.getSourceSampleId().equals("")) {
+                sample.setSourceSampleId(sampleId);
+            }
         }
 
         if (sample == null) {

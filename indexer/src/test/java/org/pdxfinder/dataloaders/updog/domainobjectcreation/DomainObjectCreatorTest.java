@@ -41,6 +41,8 @@ public class DomainObjectCreatorTest extends BaseTest {
     private ModelCreation testModel;
     private static final String key1 = "model";
     private static final String key2 = "MOCK_MODEL";
+    private static final String passage = "0";
+    private static final String hostStrainSymbol = "Not Specified";
 
     private static final String FIRST = "first";
 
@@ -228,10 +230,10 @@ public class DomainObjectCreatorTest extends BaseTest {
         pdxDataTables.put(samplePlatform, Table.create(samplePlatform).addColumns(
                 StringColumn.create("sample_id", Collections.singletonList("sample 1")),
                 StringColumn.create("sample_origin", Collections.singletonList("xenograft")),
-                StringColumn.create("passage", Collections.singletonList("")),
+                StringColumn.create("passage", Collections.singletonList(passage)),
                 StringColumn.create("model_id", Collections.singletonList(key2)),
                 StringColumn.create("host_strain_name", Collections.singletonList("")),
-                StringColumn.create("host_strain_nomenclature", Collections.singletonList("")),
+                StringColumn.create("host_strain_nomenclature", Collections.singletonList(hostStrainSymbol)),
                 StringColumn.create("molecular_characterisation_type", Collections.singletonList("mutation")),
                 StringColumn.create("raw_data_file", Collections.singletonList("PRB00009")),
                 StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing")),
@@ -333,16 +335,32 @@ public class DomainObjectCreatorTest extends BaseTest {
         verify(modelCreationCreator).create(any(), any(), any());
     }
 
-    @Test public void createSamplePlatformData_givenBlankSampleAlreadyExists_overwriteSample(){
+    @Test public void createSamplePlatformData_givenBlankSampleAlreadyExists_overwriteSampleId(){
         ModelCreation mockModel = new ModelCreation();
         Sample mockSample = new Sample();
+        mockSample.setSourceSampleId("");
+
+        HostStrain mockHostStrain = new HostStrain(hostStrainSymbol);
         Specimen mockSpecimen = new Specimen();
-        HostStrain mockHostStrain = new HostStrain("sample 1");
-        mockSpecimen.setHostStrain(mockHostStrain);
+
+        mockSpecimen.setPassage(passage);
         mockSpecimen.setSample(mockSample);
-        mockModel.setSample(mockSample);
+        mockSpecimen.setHostStrain(mockHostStrain);
+
+        mockModel.setSpecimens(Collections.singleton(mockSpecimen));
+        mockModel.addRelatedSample((mockSpecimen.getSample()));
 
         domainObjectCreator.addDomainObject(key1, key2, mockModel);
         domainObjectCreator.createSamplePlatformData(pdxDataTables);
+
+        Assert.assertNotNull(mockModel
+                .getSpecimenByPassageAndHostStrain(passage, hostStrainSymbol)
+                .getSample()
+                .getSourceSampleId());
+
+        Assert.assertNotEquals(mockModel
+                .getSpecimenByPassageAndHostStrain(passage, hostStrainSymbol)
+                .getSample()
+                .getSourceSampleId(), "");
     }
 }
