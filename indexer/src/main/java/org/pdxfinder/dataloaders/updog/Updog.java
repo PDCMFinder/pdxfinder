@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import javax.annotation.Nonnull;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -28,10 +27,10 @@ public class Updog {
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
     public Updog(
-        @Nonnull Reader reader,
-        @Nonnull TableSetCleaner tableSetCleaner,
-        @Nonnull Validator validator,
-        @Nonnull DomainObjectCreator domainObjectCreator
+        Reader reader,
+        TableSetCleaner tableSetCleaner,
+        Validator validator,
+        DomainObjectCreator domainObjectCreator
     ) {
         this.reader = reader;
         this.tableSetCleaner = tableSetCleaner;
@@ -50,15 +49,11 @@ public class Updog {
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = tableSetCleaner.cleanPdxTables(pdxTableSet);
 
-        //omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        //omicsTableSet = tableSetCleaner.cleanOmicsTables(omicsTableSet);
         omicsTableSet = new HashMap<>();
-
         treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
         treatmentTableSet = tableSetCleaner.cleanTreatmentTables(treatmentTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
-        //combinedTableSet.putAll(omicsTableSet);
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
