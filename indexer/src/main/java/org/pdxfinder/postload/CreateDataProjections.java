@@ -225,6 +225,12 @@ public class CreateDataProjections implements ApplicationContextAware{
         for(MolecularCharacterization mc:ihcMolchars){
 
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
+
+            if(model == null){
+                log.error("Molchar {} with type {} is not linked to a sample! ",mc.getId(), mc.getType());
+                continue;
+            }
+
             Long modelId = model.getId();
 
             //the findModelWithSampleByMolchar should return exactly one sample object
