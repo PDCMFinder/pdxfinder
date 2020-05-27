@@ -89,9 +89,13 @@ public class DomainObjectCreator {
         }
         persistMolecularData(true);
         persistNodes();
+        /*
+        //This is here for debugging purposes only
         sampleMolcharMap.entrySet().forEach(entry->{
             System.out.println(entry.getKey() + ":" + entry.getValue());
         });
+
+         */
     }
 
 
