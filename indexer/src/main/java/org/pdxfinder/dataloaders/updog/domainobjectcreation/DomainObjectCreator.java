@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.dataloaders.updog.TableSetCleaner;
 import org.pdxfinder.graph.dao.*;
@@ -465,7 +466,7 @@ public class DomainObjectCreator {
             sample = getPatientSample(row);
         } else if (sampleOrigin.equalsIgnoreCase("xenograft")) {
             sample = getOrCreateSpecimen(row).getSample();
-            if(sample.getSourceSampleId().equals("")) {
+            if(StringUtils.isEmpty(sample.getSourceSampleId())) {
                 sample.setSourceSampleId(sampleId);
             }
         }
