@@ -1,5 +1,6 @@
 package org.pdxfinder.graph.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import javax.persistence.GeneratedValue;
@@ -49,6 +50,10 @@ public class Marker {
 
     public void setHgncSymbol(String hgncSymbol) {
         this.hgncSymbol = hgncSymbol;
+    }
+
+    public boolean hasHgncSymbol() {
+        return StringUtils.isNotEmpty(this.hgncSymbol);
     }
 
     public String getHgncName() {

@@ -54,7 +54,7 @@ public class OmicTransformationService {
         String hgncSymbol = geneIdCache.get(ncbiGene);
         if (hgncSymbol == null) {
             Marker marker = dataImportService.getMarkerbyNcbiGeneId(ncbiGene);
-            if (isMarkerSymbolNullOrEmpty(marker)) {
+            if (marker.hasHgncSymbol()) {
                 hgncSymbol = marker.getHgncSymbol();
                 geneIdCache.put(ncbiGene, hgncSymbol);
             } else { log.warn("No marker found for NCBI gene Id {} Cannot generate Hgnc symbol", ncbiGene); }
@@ -62,7 +62,4 @@ public class OmicTransformationService {
         return hgncSymbol;
     }
 
-    private Boolean isMarkerSymbolNullOrEmpty(Marker marker){
-        return marker.getHgncSymbol() != null && !marker.getHgncSymbol().isEmpty();
-    }
 }
