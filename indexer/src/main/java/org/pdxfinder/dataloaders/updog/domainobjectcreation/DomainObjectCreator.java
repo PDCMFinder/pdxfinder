@@ -434,7 +434,7 @@ public class DomainObjectCreator {
 
     private void createMolecularData(Table table, String molcharType){
 
-       MarkerAssociation markerAssociation;
+       MarkerAssociation markerAssociation = null;
         for (Row row : table) {
 
             if(row.getRowNumber() != 1){
@@ -474,7 +474,7 @@ public class DomainObjectCreator {
             log.error(sampleOrigin);
             throw new NullPointerException();}
 
-        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "");
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "Not Available");
     }
 
     private Set getMarkers(MarkerAssociation markerAssociation) {

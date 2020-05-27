@@ -872,7 +872,7 @@
                                                            th:onclick="'window.open(\'https://www.ebi.ac.uk/ena/data/view/'+${dataRow.rawDataLabel}+'\')'">
                                                             ...
                                                         </a>
-                                                        <span th:if="${dataRow.rawDataLabel == null}" th:text="'Not Available'" ></span>
+                                                        <span th:if="${dataRow.rawDataLabel == null || dataRow.rawDataLabel == 'Not Available'} " th:text="'Not Available'" ></span>
                                                     </td>
                                                 </tr>
 

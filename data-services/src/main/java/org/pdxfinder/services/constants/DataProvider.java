@@ -8,7 +8,6 @@ public enum DataProvider {
     JAX("JAX"),
     PDXNet_MDAnderson("PDXNet-MDAnderson"),
     PDMR("PDMR"),
-    PDMR_XDOG("PDMR-XDOG"),
     PDXNet_Wistar_MDAnderson_Penn("PDXNet-Wistar-MDAnderson-Penn"),
     PDXNet_WUSTL("PDXNet-WUSTL"),
     CRL("CRL"),
@@ -23,7 +22,9 @@ public enum DataProvider {
     VHIO_BC("VHIO-BC"),
     VHIO_CRC("VHIO-CRC"),
     DFCI_CPDM("DFCI-CPDM"),
-    NKI("NKI");
+    NKI("NKI"),
+    PDMR_XDOG("PDMR-XDOG"),
+    JAX_XDOG("JAX-XDOG");
 
     private String name;
     DataProvider(String name) {
