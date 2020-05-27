@@ -45,25 +45,27 @@ public class LoadMarkers {
         String line;
         BufferedReader reader = downloadDataFromURL(dataURL);
         try {
-            while ((line = reader.readLine()) != null) {
-                //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENTREZ_ID ENSEMBL_ID
-                //HGNC ID[0]	Approved symbol[1]	Approved name[2]	Status[3]	Previous symbols[4]	Synonyms[5]
-                // Accession numbers[6]	RefSeq IDs[7]	Name synonyms[8]	Ensembl gene ID[9] NcbiGeneId[10]
-                rowData = line.split("\t");
-                symbol = parseHugoFile(rowData, 1);
-                if (!symbol.equals("")) {
+            if(reader!= null) {
+                while ((line = reader.readLine()) != null) {
+                    //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENTREZ_ID ENSEMBL_ID
+                    //HGNC ID[0]	Approved symbol[1]	Approved name[2]	Status[3]	Previous symbols[4]	Synonyms[5]
+                    // Accession numbers[6]	RefSeq IDs[7]	Name synonyms[8]	Ensembl gene ID[9] NcbiGeneId[10]
+                    rowData = line.split("\t");
+                    symbol = parseHugoFile(rowData, 1);
+                    if (!symbol.equals("")) {
 
-                    hgncId = parseHugoFile(rowData, 0);
-                    prevSymbols = parseHugoFile(rowData, 4).split(",");
-                    synonyms = parseHugoFile(rowData, 5).split(",");
-                    ensemblId = parseHugoFile(rowData, 9);
-                    ncbiId = parseHugoFile(rowData, 10);
+                        hgncId = parseHugoFile(rowData, 0);
+                        prevSymbols = parseHugoFile(rowData, 4).split(",");
+                        synonyms = parseHugoFile(rowData, 5).split(",");
+                        ensemblId = parseHugoFile(rowData, 9);
+                        ncbiId = parseHugoFile(rowData, 10);
 
-                    Marker m = createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols);
-                    dataImportService.saveMarker(m);
-                    if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
+                        Marker m = createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols);
+                        dataImportService.saveMarker(m);
+                        if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
+                    }
+                    rows++;
                 }
-                rows++;
             }
         } catch (Exception e) {
             log.error("{} %n Error wall parsing HGNC file", e.getMessage());
