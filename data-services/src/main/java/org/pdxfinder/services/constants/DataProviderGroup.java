@@ -43,7 +43,9 @@ public enum DataProviderGroup {
                 DataProvider.VHIO_BC,
                 DataProvider.VHIO_CRC,
                 DataProvider.DFCI_CPDM,
-                DataProvider.NKI
+                DataProvider.NKI,
+                DataProvider.PDMR_XDOG,
+                DataProvider.JAX_XDOG
         ));
 
         map.put(DataProviderGroup.CustomLoaders, Arrays.asList(

@@ -415,10 +415,11 @@ public class UniversalDataExporter {
 
     private void initGenomicData(List<List<String>> sheetData, String molcharType){
 
+        //TODO, these queries could be optimized to reduce db interactions
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
 
-        for(ModelCreation m: models){ ModelCreation model = dataImportService.
-              findModelWithMolecularDataByDSAndIdAndMolcharType(
+        for(ModelCreation m: models){
+            ModelCreation model = dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
                   ds.getAbbreviation(),
                   m.getSourcePdxId(),
                   molcharType);
@@ -449,7 +450,7 @@ public class UniversalDataExporter {
                 molecularData = ma.decodeMolecularData();
             }
             catch(Exception e){
-                log.error("No molecular data");
+                log.error("No molecular data in Marker Association on Sample {}", sampleId);
                 molecularData = new ArrayList<>();
             }
             for(MolecularData md : molecularData){
@@ -479,7 +480,12 @@ public class UniversalDataExporter {
                     case "mutation":
                         rowData.add(md.getMarker());
                         rowData.add(md.getAminoAcidChange());
+                        rowData.add(md.getBiotype());
+                        rowData.add(md.getCodingSequenceChange());
+                        rowData.add(md.getVariantClass());
                         rowData.add(md.getNucleotideChange());
+                        rowData.add(md.getCodonChange());
+                        rowData.add(md.getAminoAcidChange());
                         rowData.add(md.getConsequence());
                         rowData.add(md.getReadDepth());
                         rowData.add(md.getAlleleFrequency());
@@ -488,8 +494,7 @@ public class UniversalDataExporter {
                         rowData.add(md.getRefAllele());
                         rowData.add(md.getAltAllele());
                         rowData.add(md.getUcscGeneId());
-                        rowData.add(md.getNcbiGeneId()); 
-
+                        rowData.add(md.getNcbiGeneId());
                         rowData.add(md.getNcbiTranscriptId());
                         rowData.add(md.getEnsemblGeneId());
                         rowData.add(md.getEnsemblTranscriptId());
@@ -863,7 +868,6 @@ public class UniversalDataExporter {
                         dataRow.add(model.getSourcePdxId());
                         dataRow.add(hostStrainName);
                         dataRow.add(hostStrainNomenclature);
-
                         dataRow.add(mc.getType());
                         dataRow.add(mc.getPlatform().getName());
                         dataRow.add(mc.getTechnology());

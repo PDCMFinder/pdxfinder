@@ -300,18 +300,27 @@ public class DomainObjectCreator {
         if (samplePlatformTable == null) return;
 
         for (Row row : samplePlatformTable) {
+
+            String sampleId = row.getString(TSV.SamplePlatform.sample_id.name());
             String sampleOrigin = row.getString(TSV.SamplePlatform.sample_origin.name());
             String platformName = row.getString(TSV.SamplePlatform.platform.name());
             String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
+            String rawDataUrl = row.getString(TSV.SamplePlatform.raw_data_file.name());
+            String platformUrl = row.getString(TSV.SamplePlatform.internal_protocol_url.name());
+
             Sample sample = null;
 
             if (sampleOrigin.equals(PATIENTS)) {
                 sample = getPatientSample(row);
             } else if (sampleOrigin.equals("xenograft")) {
                 sample = getOrCreateSpecimen(row).getSample();
+                if (sample.getSourceSampleId().equals("")){
+                    sample.setSourceSampleId(sampleId);
+                }
             }
             if (sample == null) throw new NullPointerException();
-            getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+            sample.setRawDataUrl(rawDataUrl);
+            getOrCreateMolecularCharacterization(sample, platformName, molCharType, platformUrl);
         }
     }
 
@@ -425,8 +434,7 @@ public class DomainObjectCreator {
 
     private void createMolecularData(Table table, String molcharType){
 
-
-        MarkerAssociation markerAssociation = null;
+       MarkerAssociation markerAssociation = null;
         for (Row row : table) {
 
             if(row.getRowNumber() != 1){
@@ -443,12 +451,12 @@ public class DomainObjectCreator {
                     markerAssociation.addMolecularData(molecularData);
 
             }
-
         }
     }
 
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
 
+        String sampleId = row.getString("sample_id");
         String sampleOrigin = row.getString("sample_origin");
         String platformName = row.getString(PLATFORMS);
         Sample sample = null;
@@ -457,13 +465,16 @@ public class DomainObjectCreator {
             sample = getPatientSample(row);
         } else if (sampleOrigin.equalsIgnoreCase("xenograft")) {
             sample = getOrCreateSpecimen(row).getSample();
+            if(sample.getSourceSampleId().equals("")) {
+                sample.setSourceSampleId(sampleId);
+            }
         }
 
         if (sample == null) {
             log.error(sampleOrigin);
             throw new NullPointerException();}
 
-        return getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "Not Available");
     }
 
     private Set getMarkers(MarkerAssociation markerAssociation) {
@@ -517,19 +528,20 @@ public class DomainObjectCreator {
         return specimen;
     }
 
-    private MolecularCharacterization getOrCreateMolecularCharacterization(Sample sample, String platformName, String molCharType) {
+    private MolecularCharacterization getOrCreateMolecularCharacterization(Sample sample, String platformName,
+                                                                           String molCharType, String platformUrl) {
 
         MolecularCharacterization molecularCharacterization = sample.getMolecularCharacterization(molCharType, platformName);
         if (molecularCharacterization == null) {
             molecularCharacterization = new MolecularCharacterization();
             molecularCharacterization.setType(molCharType);
-            molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
+            molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType, platformUrl));
             sample.addMolecularCharacterization(molecularCharacterization);
         }
         return molecularCharacterization;
     }
 
-    private Platform getOrCreatePlatform(String platformName, String molCharType) {
+    private Platform getOrCreatePlatform(String platformName, String molCharType, String platformUrl) {
 
         Group providerGroup = (Group) getDomainObject(PROVIDER_GROUPS, FIRST);
         String platformId = molCharType + platformName;
@@ -538,6 +550,7 @@ public class DomainObjectCreator {
             platform = new Platform();
             platform.setGroup(providerGroup);
             platform.setName(platformName);
+            platform.setUrl(platformUrl);
             addDomainObject(PLATFORMS, platformId, platform);
         }
         return platform;

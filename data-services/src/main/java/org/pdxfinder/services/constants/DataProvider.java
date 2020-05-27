@@ -22,7 +22,9 @@ public enum DataProvider {
     VHIO_BC("VHIO-BC"),
     VHIO_CRC("VHIO-CRC"),
     DFCI_CPDM("DFCI-CPDM"),
-    NKI("NKI");
+    NKI("NKI"),
+    PDMR_XDOG("PDMR-XDOG"),
+    JAX_XDOG("JAX-XDOG");
 
     private String name;
     DataProvider(String name) {

@@ -184,7 +184,6 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @ArgGroup(multiplicity = "0..1")
         Export.Exclusive datasetRequested = new Export.Exclusive();
-
         static class Exclusive{
 
             @Option(
@@ -196,12 +195,12 @@ public class FinderCommandLine implements Callable<Integer> {
             @Option(
                     names = {"-a", "--all"},
                     description = "Export all providers data." +
-                            " Warning: do to large provider datasets this can be computationally intensive")
+                            " Warning: this can be computationally intensive")
 
             private boolean loadAll;
 
-            public String getProvider() {
-                return provider.toString();
+            public DataProvider getProvider() {
+                return provider;
             }
 
             public boolean isLoadAll() {
@@ -210,7 +209,7 @@ public class FinderCommandLine implements Callable<Integer> {
         }
         @Override
         public Integer call() throws IOException {
-            finderExporter.run(dataDirectory, datasetRequested.getProvider(), datasetRequested.isLoadAll());
+            finderExporter.run(dataDirectory, datasetRequested.provider.toString(), datasetRequested.isLoadAll());
             return 0;
         }
 
