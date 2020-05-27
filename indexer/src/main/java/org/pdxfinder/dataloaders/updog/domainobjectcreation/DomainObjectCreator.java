@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.dataloaders.updog.TableSetCleaner;
 import org.pdxfinder.graph.dao.*;
@@ -84,9 +85,9 @@ public class DomainObjectCreator {
             omicTable = tableSetCleaner.cleanOmicsTable(omicTable);
             String dataType = reader.getOmicDataType(omicFile);
             createMolecularData(omicTable, dataType);
-            persistMolecularData();
+            persistMolecularData(false);
         }
-
+        persistMolecularData(true);
         persistNodes();
         sampleMolcharMap.entrySet().forEach(entry->{
             System.out.println(entry.getKey() + ":" + entry.getValue());
@@ -465,7 +466,7 @@ public class DomainObjectCreator {
             sample = getPatientSample(row);
         } else if (sampleOrigin.equalsIgnoreCase("xenograft")) {
             sample = getOrCreateSpecimen(row).getSample();
-            if(sample.getSourceSampleId().equals("")) {
+            if(StringUtils.isEmpty(sample.getSourceSampleId())) {
                 sample.setSourceSampleId(sampleId);
             }
         }
@@ -823,7 +824,7 @@ public class DomainObjectCreator {
         return primarySite;
     }
 
-    private void persistMolecularData(){
+    private void persistMolecularData(boolean persistEmptyMolchars){
 
         Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
         while (iter.hasNext()) {
@@ -832,7 +833,7 @@ public class DomainObjectCreator {
             //persist molchar data for patient sample
             Sample patientSample = model.getSample();
             String patientSampleKey = model.getSourcePdxId()+ "__patient";
-            encodeMolecularDataFor(patientSample, patientSampleKey);
+            encodeMolecularDataFor(patientSample, patientSampleKey, persistEmptyMolchars);
 
             //persist molchar data for xenograft sample(s)
             if (model.hasSpecimens())
@@ -840,7 +841,7 @@ public class DomainObjectCreator {
                     String passage = s.getPassage();
                     String hostStrain = s.getHostStrain().getSymbol();
                     String xenoSampleKey = model.getSourcePdxId()+"__xenograft__"+passage+"__"+hostStrain;
-                    encodeMolecularDataFor(s.getSample(), xenoSampleKey);
+                    encodeMolecularDataFor(s.getSample(), xenoSampleKey, persistEmptyMolchars);
                 }
         }
     }
@@ -927,15 +928,20 @@ public class DomainObjectCreator {
     }
 
 
-    private void encodeMolecularDataFor(Sample sample, String sampleKey) {
+    private void encodeMolecularDataFor(Sample sample, String sampleKey, boolean persistEmptyMolchars) {
 
         try {
             if (sample.hasMolecularCharacterizations()) {
 
                 Iterator<MolecularCharacterization> iter = sample.getMolecularCharacterizations().iterator();
                 while (iter.hasNext()) {
-                    encodeMolecularDataFor(iter.next(), sampleKey);
-                    iter.remove();
+                    MolecularCharacterization mc = iter.next();
+                    if(mc.hasMarkerAssociations() || persistEmptyMolchars) {
+                        encodeMolecularDataFor(mc, sampleKey);
+                        Long molcharId = dataImportService.saveMolecularCharacterization(mc).getId();
+                        addIdToSampleMolcharMap(sampleKey, molcharId);
+                        iter.remove();
+                    }
                 }
             }
         }
@@ -955,9 +961,6 @@ public class DomainObjectCreator {
             mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
             mc.getFirstMarkerAssociation().encodeMolecularData();
         }
-
-        Long molcharId = dataImportService.saveMolecularCharacterization(mc).getId();
-        addIdToSampleMolcharMap(sampleKey, molcharId);
     }
 
     private void addIdToSampleMolcharMap(String sampleKey, Long molcharId){
