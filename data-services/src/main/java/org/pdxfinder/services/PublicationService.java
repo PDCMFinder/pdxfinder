@@ -15,7 +15,6 @@ import java.util.List;
 public class PublicationService {
 
     private RestTemplate restTemplate;
-    private Logger log = LoggerFactory.getLogger(PublicationService.class);
 
     private static final String PUBLICATION_PREFIX = "PMID:";
     private static final String EMPTY_STRING = "";
@@ -28,9 +27,10 @@ public class PublicationService {
         pubMedIds = sanitizePubMedIds(pubMedIds);
         List<Publication> publications = new ArrayList<>();
         pubMedIds.forEach(pubMedId->{
-            String api = String.format("%s%s&format=json&resultType=core", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
+            String api = String.format("%s?query=%s&resultType=core&format=json", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
             publications.add(restTemplate.getForObject(api, Publication.class));
         });
+
         return publications;
     }
 
@@ -46,7 +46,6 @@ public class PublicationService {
                 cleanedPubMedIds.add(pubMedId);
             }
         });
-
         return cleanedPubMedIds;
     }
 

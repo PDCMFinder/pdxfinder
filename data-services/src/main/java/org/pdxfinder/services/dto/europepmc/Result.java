@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
         "issue",
         "journalVolume",
         "pubYear",
+        "abstractText",
         "journalIssn",
         "pageInfo",
         "pubType",
@@ -39,47 +40,63 @@ import java.util.stream.Collectors;
 })
 public class Result {
 
-
+    private String id;
+    private String source;
     private String pmid;
+    private String doi;
     private String title;
     private String authorString;
-    private JournalInfo journalInfo;
-
+    private String journalTitle;
+    private String issue;
+    private String journalVolume;
     private String pubYear;
     private String abstractText;
+    private String journalIssn;
+    private String pageInfo;
+    private String pubType;
+    private String isOpenAccess;
+    private String inEPMC;
+    private String inPMC;
+    private String hasPDF;
+    private String hasBook;
+    private String hasSuppl;
+    private Integer citedByCount;
+    private String hasReferences;
+    private String hasTextMinedTerms;
+    private String hasDbCrossReferences;
+    private String hasLabsLinks;
+    private String hasTMAccessionNumbers;
+    private String firstIndexDate;
+    private String firstPublicationDate;
 
     public Result() {
     }
 
-    public Result(String pmid, String title,
-                  String authorString, JournalInfo journalInfo,
-                  String pubYear, String abstractText) {
-        this.pmid = pmid;
+    public Result(String title, String authorString, String journalTitle, String pubYear) {
         this.title = title;
         this.authorString = authorString;
-        this.journalInfo = journalInfo;
+        this.journalTitle = journalTitle;
         this.pubYear = pubYear;
-        this.abstractText = abstractText;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public String getPmid() {
         return pmid;
     }
 
-    public void setPmid(String pmid) {
-        this.pmid = pmid;
+    public String getDoi() {
+        return doi;
     }
 
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setAuthorString(String authorString) {
-        this.authorString = authorString;
     }
 
     public String getAuthorString() {
@@ -92,19 +109,19 @@ public class Result {
 
         String lastAuthor = this.authorString.substring(this.authorString.lastIndexOf(delimiter) + 1);
 
-       return String.format("%s ... %s", first3Authors, lastAuthor);
+        return String.format("%s ... %s", first3Authors, lastAuthor);
     }
 
-    public JournalInfo getJournalInfo() {
-        return journalInfo;
+    public String getJournalTitle() {
+        return journalTitle;
     }
 
-    public void setJournalInfo(JournalInfo journalInfo) {
-        this.journalInfo = journalInfo;
+    public String getIssue() {
+        return issue;
     }
 
-    public void setPubYear(String pubYear) {
-        this.pubYear = pubYear;
+    public String getJournalVolume() {
+        return journalVolume;
     }
 
     public String getPubYear() {
@@ -117,5 +134,73 @@ public class Result {
 
     public void setAbstractText(String abstractText) {
         this.abstractText = abstractText;
+    }
+
+    public String getJournalIssn() {
+        return journalIssn;
+    }
+
+    public String getPageInfo() {
+        return pageInfo;
+    }
+
+    public String getPubType() {
+        return pubType;
+    }
+
+    public String getIsOpenAccess() {
+        return isOpenAccess;
+    }
+
+    public String getInEPMC() {
+        return inEPMC;
+    }
+
+    public String getInPMC() {
+        return inPMC;
+    }
+
+    public String getHasPDF() {
+        return hasPDF;
+    }
+
+    public String getHasBook() {
+        return hasBook;
+    }
+
+    public String getHasSuppl() {
+        return hasSuppl;
+    }
+
+    public Integer getCitedByCount() {
+        return citedByCount;
+    }
+
+    public String getHasReferences() {
+        return hasReferences;
+    }
+
+    public String getHasTextMinedTerms() {
+        return hasTextMinedTerms;
+    }
+
+    public String getHasDbCrossReferences() {
+        return hasDbCrossReferences;
+    }
+
+    public String getHasLabsLinks() {
+        return hasLabsLinks;
+    }
+
+    public String getHasTMAccessionNumbers() {
+        return hasTMAccessionNumbers;
+    }
+
+    public String getFirstIndexDate() {
+        return firstIndexDate;
+    }
+
+    public String getFirstPublicationDate() {
+        return firstPublicationDate;
     }
 }

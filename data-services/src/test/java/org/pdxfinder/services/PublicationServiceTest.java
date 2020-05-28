@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.services.constants.DataUrl;
-import org.pdxfinder.services.dto.europepmc.JournalInfo;
 import org.pdxfinder.services.dto.europepmc.Publication;
 import org.pdxfinder.services.dto.europepmc.Result;
 import org.slf4j.Logger;
@@ -60,7 +59,6 @@ public class PublicationServiceTest extends BaseTest {
 
     }
 
-
     @Test
     public void givenPubMedIdAndApiUrl_whenGetEuropePmcPublicationsIsCalled_thenReturnEuropmcResult() throws Exception {
 
@@ -71,13 +69,11 @@ public class PublicationServiceTest extends BaseTest {
         String expectedTitle= "The humanized anti-human AMHRII mAb 3C23K exerts an anti-tumor activity against human ovarian cancer through tumor-associated macrophages.";
         String expectedAuthors= "Bougherara H, Némati F, Nicolas A, Massonnet G, Pugnière M, Ngô C, Le Frère-Belda MA";
         String expectedPubYear = "2017";
-        String expectedAbstractText = "Oncotarget";
-
-        JournalInfo journalInfo = new JournalInfo();
+        String expectedJournalTitle = "Oncotarget";
 
         Map<String, List<Result>> publication  = Collections.singletonMap(
                 "resultList",
-                Collections.singletonList(new Result(pubMedId, expectedTitle, expectedAuthors, journalInfo, expectedPubYear, expectedAbstractText))
+                Collections.singletonList(new Result(expectedTitle, expectedAuthors, expectedJournalTitle, expectedPubYear))
         );
         Publication expectedPublication = new Publication(publication);
 
@@ -99,7 +95,7 @@ public class PublicationServiceTest extends BaseTest {
 
         assertEquals(expectedTitle, publicationResult.getTitle());
         assertEquals(expectedPubYear, publicationResult.getPubYear());
-        //assertEquals(expectedJournalTitle, publicationResult.getJournalTitle());
+        assertEquals(expectedJournalTitle, publicationResult.getJournalTitle());
 
     }
 

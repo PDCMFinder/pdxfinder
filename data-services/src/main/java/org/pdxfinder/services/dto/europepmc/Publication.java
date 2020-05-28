@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "version",
-        "hitCount",
-        "nextCursorMark",
-        "request",
-        "resultList"
-})
+//@JsonPropertyOrder({
+//        "version",
+//        "hitCount",
+//        "nextCursorMark",
+//        "request",
+//        "resultList"
+//})
 public class Publication {
 
     private Map<String, List<Result>> resultList;
