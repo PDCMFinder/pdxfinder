@@ -374,9 +374,69 @@
 
                             </div>
 
+
+
+                            <div th:unless="${#lists.isEmpty(data.publications)}"
+                                 class="columns medium-12 small-12 margin-top-medium card-3">
+                                <div class="responsive-table top-space-20">
+
+                                    <table th:each="pub, iter : ${data.publications}" class="datatable-pdx table-borderedPdx pdx-table head-left">
+
+                                        <thead th:if="${iter.index == 0}">
+                                        <tr><th colspan="2"> Publications</th></tr>
+                                        </thead>
+
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-2"> Title </th>
+                                            <td><a th:text="${#strings.capitalizeWords(pub.resultList.result[0].title)}"
+                                                   th:href="| https://europepmc.org/article/MED/${pub.resultList.result[0].id} |"
+                                                   target="_blank"
+                                                   style="white-space: normal;"> Title Text <i class="icon icon-generic" data-icon="x"> </i> </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-2">Authors</th>
+                                            <td th:text="${pub.resultList.result[0].authorString}">Bougherara H, Némati F, Nicolas A, ... Decaudin D.</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-2">Publication year</th>
+                                            <td th:text="${pub.resultList.result[0].pubYear}"> 2017 </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-2"> Journal</th>
+                                            <td th:text="${pub.resultList.result[0].title}">  Journal Title </td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td class="text-left" colspan="2">
+
+                                                <ul class="vertical menu" data-accordion-menu>
+                                                    <li>
+                                                        <a type="button" th:id="|publication-${iter.index}|" class="primary button card-3b small-2 bold" href="#">
+                                                            <span th:id="|btn-text-${iter.index}|"> SHOW ABSTRACT</span> &nbsp;<i class="icon icon-generic" data-icon="P"></i>
+                                                        </a>
+                                                        <ul class="menu vertical nested topSace10">
+                                                            <li>
+                                                                <div class="callout card-3" style="white-space: normal; margin-left: -10px;" >
+                                                                    <p th:text="${pub.resultList.result[0].abstractText}"> </p>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+
+                                            </td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
                         </div>
-
-
                     </div>
 
 
@@ -976,20 +1036,12 @@
                                             <div class="responsive-table" style="margin-top: 20px;" id="variationTableData">
 
                                             </div>
-
                                         </div>
 
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-
-
                     </div>
 
                     <div class="tabs-panel" id="dosing_studies">
@@ -1026,20 +1078,11 @@
                     </div>
 
                 </div>
-
-
             </section>
-
-
         </section>
-
     </div>
     <!-- End suggested layout containers / #content -->
-
-
     <!--/*/ <th:block th:include="fragments/shared :: footer"></th:block> /*/-->
-
-
 </div>
 <!-- JavaScript -->
 
@@ -1054,33 +1097,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.highlightRegex/0.1.2/highlightRegex.min.js"></script>
 <script th:src="@{/js/script.js}"></script>
 <script th:src="@{/js/pdxFinder.js}"></script>
+<script th:src="@{/js/pdxfinder-behaviour.js}"></script>
 <!--<script th:src="@{/js/main.js}"></script>-->
 
 
 <script type="text/javascript" language="javascript" th:inline="javascript">
 
+    let publications = [[${data.publications}]];
+    publications.forEach((publication, iter, publications) => {
+        document.querySelector(`#publication-${iter}`)
+            .addEventListener('click', () => { PDXFinder.switchButtonText(`#btn-text-${iter}`); });
+    });
+
     var modelId = [[${data.modelId}]];
     var dataSrc = [[${data.dataSource}]];
     jQuery(document).ready(function () {
-        console.log("ready");
-        console.log("Adding event listener to molchardatalink");
-
         jQuery(".molecularDataLink").on("click", function () {
-
             $('#omicDataContainer').show();
             getMolecularDataTable(jQuery(this).attr("id"), jQuery(this).attr("title"));
-
         });
-
-
     });
 
     // We define the function
     function drawTable(tableId, apiURL) {
-
-        var l = jQuery("#tableId tr").length;
-        console.log(tableId + " " + l);
-
+        var l = jQuery("#tableId tr").length;;
         var dataTable = $('#' + tableId).DataTable({
             iDisplayLength: 10,
             serverSide: true,
@@ -1094,7 +1134,6 @@
                     $("#pdxFinder-grid_processing").css("display", "none");
                 }
             },
-
             dom: "frtiS",
             scrollY: 350,
             scrollX: true,
@@ -1106,16 +1145,11 @@
                 loadingIndicator: true,
                 rowHeight: 30
             }
-
         });
-
         $(window).bind('resize', function () {
             dataTable.fnAdjustColumnSizing();
         });
     }
-
-
-
 
     function initTabs(cnt) {
         for (var i = 0; i < 5; i++) {
@@ -1123,54 +1157,21 @@
         }
     }
 
-/*    function showTabs(cnt) {
-        for (var i = 0; i < 5; i++) {
-            var content = document.getElementsByClassName("hideContent" + cnt)[i];
-            var variation = document.getElementsByClassName("hideVariationData")[0];
-
-            if (content !== undefined) {
-                content.style.position = "static";
-            }
-            if (variation !== undefined) {
-                variation.style.position = "static";
-            }
-
-        }
-    }
-
-
-    function revealVariationData() {
-
-        // Activate the display of the vData
-        document.getElementsByClassName("hideVariationData")[0].style.position = "static";
-
-        // Open the corresponding tech Tab:
-        // showTabs(cnt);
-    }*/
-
     // Check if variation tab is deeplinked on page load:
     $(document).ready(function () {
-
-
         var hash = window.location.hash;
-
         if (hash == "#variation") {
             for (var i = 0; i < 5; i++) {
                 var content = document.getElementsByClassName("hideContent0")[i];
                 if (content !== undefined) {
                     content.style.position = "static";
                 }
-
             }
         }
     });
-
-
-
 </script>
 
 <script type="application/ld+json">
-
 {
     "@context": "http://schema.org",
     "@type": "Dataset",
@@ -1184,8 +1185,6 @@
     "dateModified": "2018",
     "citation": "https://doi.org/10.1101/291443"
 }
-
-
 </script>
 </body>
 </html>

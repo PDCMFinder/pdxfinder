@@ -1,5 +1,7 @@
 package org.pdxfinder.services.dto;
 
+import org.pdxfinder.services.dto.europepmc.Publication;
+
 import java.util.List;
 import java.util.Set;
 
@@ -76,12 +78,11 @@ public class DetailsDTO {
     private int dosingStudyNumbers;
 
 
+    private List<Publication> publications;
 
 
     /*
     // Disabled fields
-
-
 
     private String externalId;
     private String dataSource;
@@ -383,5 +384,13 @@ public class DetailsDTO {
 
     public void setDataTypes(Set<String> dataTypes) {
         this.dataTypes = dataTypes;
+    }
+
+    public List<Publication> getPublications() {
+        return this.publications;
+    }
+
+    public void setPublications(List<Publication> publications) {
+        this.publications = publications;
     }
 }
