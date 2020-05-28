@@ -38,6 +38,7 @@ public class DetailsService {
     private PlatformService platformService;
     private DrugService drugService;
     private PatientService patientService;
+    private PublicationService publicationService;
 
     private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
     private final String JAX_URL_TEXT = "View data at JAX";
@@ -71,7 +72,8 @@ public class DetailsService {
                           PlatformService platformService,
                           DrugService drugService,
                           PatientService patientService,
-                          MarkerAssociationRepository markerAssociationRepository) {
+                          MarkerAssociationRepository markerAssociationRepository,
+                          PublicationService publicationService) {
 
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
@@ -86,6 +88,7 @@ public class DetailsService {
         this.drugService = drugService;
         this.patientService = patientService;
         this.markerAssociationRepository = markerAssociationRepository;
+        this.publicationService = publicationService;
 
     }
 
@@ -390,6 +393,20 @@ public class DetailsService {
         dto.setMolecularDataRows(mdeDTO);
         dto.setMolecularDataEntrySize(mdeDTO.size());
         dto.setDataTypes(dataTypes);
+
+        // Get PDX Publication Data
+        List<String> pubMedIds = new ArrayList<>();
+        Optional<Set<Group>> optionalGroups = Optional.ofNullable(pdx.getGroups());
+        optionalGroups.ifPresent(groups -> {
+            for (Group group : groups){
+                if (group.getType().equals("Publication")){
+                    pubMedIds.add(group.getPubMedId());
+                }
+            }
+        });
+        pubMedIds.add("PMID:17606733");
+        dto.setPublications(publicationService.getEuropePmcPublications(pubMedIds));
+
         return dto;
     }
 
