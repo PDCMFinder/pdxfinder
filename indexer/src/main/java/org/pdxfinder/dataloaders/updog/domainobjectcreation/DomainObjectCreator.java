@@ -166,8 +166,8 @@ public class DomainObjectCreator {
 
             Patient patient = (Patient) getDomainObject(PATIENTS, patientId);
             if (patient == null) {
-                log.error("Patient not found {}", patientId);
-                throw new NullPointerException();}
+                log.error("Patient id is present in sample tab but not in patient tab {}", patientId);
+                continue;}
 
             PatientSnapshot patientSnapshot = patient.getSnapShotByCollection(
                     ageAtCollection,

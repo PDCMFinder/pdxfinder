@@ -45,7 +45,8 @@ public enum DataProviderGroup {
                 DataProvider.DFCI_CPDM,
                 DataProvider.NKI,
                 DataProvider.PDMR_XDOG,
-                DataProvider.JAX_XDOG
+                DataProvider.JAX_XDOG,
+                DataProvider.SJCRH
         ));
 
         map.put(DataProviderGroup.CustomLoaders, Arrays.asList(
