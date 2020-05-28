@@ -282,11 +282,10 @@ public class DomainObjectCreator {
             List<ExternalUrl> externalUrls = getExternalUrls(email, formUrl, databaseUrl);
             modelCreation.setExternalUrls(externalUrls);
 
-            Optional.ofNullable(project).ifPresent(
-                    s -> {
-                        Group projectGroup = dataImportService.getProjectGroup(s);
-                        modelCreation.addGroup(projectGroup);
-                    });
+            if(!StringUtils.isBlank(project)){
+                Group projectGroup = dataImportService.getProjectGroup(project);
+                modelCreation.addGroup(projectGroup);
+            }
 
             if (eitherIsPresent(accessibility, europdxAccessModality)) {
                 Group access = dataImportService.getAccessibilityGroup(accessibility, europdxAccessModality);
