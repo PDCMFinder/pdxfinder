@@ -307,6 +307,9 @@ h5{
     font-size: 13px;
     float: right;
 }
+.bold{
+    font-weight: bold;
+}
 
 
 .margin-vertical-20{margin-top:20px;margin-bottom:20px}

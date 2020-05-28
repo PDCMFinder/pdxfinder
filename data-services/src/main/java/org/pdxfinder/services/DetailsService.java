@@ -404,7 +404,6 @@ public class DetailsService {
                 }
             }
         });
-        pubMedIds.add("PMID:17606733");
         dto.setPublications(publicationService.getEuropePmcPublications(pubMedIds));
 
         return dto;
