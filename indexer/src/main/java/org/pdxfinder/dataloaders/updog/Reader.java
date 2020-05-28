@@ -71,9 +71,9 @@ public class Reader {
 
     public List<Path> getOmicFilePaths(Path targetDirectory) {
         List<Path> paths = new ArrayList<>();
-        try {
+        try(Stream<Path> walk = Files.walk(targetDirectory)) {
             PathMatcher omicPatterns = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna,expression}/**.tsv");
-            return Files.walk(targetDirectory)
+            return walk
                 .filter(omicPatterns::matches)
                 .collect(Collectors.toList());
         } catch (IOException e) {

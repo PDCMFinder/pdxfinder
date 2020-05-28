@@ -28,9 +28,10 @@ public class OmicTransformationService {
 
     public void convertListOfNcbiToHgnc(List<String> geneList){
         String fileOut = "ncbiToHugoAccesions";
-        BufferedWriter out;
+        BufferedWriter out = null;
+        FileWriter fstream = null;
         try {
-            FileWriter fstream = new FileWriter(fileOut, true);
+            fstream = new FileWriter(fileOut, true);
             out = new BufferedWriter(fstream);
             BufferedWriter finalOut = out;
             geneList.forEach(g ->
@@ -47,6 +48,14 @@ public class OmicTransformationService {
             out.close();
         } catch(IOException e){
             log.error("Failure opening output file %n {}", e.toString());
+        }
+        finally{
+            try {
+                if (fstream != null) fstream.close();
+                if (out != null) out.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
