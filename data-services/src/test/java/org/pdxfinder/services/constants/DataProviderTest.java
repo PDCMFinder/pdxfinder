@@ -64,6 +64,8 @@ public class DataProviderTest extends BaseTest {
                     break;
                 case JAX_XDOG:
                     break;
+                case SJCRH:
+                    break;
                 default:
                     message = String.format("%s %s", ASSERTION_ERROR, option);
                     expected = false;
