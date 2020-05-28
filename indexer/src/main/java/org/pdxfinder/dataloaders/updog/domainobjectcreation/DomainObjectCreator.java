@@ -209,11 +209,14 @@ public class DomainObjectCreator {
             String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
             String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
             String passageString = getCellAsText(row, TSV.Metadata.passage_number.name());
+            String publications = getCellAsText(row, TSV.Metadata.publications.name());
 
             ModelCreation modelCreation = new ModelCreation();
             modelCreation.setSourcePdxId(modelId);
             modelCreation.setDataSource(providerGroup.getAbbreviation());
             addDomainObject(MODELS, modelId, modelCreation);
+
+            createPublication(modelCreation, publications);
 
             String[] passageArr = passageString.split(",");
 
@@ -361,6 +364,19 @@ public class DomainObjectCreator {
                 if(model == null) throw new NullPointerException();
                 TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
                 model.addTreatmentProtocol(treatmentProtocol);
+            }
+        }
+    }
+
+    void createPublication(ModelCreation modelCreation, String publications ){
+
+        if(!StringUtils.isBlank(publications)){
+            String[] publicationArr = publications.split(",");
+            for(String publication:publicationArr){
+                if(!StringUtils.isBlank(publication)){
+                    Group publicationGroup = dataImportService.getPublicationGroup(publication);
+                    modelCreation.addGroup(publicationGroup);
+                }
             }
         }
     }
