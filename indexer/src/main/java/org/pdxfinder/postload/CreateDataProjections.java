@@ -471,11 +471,21 @@ public class CreateDataProjections implements ApplicationContextAware{
             List<DataAvailableDTO> dataAvailableDTOList = new ArrayList<>();
 
             for(Map.Entry<String, Set<String>> platform :platformMap.entrySet()){
-
-                String[] platformArr = platform.getKey().split("___");
-
-                DataAvailableDTO dto = new DataAvailableDTO(platformArr[0], platformArr[1], Integer.toString(platform.getValue().size()), platformArr[2]);
-                dataAvailableDTOList.add(dto);
+                try {
+                    String[] platformArr = platform.getKey().split("___");
+                    String dataType = platformArr[0];
+                    String platformName = platformArr[1];
+                    String platformUrl = "";
+                    if(platformArr.length > 2){
+                        platformUrl = platformArr[2];
+                    }
+                    String numOfModels = Integer.toString(platform.getValue().size());
+                    DataAvailableDTO dto = new DataAvailableDTO(dataType, platformName, numOfModels, platformUrl);
+                    dataAvailableDTOList.add(dto);
+                }
+                catch(Exception e){
+                    log.error(platform.getKey());
+                }
             }
 
             int drugDosingStudies = dataImportService.findDrugDosingStudyNumberByDataSource(group.getAbbreviation());

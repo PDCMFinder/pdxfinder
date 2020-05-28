@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.BaseTest;
-import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -17,7 +16,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-import tech.tablesaw.api.Row;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
@@ -362,5 +362,23 @@ public class DomainObjectCreatorTest extends BaseTest {
                 .getSpecimenByPassageAndHostStrain(passage, hostStrainSymbol)
                 .getSample()
                 .getSourceSampleId(), "");
+    }
+
+    @Test public void getCellAsText_whenGivenDifferentColumnTypes_returnsString() {
+        Table table = Table.create(
+            "table",
+            StringColumn.create("StringColumn", "x"),
+            IntColumn.create("IntColumn", new int[]{1}),
+            DoubleColumn.create("DoubleColumn", 1.0));
+
+        Assert.assertEquals(
+            "x",
+            domainObjectCreator.getCellAsText(table.row(0), "StringColumn"));
+        Assert.assertEquals(
+            "1",
+            domainObjectCreator.getCellAsText(table.row(0), "IntColumn"));
+        Assert.assertEquals(
+            "1.0",
+            domainObjectCreator.getCellAsText(table.row(0), "DoubleColumn"));
     }
 }

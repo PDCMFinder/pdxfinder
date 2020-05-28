@@ -28,9 +28,10 @@ public class OmicTransformationService {
 
     public void convertListOfNcbiToHgnc(List<String> geneList){
         String fileOut = "ncbiToHugoAccesions";
-        BufferedWriter out;
+        BufferedWriter out = null;
+        FileWriter fstream = null;
         try {
-            FileWriter fstream = new FileWriter(fileOut, true);
+            fstream = new FileWriter(fileOut, true);
             out = new BufferedWriter(fstream);
             BufferedWriter finalOut = out;
             geneList.forEach(g ->
@@ -48,13 +49,21 @@ public class OmicTransformationService {
         } catch(IOException e){
             log.error("Failure opening output file %n {}", e.toString());
         }
+        finally{
+            try {
+                if (fstream != null) fstream.close();
+                if (out != null) out.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     public String ncbiGeneIdToHgncSymbol(String ncbiGene) {
         String hgncSymbol = geneIdCache.get(ncbiGene);
         if (hgncSymbol == null) {
             Marker marker = dataImportService.getMarkerbyNcbiGeneId(ncbiGene);
-            if (isMarkerSymbolNullOrEmpty(marker)) {
+            if (marker.hasHgncSymbol()) {
                 hgncSymbol = marker.getHgncSymbol();
                 geneIdCache.put(ncbiGene, hgncSymbol);
             } else { log.warn("No marker found for NCBI gene Id {} Cannot generate Hgnc symbol", ncbiGene); }
@@ -62,7 +71,4 @@ public class OmicTransformationService {
         return hgncSymbol;
     }
 
-    private Boolean isMarkerSymbolNullOrEmpty(Marker marker){
-        return marker.getHgncSymbol() != null && !marker.getHgncSymbol().isEmpty();
-    }
 }

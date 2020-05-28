@@ -253,11 +253,12 @@ public class Sample {
 
         if(molecularCharacterizations == null) return null;
 
+        platformName = platformName.replaceAll("[^A-Za-z0-9 _-]", "");
         for(MolecularCharacterization mc : molecularCharacterizations){
 
             if(mc.getType().equals(type)){
 
-                if(mc.getPlatform() != null && mc.getPlatform().getName().equals(platformName)) {
+                if(mc.getPlatform() != null && mc.getPlatform().getName().replaceAll("[^A-Za-z0-9 _-]", "").equalsIgnoreCase(platformName)) {
 
                     return mc;
                 }
