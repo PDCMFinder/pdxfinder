@@ -24,7 +24,8 @@ public enum DataProvider {
     DFCI_CPDM("DFCI-CPDM"),
     NKI("NKI"),
     PDMR_XDOG("PDMR-XDOG"),
-    JAX_XDOG("JAX-XDOG");
+    JAX_XDOG("JAX-XDOG"),
+    SJCRH("SJCRH");
 
     private String name;
     DataProvider(String name) {
