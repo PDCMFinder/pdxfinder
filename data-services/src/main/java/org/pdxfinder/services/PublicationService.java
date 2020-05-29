@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class PublicationService {
 
-    @Autowired
     private RestTemplate restTemplate;
 
     private static final String PUBLICATION_PREFIX = "PMID:";
     private static final String EMPTY_STRING = "";
 
-    @Autowired
     public PublicationService(RestTemplate restTemplate) {
       this.restTemplate = restTemplate;
     }

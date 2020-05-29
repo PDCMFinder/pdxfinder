@@ -187,7 +187,7 @@
                         <!-- Summary first row -->
                         <div class="row large-12 medium-12 expanded">
 
-                            <div class="columns medium-12 small-12 margin-top-30 card-3">
+                            <!--<div class="columns medium-12 small-12 margin-top-30 card-3">
                                 <div class="responsive-table top-space-20">
                                     <table class="datatable-pdx table-borderedPdx pdx-table head-left">
                                         <thead>
@@ -224,95 +224,28 @@
                                     </table>
                                 </div>
 
-                            </div>
-
-                            <div class="columns medium-12 small-12 margin-top-medium card-3">
-                                <div class="responsive-table top-space-20">
-                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
-                                        <thead>
-                                        <tr>
-                                            <th colspan="2"> Patient Tumor</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Histology</th>
-                                            <td class="text-left"><span
-                                                    th:text="${data.mappedOntologyTermLabel}"></span></td>
-                                        </tr>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Primary Tissue</th>
-                                            <td class="text-left" th:text="${data.primaryTissue}"></td>
-                                        </tr>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Collection Site</th>
-                                            <td class="text-left" th:text="${data.collectionSite}"></td>
-                                        </tr>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Tumor Type</th>
-                                            <td class="text-left" th:text="${data.tumorType}"></td>
-                                        </tr>
-
-                                        <tr>
-                                            <th class="text-left medium-4"> Grade</th>
-                                            <td th:if="${#strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified')}">
-                                                <span th:utext="${data.grade}"></span>
-                                            </td>
-                                            <td th:if="${not ( #strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified') ) }">
-                                                <span th:utext="${data.grade}"></span>
-                                                <span th:utext="${'(<b> Classification: </b>'+data.gradeClassification+')'}"></span>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <th class="text-left medium-4"> Stage</th>
-                                            <td th:if="${#strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified')}">
-                                                <span th:utext="${data.stage}"></span>
-                                            </td>
-                                            <td th:if="${not ( #strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified') ) }">
-                                                <span th:utext="${data.stage}"></span>
-                                                <span th:utext="${'(<b> Classification: </b>'+data.stageClassification+')'}"></span>
-                                            </td>
-                                        </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                            </div>
-
-
-                            <!--
-                            <div class="columns medium-12 small-12 margin-top-medium card-3">
-                                <div class="responsive-table top-space-20">
-                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
-                                        <thead>
-                                        <tr>
-                                            <th colspan="2">PDX model</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Strain</th>
-                                            <td class="text-left" th:text="${data.strain}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Engraftment Site</th>
-                                            <td th:text="${data.engraftmentSite}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Implantation Material</th>
-                                            <td th:text="${data.sampleType}"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
                             </div> -->
+
+
+                            <div class="columns medium-12 small-12 margin-top-30 card-3">
+                               <div class="responsive-table top-space-20">
+                                   <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+                                       <thead>
+                                       <tr>
+                                           <th colspan="2"> Related Models </th>
+                                       </tr>
+                                       </thead>
+                                       <tbody>
+                                       <tr th:if="${not #lists.isEmpty(data.relatedModels)}">
+                                           <th class="text-left"> Models </th>
+                                           <td><span th:each="relMod:${data.relatedModels}"><a th:text="${relMod}"
+                                                                                               th:href="@{'/pdx/'+${data.dataSource}+'/'+${relMod}}"></a> </span>
+                                           </td>
+                                       </tr>
+                                       </tbody>
+                                   </table>
+                               </div>
+                           </div>
 
 
                             <div class="columns medium-12 small-12 margin-top-medium card-3">
@@ -442,264 +375,209 @@
 
                     <div class="tabs-panel" id="patients">
 
-                        <!-- Tabs Section
-                        <section class="row large-12 medium-12 expanded" id="detailsData">
-                            <div class="row large-12 medium-12 expanded">
-                                <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                    <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;"> Patient at Tumor Collection </a></li>
-                                </ul>
-                            </div>
-
-                            <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                                <div class="tabs-panel is-active" id="summary">
-
-                                    <div class="row large-12 medium-12 expanded">
-
-                                        <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                            <div class="responsive-table" style="margin-top: 20px;">
-                                                <table class="pdx-table head-left">
-                                                    <tbody>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Gender</th>
-                                                        <td th:text="${data.patient.gender}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4"> Age at Diagnosis</th>
-                                                        <td th:text="${data.patient.ageAtDiagnosis}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Disease Body Location</th>
-                                                        <td th:text="${data.patient.diseaseBodyLocation}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4">CTEP SDC Code</th>
-                                                        <td th:text="${data.patient.CTEPSDCCode}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Diagnosis Subtype</th>
-                                                        <td th:text="${data.patient.diagnosisSubtype}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Race / Ethnicity</th>
-                                                        <td th:text="${data.patient.raceAndEthnicity}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Sex</th>
-                                                        <td th:text="${data.patient.gender}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Race / Ethnicity</th>
-                                                        <td>
-                                                            <span th:text="${data.race}"></span>
-                                                            <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
-                                                            <span th:text="${data.ethnicity}"></span>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section> -->
-
-
-                        <!--
-                        <th class="text-left large-12" style="font-size: 17px;">IHC: CD34+, CD99+, EMA+, bcl2+; AE1/AE3 -, CAM5.2 - </th>
-                            <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
-                                <div class="row large-12 medium-12 expanded">
-                                    <ul class="tabs style-2"   data-deep-link="true" data-tabs id="example2-tabs">
-                                        <li class="tabs-title is-active"><a href="#initialDiagnosis" aria-selected="true" style="font-size: 15px; padding: 15px;">Additional patient History</a></li>
-                                    </ul>
-                                </div>
-
-                                <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                                    <div class="tabs-panel is-active" id="summary">
-
-
-                                        <div class="row large-12 medium-12 expanded">
-
-                                            <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                                <div class="responsive-table" style="margin-top: 20px;">
-                                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
-                                                        <thead>
-                                                        <tr>
-                                                            <th colspan="2"> Known Genetic Mutations / Tumor Markers</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-
-                                                        <tr>
-                                                            <td>
-                                                    <span th:each="mut : ${data.patient.knownGeneticMutations}"
-                                                          th:text="${mut}"> ...
-                                                    </span>
-
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>-->
-
-
                         <section class="row large-12 medium-12 expanded" id="detailsData" style="margin-top: 20px;">
 
-                            <div class="row large-12 medium-12 expanded">
-                                <ul class="tabs style-2" data-deep-link="true" data-tabs id="example2-tabs">
-                                    <li class="tabs-title is-active"><a href="#initialDiagnosis"
-                                                                        aria-selected="true"
-                                                                        style="font-size: 15px; padding: 15px;">
-                                        Patient Tumor Collection For PDX Model </a></li>
-                                </ul>
+
+                            <div class="columns medium-12 small-12 margin-top-medium card-3">
+                                <div class="responsive-table top-space-20">
+                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2"> Patient </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        <tr>
+                                            <th class="text-left medium-4">Sex</th>
+                                            <td th:text="${data.patient.gender}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left medium-4">Race / Ethnicity</th>
+                                            <td>
+                                                <span th:text="${data.race}"></span>
+                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
+                                                <span th:text="${data.ethnicity}"></span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <th class="text-left medium-4"> Derived Model </th>
+                                            <td>
+                                                <span th:text="${data.modelId}"> present model</span>
+                                                <span th:each="relMod:${data.relatedModels}">
+                                                    <a th:text="${relMod}" th:href="@{'/pdx/'+${data.dataSource}+'/'+${relMod}}"></a>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+
+                                        <!--<tr>
+                                            <th class="text-left medium-4">Primary Tissue</th>
+                                            <td class="text-left" th:text="${data.primaryTissue}"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <th class="text-left medium-4">Collection Site</th>
+                                            <td class="text-left" th:text="${data.collectionSite}"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <th class="text-left medium-4">Tumor Type</th>
+                                            <td class="text-left" th:text="${data.tumorType}"></td>
+                                        </tr> -->
+
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
 
-                            <div class="tabs-content style-2" data-tabs-content="example2-tabs">
-                                <div class="tabs-panel is-active" id="summary">
 
-                                    <div class="row large-12 medium-12 expanded">
+                            <div class="columns medium-12 small-12 margin-top-10 card-3">
+                                <div class="responsive-table top-space-20">
+                                    <table class="datatable-pdx pdx-table head-left">
+                                        <thead>
+                                        <tr>
+                                            <th> Patient Tumor Collection For PDX Model </th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                    <table class="pdx-table head-left top-space-n-20">
+                                        <thead>
+                                        <th></th>
+                                        <th:block
+                                                th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
+                                                th:each="event, iter : ${data.patient.collectionEvents}">
 
-                                        <div class="columns medium-12 small-12 margin-top-10 card-3">
-                                            <div class="responsive-table" style="margin-top: 20px;">
-                                                <table class="pdx-table head-left">
-                                                    <thead>
-                                                    <th></th>
-                                                    <th:block
-                                                            th:if="${not #lists.isEmpty(data.patient.collectionEvents)}"
-                                                            th:each="event, iter : ${data.patient.collectionEvents}">
+                                            <th th:if="${event.pdxMouse != data.modelId}"
+                                                th:text="${'Collection '} + ${' (Other Model)'}">
+                                                Collection
+                                            </th>
+                                            <th th:if="${event.pdxMouse == data.modelId}"
+                                                th:text="${'Collection '} + ${' (Current Model)'}">
+                                                Collection
+                                            </th>
 
-                                                        <th th:if="${event.pdxMouse != data.modelId}"
-                                                            th:text="${'Collection '} + ${' (Other Model)'}">
-                                                            Collection
-                                                        </th>
-                                                        <th th:if="${event.pdxMouse == data.modelId}"
-                                                            th:text="${'Collection '} + ${' (Current Model)'}">
-                                                            Collection
-                                                        </th>
+                                        </th:block>
+                                        </thead>
+                                        <tbody>
 
-                                                    </th:block>
-                                                    </thead>
-                                                    <tbody>
+                                        <th:block
+                                                th:if="${not #lists.isEmpty(data.patient.collectionEvents)}">
 
-                                                    <th:block
-                                                            th:if="${not #lists.isEmpty(data.patient.collectionEvents)}">
+                                            <tr>
+                                                <th class="text-left medium-4">Age</th>
 
-                                                        <tr>
-                                                            <th class="text-left medium-4">Age</th>
+                                                <th:block
+                                                        th:each="event : ${data.patient.collectionEvents}">
+                                                    <td th:text="${event.age}"
+                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                        ... AGE ...
+                                                    </td>
+                                                </th:block>
+                                            </tr>
 
-                                                            <th:block
-                                                                    th:each="event : ${data.patient.collectionEvents}">
-                                                                <td th:text="${event.age}"
-                                                                    th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                    ... AGE ...
-                                                                </td>
-                                                            </th:block>
-                                                        </tr>
+                                            <tr>
+                                                <th class="text-left medium-4"> Diagnosis</th>
 
-                                                        <tr>
-                                                            <th class="text-left medium-4"> Diagnosis</th>
+                                                <th:block
+                                                        th:each="event : ${data.patient.collectionEvents}">
+                                                    <td th:text="${event.diagnosis}"
+                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                        ... DIAGNOSIS ...
+                                                    </td>
+                                                </th:block>
+                                            </tr>
 
-                                                            <th:block
-                                                                    th:each="event : ${data.patient.collectionEvents}">
-                                                                <td th:text="${event.diagnosis}"
-                                                                    th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                    ... DIAGNOSIS ...
-                                                                </td>
-                                                            </th:block>
-                                                        </tr>
+                                            <tr>
+                                                <th class="text-left medium-4"> Type</th>
 
-                                                        <tr>
-                                                            <th class="text-left medium-4"> Type</th>
+                                                <th:block th:each="event : ${data.patient.collectionEvents}">
+                                                    <td th:text="${event.type}"
+                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                        ... TYPE ...
+                                                    </td>
+                                                </th:block>
+                                            </tr>
 
-                                                            <th:block
-                                                                    th:each="event : ${data.patient.collectionEvents}">
-                                                                <td th:text="${event.type}"
-                                                                    th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                    ... TYPE ...
-                                                                </td>
-                                                            </th:block>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <th class="text-left medium0-4"> PDX Mouse</th>
-                                                            <th:block
-                                                                    th:each="event : ${data.patient.collectionEvents}">
-
-                                                                <td th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                            <tr>
+                                                <th class="text-left medium0-4"> PDX Mouse</th>
+                                                <th:block th:each="event : ${data.patient.collectionEvents}">
+                                                    <td th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
 
                                                                         <span th:if="${#strings.equals(event.pdxMouse, data.modelId) }"
                                                                               th:text="${event.pdxMouse}">
                                                                          ... MODELID ...
                                                                         </span>
 
-                                                                    <span th:if="${not #strings.equals(event.pdxMouse, data.modelId) }">
+                                                        <span th:if="${not #strings.equals(event.pdxMouse, data.modelId) }">
                                                                             <a th:text="${event.pdxMouse}"
                                                                                th:href="@{'/pdx/'+${data.dataSource}+'/'+${event.pdxMouse}}"
                                                                                target="_blank"> ... MODELID ... </a>
                                                                         </span>
-                                                                </td>
+                                                    </td>
 
-                                                            </th:block>
-                                                        </tr>
+                                                </th:block>
+                                            </tr>
 
-                                                        <tr>
-                                                            <th class="text-left medium-4">Collection Site</th>
+                                            <tr>
+                                                <th class="text-left medium-4">Collection Site</th>
 
-                                                            <th:block
-                                                                    th:each="event : ${data.patient.collectionEvents}">
-                                                                <td th:text="${event.collectionSite}"
-                                                                    th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                    ... COLLECTION SITE ...
-                                                                </td>
-                                                            </th:block>
-                                                        </tr>
+                                                <th:block
+                                                        th:each="event : ${data.patient.collectionEvents}">
+                                                    <td th:text="${event.collectionSite}"
+                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                        ... COLLECTION SITE ...
+                                                    </td>
+                                                </th:block>
+                                            </tr>
 
-                                                        <!--<tr>
-                                                        <th class="text-left medium-4">Data</th>
+                                        </th:block>
 
-                                                        <th:block th:each="event : ${data.patient.collectionEvents}">
-                                                            <td th:text="${event.data}"
-                                                                th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
-                                                                ... DATASET ...
-                                                            </td>
-                                                        </th:block>
-                                                        </tr> -->
+                                        </tbody>
+                                    </table>
 
+                                    <table class="pdx-table head-left">
+                                        <tbody>
+                                        <tr>
+                                            <th class="text-left medium-4"> Grade</th>
+                                            <td th:if="${#strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified')}">
+                                                <span th:utext="${data.grade}"></span>
+                                            </td>
+                                            <td th:if="${not ( #strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified') ) }">
+                                                <span th:utext="${data.grade}"></span>
+                                                <span th:utext="${'(<b> Classification: </b>'+data.gradeClassification+')'}"></span>
+                                            </td>
+                                        </tr>
 
-                                                    </th:block>
+                                        <tr>
+                                            <th class="text-left medium-4"> Stage</th>
+                                            <td th:if="${#strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified')}">
+                                                <span th:utext="${data.stage}"></span>
+                                            </td>
+                                            <td th:if="${not ( #strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified') ) }">
+                                                <span th:utext="${data.stage}"></span>
+                                                <span th:utext="${'(<b> Classification: </b>'+data.stageClassification+')'}"></span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
 
-                                                    </tbody>
-                                                </table>
-
-                                                <table class="pdx-table head-left">
-                                                    <tbody>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Sex</th>
-                                                        <td th:text="${data.patient.gender}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-left medium-4">Race / Ethnicity</th>
-                                                        <td>
-                                                            <span th:text="${data.race}"></span>
-                                                            <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
-                                                            <span th:text="${data.ethnicity}"></span>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-
-                                            </div>
+                                </div>
+                            </div>
 
 
-                                        </div>
+
+
+
+
+                            <div class="tabs-content style-2" data-tabs-content="example2-tabs">
+                                <div class="tabs-panel is-active" id="summary">
+
+                                    <div class="row large-12 medium-12 expanded">
+
+
                                     </div>
                                 </div>
                             </div>
