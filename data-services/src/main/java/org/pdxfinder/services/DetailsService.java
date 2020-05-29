@@ -474,6 +474,7 @@ public class DetailsService {
                         .setZscore(md.getZscore())
                         .setGenomeAssembly(md.getGenomeAssembly())
                         .setCytogeneticsResult(md.getCytogeneticsResult())
+                        .setIlluminaHGEAExp(md.getIlluminaHGEAExpressionValue())
                         .build();
 
                 tableData.add(dataRow);

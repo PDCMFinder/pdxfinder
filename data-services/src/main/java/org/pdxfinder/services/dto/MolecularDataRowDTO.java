@@ -32,7 +32,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "RNAseq Count",
         "Z-Score",
         "Genome Assembly",
-        "Result"
+        "Result",
+        "Illumina HGEA Exp"
 })
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MolecularDataRowDTO {
@@ -70,6 +71,7 @@ public class MolecularDataRowDTO {
     private String cnaCopyNumberStatus;
     private String cnaGisticValue;
     private String cnaPicnicValue;
+    private String illuminaHGEAExp;
 
 
     public MolecularDataRowDTO() {
@@ -426,6 +428,17 @@ public class MolecularDataRowDTO {
         return this;
     }
 
+
+    @JsonProperty("Illumina HGEA Exp")
+    public String getIlluminaHGEAExp(){
+        return illuminaHGEAExp;
+    }
+
+    @JsonProperty("Illumina HGEA Exp")
+    public MolecularDataRowDTO setIlluminaHGEAExp(String value) {
+        this.illuminaHGEAExp = value;
+        return this;
+    }
     public MolecularDataRowDTO build() {
         return this;
     }
