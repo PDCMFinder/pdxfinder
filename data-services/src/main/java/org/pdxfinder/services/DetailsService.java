@@ -374,7 +374,7 @@ public class DetailsService {
                     mde.setPlatformUsedLabel(mc.getPlatform().getName());
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
                     mde.setMolcharId(mc.getId().toString());
-                    setRawDataLabelAndLink(mde, xenoSample);
+                    //setRawDataLabelAndLink(mde, xenoSample);
 
                     int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 

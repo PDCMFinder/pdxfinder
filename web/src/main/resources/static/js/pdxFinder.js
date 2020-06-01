@@ -556,7 +556,7 @@ function referenceDatabase(dataObject) {
     databases.forEach((database) => {
         result += `<span class="small">
                         <a target="_blank" href="${referenceDBs[database]}" 
-                            style="text-decoration:none; color:#06369d; text-transform: lowercase;"> 
+                            style="text-decoration:none; color:#06369d; text-transform: uppercase;"> 
                                 ${database} <i class="icon icon-generic small" data-icon="x"> </i> 
                           </a>
                     </span>&nbsp;`;
