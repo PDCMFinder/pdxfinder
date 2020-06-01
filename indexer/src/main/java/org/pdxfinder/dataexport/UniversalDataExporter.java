@@ -2,7 +2,6 @@ package org.pdxfinder.dataexport;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
@@ -13,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.nio.file.Files;
 
 
 /*
@@ -240,7 +239,7 @@ public class UniversalDataExporter {
                         modelId = dataImportService.findModelBySample(sample).getSourcePdxId();
                     }
                     catch (Exception e){
-                        log.error("Sample: {}", sampleId);
+                        log.error("Error getting model Id from sample: {}", sampleId);
                     }
 
                     dataRow.add(patientId);

@@ -789,7 +789,7 @@
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <a th:if="${dataRow.platformUsedUrl != null}" target="_blank"
+                                                        <a th:if="${dataRow.platformUsedUrl != null or dataRow.platformUsedLabel == '' }" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
                                                            th:text="${#strings.replace(dataRow.platformUsedLabel,'_',' ')}"
                                                            th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
@@ -807,10 +807,10 @@
                                                     <td>
                                                         <a th:text="${dataRow.rawDataLabel}"
                                                            style="color: #06369d; text-decoration: none;"
-                                                           th:onclick="'window.open(\'https://www.ebi.ac.uk/ena/data/view/'+${dataRow.rawDataLabel}+'\')'">
+                                                           th:onclick="'window.open(\' '+${dataRow.rawDataLink}+'\')'">
                                                             ...
                                                         </a>
-                                                        <span th:if="${dataRow.rawDataLabel == null || dataRow.rawDataLabel == 'Not Available'} " th:text="'Not Available'" ></span>
+                                                        <span th:if="${dataRow.rawDataLink == ''} " th:text="'Not Available'" ></span>
                                                     </td>
                                                 </tr>
 

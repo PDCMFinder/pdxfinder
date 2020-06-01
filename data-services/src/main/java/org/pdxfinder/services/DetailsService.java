@@ -316,8 +316,8 @@ public class DetailsService {
             mde.setDataAvailableLabel(mc.getPlatform().getName());
             mde.setDataAvailableUrl("");
             mde.setPlatformUsedLabel(mc.getPlatform().getName());
-            mde.setRawDataLabel(patientSample.getRawDataUrl());
             mde.setMolcharId(mc.getId().toString());
+            setRawDataLabelAndLink(mde, patientSample);
 
             if (mc.getPlatform().getName() == null || mc.getPlatform().getName().isEmpty() || mc.getPlatform().getName().toLowerCase().equals("not specified")
                     || mc.getPlatform().getUrl() == null || mc.getPlatform().getUrl().isEmpty()) {
@@ -369,8 +369,9 @@ public class DetailsService {
                     mde.setDataAvailableUrl("");
                     mde.setPlatformUsedLabel(mc.getPlatform().getName());
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
-                    mde.setRawDataLabel(xenoSample.getRawDataUrl());
                     mde.setMolcharId(mc.getId().toString());
+                    setRawDataLabelAndLink(mde, xenoSample);
+
                     int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
                     if (assocData == 0) {
@@ -407,6 +408,16 @@ public class DetailsService {
         dto.setPublications(publicationService.getEuropePmcPublications(pubMedIds));
 
         return dto;
+    }
+
+    private void setRawDataLabelAndLink(MolecularDataEntryDTO mde, Sample xenoSample) {
+        String[] rawDataArray = xenoSample.getRawDataUrl().split(",");
+        mde.setRawDataLabel(rawDataArray[0]);
+        if(rawDataArray.length == 2){
+            mde.setRawDataLink(rawDataArray[1]);
+        } else {
+            mde.setRawDataLink("");
+        }
     }
 
     public MolecularDataTableDTO getMolecularDataTable(String id){
