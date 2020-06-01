@@ -1,20 +1,12 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.BrokenRelationErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.DuplicateValueErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.EmptyValueErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.MissingColumnErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.MissingTableErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.*;
+import org.slf4j.*;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class Validator {

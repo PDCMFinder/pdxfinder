@@ -78,7 +78,6 @@ public class DomainObjectCreator {
         createTreatmentData(pdxDataTables);
         createDrugDosingData(pdxDataTables);
 
-        //read one omic file, add molchar data to domain object
         List<Path> omicFiles = reader.getOmicFilePaths(targetDirectory);
         for(Path omicFile: omicFiles) {
             Table omicTable = reader.readOmicTable(omicFile);
@@ -89,13 +88,6 @@ public class DomainObjectCreator {
         }
         persistMolecularData(true);
         persistNodes();
-        /*
-        //This is here for debugging purposes only
-        sampleMolcharMap.entrySet().forEach(entry->{
-            System.out.println(entry.getKey() + ":" + entry.getValue());
-        });
-
-         */
     }
 
 
