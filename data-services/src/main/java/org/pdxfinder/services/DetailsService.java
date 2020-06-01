@@ -5,6 +5,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.dto.*;
+import org.pdxfinder.services.dto.pdxgun.MarkerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -58,6 +59,7 @@ public class DetailsService {
     private final String WUSTL_DS = "PDXNet-WUSTL";
 
     private final static Logger log = LoggerFactory.getLogger(DetailsService.class);
+    private ReferenceDbService referenceDbService;
 
 
     public DetailsService(SampleRepository sampleRepository,
@@ -73,7 +75,8 @@ public class DetailsService {
                           DrugService drugService,
                           PatientService patientService,
                           MarkerAssociationRepository markerAssociationRepository,
-                          PublicationService publicationService) {
+                          PublicationService publicationService,
+                          ReferenceDbService referenceDbService) {
 
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
@@ -89,6 +92,7 @@ public class DetailsService {
         this.patientService = patientService;
         this.markerAssociationRepository = markerAssociationRepository;
         this.publicationService = publicationService;
+        this.referenceDbService = referenceDbService;
 
     }
 
@@ -420,9 +424,9 @@ public class DetailsService {
         }
     }
 
+
     public MolecularDataTableDTO getMolecularDataTable(String id){
 
-        List<MolecularDataRowDTO> tableData = new ArrayList<>();
         MolecularDataTableDTO dto = new MolecularDataTableDTO();
         MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
 
@@ -447,52 +451,63 @@ public class DetailsService {
             String sampleId = sample.getSourceSampleId() == null ? "" : sample.getSourceSampleId();
 
             MarkerAssociation markerAssociation = mc.getFirstMarkerAssociation();
-            List<MolecularData> molecularDataList = null;
-
             try {
-                molecularDataList = markerAssociation.decodeMolecularData();
+                List<MolecularData> molecularDataList = markerAssociation.decodeMolecularData();
+                List<MolecularDataRowDTO> tableData = this.getMolecularDataRow(sampleId, molecularDataList);
+                dto.setMolecularDataRows(tableData);
             } catch (Exception e) {
                 log.error("Error getting molecular data");
-                molecularDataList = new ArrayList<>();
             }
-
-            for (MolecularData md : molecularDataList) {
-
-                MolecularDataRowDTO dataRow = new MolecularDataRowDTO();
-                dataRow.setSampleId(sampleId)
-                        .setHgncSymbol(md.getMarker())
-                        .setAminoAcidChange(md.getAminoAcidChange())
-                        .setConsequence(md.getConsequence())
-                        .setNucleotideChange(md.getNucleotideChange())
-                        .setReadDepth(md.getReadDepth() == null ? "" : md.getReadDepth())
-                        .setAlleleFrequency(md.getAlleleFrequency())
-                        .setProbeIdAffymetrix(md.getProbeIDAffymetrix())
-                        .setCnaLog10rCna(md.getCnaLog10RCNA())
-                        .setCnaLog2rCna(md.getCnaLog2RCNA())
-                        .setCnaCopyNumberStatus(md.getCnaCopyNumberStatus())
-                        .setCnaGisticValue(md.getCnaGisticValue())
-                        .setChromosome(md.getChromosome())
-                        .setSeqStartPosition(md.getSeqStartPosition())
-                        .setSeqEndPosition( md.getSeqEndPosition())
-                        .setRefAllele(md.getRefAllele())
-                        .setAltAllele(md.getAltAllele())
-                        .setRsidVariants(md.getVariantClass())
-                        .setEnsemblTranscriptId( md.getEnsemblTranscriptId())
-                        .setEnsemblTranscriptId(md.getEnsemblGeneId())
-                        .setUcscTranscriptId(md.getUcscGeneId())
-                        .setNcbiTranscriptId( md.getNcbiGeneId())
-                        .setRnaSeqCount( md.getRnaSeqCount())
-                        .setZscore(md.getZscore())
-                        .setGenomeAssembly(md.getGenomeAssembly())
-                        .setCytogeneticsResult(md.getCytogeneticsResult())
-                        .setIlluminaHGEAExp(md.getIlluminaHGEAExpressionValue())
-                        .build();
-
-                tableData.add(dataRow);
-            }
-            dto.setMolecularDataRows(tableData);
         }
         return dto;
+    }
+
+
+    private List<MolecularDataRowDTO> getMolecularDataRow(String sampleId, List<MolecularData> molecularDataList){
+
+        List<String> markerList = referenceDbService.getMarkerListFromMolecularData(molecularDataList);
+        Map<String, MarkerData> referenceData = referenceDbService.getReferenceDataForMarkerList(markerList);
+        List<MolecularDataRowDTO> tableData = new ArrayList<>();
+        molecularDataList.forEach(md -> {
+
+            String hgncSymbol = md.getMarker();
+            Optional<MarkerData> optionalMarkerData = Optional.ofNullable(referenceData.get(hgncSymbol));
+            MarkerData markerData = optionalMarkerData.orElse(new MarkerData(hgncSymbol));
+
+            MolecularDataRowDTO dataRow = new MolecularDataRowDTO();
+            dataRow.setSampleId(sampleId)
+                    .setHgncSymbol(markerData)
+                    .setAminoAcidChange(md.getAminoAcidChange())
+                    .setConsequence(md.getConsequence())
+                    .setNucleotideChange(md.getNucleotideChange())
+                    .setReadDepth(md.getReadDepth() == null ? "" : md.getReadDepth())
+                    .setAlleleFrequency(md.getAlleleFrequency())
+                    .setProbeIdAffymetrix(md.getProbeIDAffymetrix())
+                    .setCnaLog10rCna(md.getCnaLog10RCNA())
+                    .setCnaLog2rCna(md.getCnaLog2RCNA())
+                    .setCnaCopyNumberStatus(md.getCnaCopyNumberStatus())
+                    .setCnaGisticValue(md.getCnaGisticValue())
+                    .setChromosome(md.getChromosome())
+                    .setSeqStartPosition(md.getSeqStartPosition())
+                    .setSeqEndPosition( md.getSeqEndPosition())
+                    .setRefAllele(md.getRefAllele())
+                    .setAltAllele(md.getAltAllele())
+                    .setRsidVariants(md.getVariantClass())
+                    .setEnsemblTranscriptId( md.getEnsemblTranscriptId())
+                    .setEnsemblTranscriptId(md.getEnsemblGeneId())
+                    .setUcscTranscriptId(md.getUcscGeneId())
+                    .setNcbiTranscriptId( md.getNcbiGeneId())
+                    .setRnaSeqCount( md.getRnaSeqCount())
+                    .setZscore(md.getZscore())
+                    .setGenomeAssembly(md.getGenomeAssembly())
+                    .setCytogeneticsResult(md.getCytogeneticsResult())
+                    .setIlluminaHGEAExp(md.getIlluminaHGEAExpressionValue())
+                    .build();
+
+            tableData.add(dataRow);
+        });
+
+        return tableData;
     }
 
     /**
