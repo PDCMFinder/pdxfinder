@@ -34,7 +34,7 @@ public class FinderCommandLineTest extends BaseTest {
         doNothing().when(this.finderLoader).run(
             anyListOf(DataProvider.class),
             any(File.class),
-            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
+            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
         );
     }
 
@@ -45,7 +45,7 @@ public class FinderCommandLineTest extends BaseTest {
         verify(this.finderLoader).run(
             anyListOf(DataProvider.class),
             any(File.class),
-            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
+            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
         );
         verifyNoMoreInteractions(this.finderLoader);
     }
@@ -57,7 +57,7 @@ public class FinderCommandLineTest extends BaseTest {
         verify(this.finderLoader).run(
             anyListOf(DataProvider.class),
             any(File.class),
-            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
+            anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
         );
         verifyNoMoreInteractions(this.finderLoader);
     }

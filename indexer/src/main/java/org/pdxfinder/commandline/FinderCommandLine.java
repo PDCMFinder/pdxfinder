@@ -127,7 +127,6 @@ public class FinderCommandLine implements Callable<Integer> {
                     dataDirectory,
                     validateOnlyRequested,
                     loadCacheRequested,
-                    keepDatabaseRequested,
                     postLoadRequested,
                     initializeMappingDB
             );

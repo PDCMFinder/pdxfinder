@@ -1,7 +1,5 @@
 package org.pdxfinder.services.loader;
 
-import static org.hamcrest.CoreMatchers.allOf;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -14,15 +12,8 @@ import org.pdxfinder.services.loader.envload.LoadMarkers;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doAnswer;
-
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.*;
 
 public class LoadMarkerTest extends BaseTest {
 
@@ -50,7 +41,7 @@ public class LoadMarkerTest extends BaseTest {
 
 
     @Test
-    public void given_MarkerDataUrl_When_LoadGenesInvoked_Then_saveMarkers() throws IOException {
+    public void given_MarkerDataUrl_When_LoadGenesInvoked_Then_saveMarkers() throws Exception {
 
         // given
         String markerDataUrl = DataUrl.HUGO_FILE_URL.get();
@@ -59,24 +50,8 @@ public class LoadMarkerTest extends BaseTest {
         loadMarkers.loadGenes(markerDataUrl);
 
         // Then
-        verify(dataImportService, atLeast(100)).saveMarker(any(Marker.class));
+        verify(dataImportService).saveAllMarkers(anyListOf(Marker.class));
 
     }
-
-    @Test
-    public void given_WrongUrl_When_LoadGenesInvokedWithMalformedURL_then_noMarkerIsSaved() throws IOException {
-
-        // given
-        String malformedGeneURL = "genemaes.org";
-
-        // When
-        loadMarkers.loadGenes(malformedGeneURL);
-
-        // Then
-        verify(dataImportService, never()).saveMarker(any(Marker.class));
-
-    }
-
-
 
 }

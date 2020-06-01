@@ -994,6 +994,10 @@ public class DataImportService {
         return markerRepository.save(marker);
     }
 
+    public void saveAllMarkers(Collection<Marker> markers) {
+        markerRepository.save(markers);
+    }
+
     public Collection<Marker> getAllMarkers() {
         return markerRepository.findAllMarkers();
     }

@@ -114,27 +114,14 @@ public class FinderLoader {
         File dataDirectory,
         boolean validateOnlyRequested,
         boolean loadCacheRequested,
-        boolean keepDatabaseRequested,
         boolean postLoadRequested,
         boolean initializeMappingDb
     ) {
 
-        this.keepDatabaseIfRequested(keepDatabaseRequested);
-        this.loadCache(loadCacheRequested);
-        this.loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
-        this.postLoad(dataProviders, postLoadRequested);
-
-        this.initializeMappingDb(initializeMappingDb);
-    }
-
-    private void keepDatabaseIfRequested(boolean keepDatabaseRequested) {
-        if (keepDatabaseRequested) {
-            log.info("Using existing database: {}", databaseURI);
-        } else {
-            throw new UnsupportedOperationException(
-                "Removing the database on load is not yet supported, " +
-                    "please use `-k` or `--keep-db` for the time being.");
-        }
+        loadCache(loadCacheRequested);
+        loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
+        postLoad(dataProviders, postLoadRequested);
+        initializeMappingDb(initializeMappingDb);
     }
 
     private void loadCache(boolean loadCacheRequested) {
