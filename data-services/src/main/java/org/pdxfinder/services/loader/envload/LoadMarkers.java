@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashSet;
 
 @Service
 public class LoadMarkers {
@@ -60,7 +59,7 @@ public class LoadMarkers {
                         ensemblId = parseHugoFile(rowData, 9);
                         ncbiId = parseHugoFile(rowData, 10);
 
-                        Marker m = createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols);
+                        Marker m = Marker.createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols);
                         dataImportService.saveMarker(m);
                         if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
                     }
@@ -103,26 +102,6 @@ public class LoadMarkers {
             e.printStackTrace();
         }
         return reader;
-    }
-
-    private Marker createMarker(String symbol, String ensemblId, String hgncId, String ncbiId, String[] synonyms, String[] prevSymbols) {
-        Marker m = new Marker();
-        m.setHgncSymbol(symbol);
-        if (!ensemblId.isEmpty()) {
-            m.setEnsemblGeneId(ensemblId);
-        }
-        if (!hgncId.isEmpty()) {
-            m.setHgncId(hgncId);
-        }
-        if (!ncbiId.isEmpty())
-            m.setNcbiGeneId(ncbiId);
-        if (synonyms.length > 0) {
-            m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
-        }
-        if (prevSymbols.length > 0) {
-            m.setPrevSymbols(new HashSet<>(Arrays.asList(prevSymbols)));
-        }
-        return m;
     }
 
     private String parseHugoFile(String[] rowData, int column){
