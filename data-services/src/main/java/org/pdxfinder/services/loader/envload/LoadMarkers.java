@@ -10,11 +10,8 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 @Service
 public class LoadMarkers {
@@ -53,7 +50,7 @@ public class LoadMarkers {
             reader = new BufferedReader(new InputStreamReader(
                     (conn.getInputStream())));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("There was an error attempting to connect to {}", dataURL, e);
         }
         return reader;
     }
@@ -78,8 +75,7 @@ public class LoadMarkers {
         try {
             while ((line = reader.readLine()) != null) {
                 rowNumber ++;
-                if (rowNumber == 1)
-                    continue;
+                if (rowNumber == 1) continue; // Skip header
 
                 rowData = line.split("\t");
                 symbol = parseHugoFile(rowData, 1);
@@ -92,8 +88,6 @@ public class LoadMarkers {
                     ncbiId = parseHugoFile(rowData, 10);
 
                     markers.add(Marker.createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols));
-                    if (rowNumber != 0 && rowNumber % 200 == 0)
-                        System.out.print(String.format("Parsed %s markers\r", rowNumber));
                 }
             }
         } catch (Exception e) {
