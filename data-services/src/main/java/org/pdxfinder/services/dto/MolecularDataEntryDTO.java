@@ -14,6 +14,7 @@ public class MolecularDataEntryDTO {
     private String platformUsedLabel;
     private String platformUsedUrl;
     private String rawDataLabel;
+    private String rawDataLink;
 
     private String molcharId;
 
@@ -140,4 +141,13 @@ public class MolecularDataEntryDTO {
     public void setIsVisible(String isVisible) {
         this.isVisible = isVisible;
     }
+
+    public String getRawDataLink() {
+        return rawDataLink;
+    }
+
+    public void setRawDataLink(String rawDataLink) {
+        this.rawDataLink = rawDataLink;
+    }
+
 }

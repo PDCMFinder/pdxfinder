@@ -1,11 +1,11 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
 import org.apache.commons.lang3.StringUtils;
+import org.pdxfinder.dataloaders.updog.Reader;
 import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.dataloaders.updog.TableSetCleaner;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.dataloaders.updog.Reader;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -310,7 +310,7 @@ public class DomainObjectCreator {
             String sampleOrigin = row.getString(TSV.SamplePlatform.sample_origin.name());
             String platformName = row.getString(TSV.SamplePlatform.platform.name());
             String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
-            String rawDataUrl = row.getString(TSV.SamplePlatform.raw_data_file.name());
+            String rawDataUrl = formatAccessionToURL(row.getString(TSV.SamplePlatform.raw_data_file.name()));
             String platformUrl = row.getString(TSV.SamplePlatform.internal_protocol_url.name());
 
             Sample sample = null;
@@ -327,6 +327,27 @@ public class DomainObjectCreator {
             sample.setRawDataUrl(rawDataUrl);
             getOrCreateMolecularCharacterization(sample, platformName, molCharType, platformUrl);
         }
+    }
+
+    public String formatAccessionToURL(String rawDataUrl) {
+        String formattedAccesionLink = "";
+        String ENAprojectRe = "^PRJ[EDN][A-Z][0-9]{0,15}$";
+        String ENAaccessionRe = "^[EDS]R[SXRP][0-9]{6,}$";
+        String EGAaccessionRe = "^EGA[A-Za-z0-9]+$";
+        String GEOaccessionRe = "^GSM[A-Za-z0-9]+$";
+
+        if (rawDataUrl.matches(ENAaccessionRe) || rawDataUrl.matches(ENAprojectRe)){
+            formattedAccesionLink = String.format("https://www.ebi.ac.uk/ena/data/view/%s", rawDataUrl);
+        }
+        else if(rawDataUrl.matches(EGAaccessionRe)){
+            formattedAccesionLink = String.format("https://www.ebi.ac.uk/ega/search/site/%s", rawDataUrl);
+        }
+        else if(rawDataUrl.matches(GEOaccessionRe)){
+            formattedAccesionLink = String.format("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=%s", rawDataUrl);
+        } else
+            rawDataUrl = "";
+
+        return (!rawDataUrl.equals("")) ? String.format("%s,%s", rawDataUrl, formattedAccesionLink) : "";
     }
 
     void createTreatmentData(Map<String, Table> pdxDataTables){
@@ -986,7 +1007,7 @@ public class DomainObjectCreator {
         String drugString = row.getString(TSV.Treatment.treatment_name.name());
         String doseString = getCellAsText(row, TSV.Treatment.treatment_dose.name());
         String responseString = row.getString(TSV.Treatment.treatment_response.name());
-        String responseClassificationString = row.getString(TSV.Treatment.response_classification.name());;
+        String responseClassificationString = row.getString(TSV.Treatment.response_classification.name());
         String[] drugArray = drugString.split("\\+");
         String[] doseArray = doseString.split(";");
 
