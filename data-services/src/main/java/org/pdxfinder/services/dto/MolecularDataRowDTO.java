@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.pdxfinder.services.dto.pdxgun.MarkerData;
 
 
 @JsonPropertyOrder({
@@ -45,7 +46,7 @@ public class MolecularDataRowDTO {
     private String refAllele;
     private String altAllele;
     private String consequence;
-    private String hgncSymbol;
+    private MarkerData hgncSymbol;
     protected String rnaSeqCount;
     private String zscore;
     private String aminoAcidChange;
@@ -143,12 +144,12 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("HGNC Symbol")
-    public String getHgncSymbol() {
+    public MarkerData getHgncSymbol() {
         return hgncSymbol;
     }
 
     @JsonProperty("HGNC Symbol")
-    public MolecularDataRowDTO setHgncSymbol(String hgncSymbol) {
+    public MolecularDataRowDTO setHgncSymbol(MarkerData hgncSymbol) {
         this.hgncSymbol = hgncSymbol;
         return this;
     }
@@ -428,7 +429,6 @@ public class MolecularDataRowDTO {
         return this;
     }
 
-
     @JsonProperty("Illumina HGEA Exp")
     public String getIlluminaHGEAExp(){
         return illuminaHGEAExp;
@@ -439,8 +439,10 @@ public class MolecularDataRowDTO {
         this.illuminaHGEAExp = value;
         return this;
     }
+
     public MolecularDataRowDTO build() {
         return this;
     }
+
 }
 

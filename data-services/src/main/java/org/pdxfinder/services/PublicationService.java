@@ -2,15 +2,10 @@ package org.pdxfinder.services;
 
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.dto.europepmc.Publication;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PublicationService {
@@ -24,6 +19,7 @@ public class PublicationService {
       this.restTemplate = restTemplate;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<Publication> getEuropePmcPublications(List<String> pubMedIds) {
         pubMedIds = sanitizePubMedIds(pubMedIds);
         List<Publication> publications = new ArrayList<>();
@@ -36,6 +32,7 @@ public class PublicationService {
     }
 
 
+    @SuppressWarnings("WeakerAccess")
     public List<String> sanitizePubMedIds(List<String> pubMedIds){
         List<String> cleanedPubMedIds = new ArrayList<>();
         pubMedIds.forEach(pubMedId -> {
