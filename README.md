@@ -1,14 +1,14 @@
-<center>
-  [![PDX Finder logo](images/pdx_finder_logo.png)](https://www.pdxfinder.org)
-</center>
-
 # PDX Finder
 
 [![Build Status](https://travis-ci.org/PDXFinder/pdxfinder.svg?branch=master)](https://travis-ci.org/PDXFinder/pdxfinder)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?branch=master&project=pdxfinder&metric=ncloc)](https://sonarcloud.io/dashboard?id=pdxfinder&branch=dev)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?branch=master&project=pdxfinder&metric=coverage)](https://sonarcloud.io/dashboard?id=pdxfinder&branch=dev)
 
-
+<p align="center">
+  <a href="https://www.pdxfinder.org">
+    <img src="images/pdx_finder_logo.png" />
+  </a>
+</p><br />
 
 [PDX Finder](https://www.pdxfinder.org) is the world's largest open [Patient Derived Xenograft](https://en.wikipedia.org/wiki/Patient_derived_xenograft) database, containing phenomic information for over 2900 murine models, facilitating data and model sharing for the cancer research community.
 
