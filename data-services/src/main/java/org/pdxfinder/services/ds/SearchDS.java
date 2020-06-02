@@ -178,7 +178,8 @@ public class SearchDS {
 
         //age filter def
         List<FacetOption> ageOptions = new ArrayList<>();
-        ageOptions.add(new FacetOption("0-9", "0-9"));
+        ageOptions.add(new FacetOption("0-23 months", "0-23months"));
+        ageOptions.add(new FacetOption("2-9", "2-9"));
         ageOptions.add(new FacetOption("10-19", "10-19"));
         ageOptions.add(new FacetOption("20-29", "20-29"));
         ageOptions.add(new FacetOption("30-39", "30-39"));
