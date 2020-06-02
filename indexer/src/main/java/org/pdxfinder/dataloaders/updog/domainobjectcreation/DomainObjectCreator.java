@@ -1055,14 +1055,17 @@ public class DomainObjectCreator {
         try {
             if (row.getColumnType(columnName) == ColumnType.STRING) {
                 return row.getString(columnName);
+            } else if(row.getColumnType(columnName) == ColumnType.TEXT){
+                return row.getText(columnName);
             } else if (row.getColumnType(columnName) == ColumnType.DOUBLE) {
                 return Double.toString(row.getDouble(columnName));
             } else if (row.getColumnType(columnName) == ColumnType.INTEGER) {
                 return Integer.toString(row.getInt(columnName));
-            } else {
+            }
+            else {
                 throw new IllegalArgumentException(
                     String.format("Tried to parse %s for row %s as a string " +
-                            "but didn't recognise the column type", columnName, row.getRowNumber()));
+                            "but didn't recognise the column type: %s", columnName, row.getRowNumber(), row.getColumnType(columnName)));
             }
         } catch (Exception e){
             log.error("Could not access column {} in row {}", columnName, row.getRowNumber(), e);
