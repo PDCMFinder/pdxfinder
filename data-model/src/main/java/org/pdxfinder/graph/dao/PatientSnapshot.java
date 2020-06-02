@@ -101,7 +101,7 @@ public class PatientSnapshot {
     private String getAgeBin(Integer ageInteger){
         String ageBin;
         if(ageInteger <2){
-            ageBin = "0-23months";
+            ageBin = "0-23 months";
         } else if (ageInteger < 10) {
             ageBin = "2-9";
         } else if (ageInteger < 20) {
