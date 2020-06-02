@@ -67,7 +67,7 @@ public class Updog {
     private void reportAnyErrors(List<ValidationError> validationErrors) {
         if (CollectionUtils.isNotEmpty(validationErrors))
             for (ValidationError error : validationErrors) {
-                log.error(error.message());
+                log.debug(error.message());
             }
         else
             log.info("There were no validation errors raised, great!");
