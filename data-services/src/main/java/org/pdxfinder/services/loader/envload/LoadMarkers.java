@@ -27,12 +27,13 @@ public class LoadMarkers {
     public void loadGenes(String dataURL) {
         Instant start = Instant.now();
 
+        log.info("Downloading latest marker data from {}...", dataURL);
         BufferedReader reader = downloadDataFromURL(dataURL);
         List<Marker> markers = parseMarkers(reader);
         dataImportService.saveAllMarkers(markers);
 
         Instant finish = Instant.now();
-        log.info("{} markers downloaded and saved in {} seconds",
+        log.info("{} markers retrieved and loaded in {} seconds",
             markers.size(),
             Duration.between(start, finish).getSeconds());
     }
@@ -88,6 +89,8 @@ public class LoadMarkers {
                     ncbiId = parseHugoFile(rowData, 10);
 
                     markers.add(Marker.createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols));
+                    if (rowNumber % 200 == 0)
+                        System.out.print(String.format("Parsed %s markers...\r", rowNumber));
                 }
             }
         } catch (Exception e) {

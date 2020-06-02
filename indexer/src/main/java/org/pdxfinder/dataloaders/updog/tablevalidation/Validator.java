@@ -33,12 +33,19 @@ public class Validator {
                 tableSetSpecification.getProvider());
             return validationErrors;
         }
+        performColumnValidations(tableSet, tableSetSpecification);
+
+        return validationErrors;
+    }
+
+    private void performColumnValidations(
+        Map<String, Table> tableSet,
+        TableSetSpecification tableSetSpecification
+    ) {
         checkRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueColumnsForDuplicates(tableSet, tableSetSpecification);
-        //checkRelationsValid(tableSet, tableSetSpecification);
-
-        return validationErrors;
+        checkRelationsValid(tableSet, tableSetSpecification);
     }
 
     private void checkRequiredTablesPresent(

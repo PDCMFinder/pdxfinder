@@ -67,19 +67,10 @@ public class Updog {
     private void reportAnyErrors(List<ValidationError> validationErrors) {
         if (CollectionUtils.isNotEmpty(validationErrors))
             for (ValidationError error : validationErrors) {
-                log.error(error.verboseMessage());
+                log.error(error.message());
             }
         else
             log.info("There were no validation errors raised, great!");
-    }
-
-    private boolean hasNoValidationErrors(List<ValidationError> errors) {
-        return CollectionUtils.isEmpty(errors);
-    }
-
-    private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
-        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna,expression}/*.tsv");
-        return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
     }
 
     private Map<String, Table> readPdxTablesFromPath(Path updogProviderDirectory) {
