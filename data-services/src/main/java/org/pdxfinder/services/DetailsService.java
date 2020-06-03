@@ -374,7 +374,7 @@ public class DetailsService {
                     mde.setPlatformUsedLabel(mc.getPlatform().getName());
                     mde.setPlatformUsedUrl(mc.getPlatform().getUrl());
                     mde.setMolcharId(mc.getId().toString());
-                    //setRawDataLabelAndLink(mde, xenoSample);
+                    setRawDataLabelAndLink(mde, xenoSample);
 
                     int assocData = molecularCharacterizationRepository.findAssociationsNumberById(mc);
 
@@ -414,11 +414,15 @@ public class DetailsService {
         return dto;
     }
 
-    private void setRawDataLabelAndLink(MolecularDataEntryDTO mde, Sample xenoSample) {
-        String[] rawDataArray = xenoSample.getRawDataUrl().split(",");
-        mde.setRawDataLabel(rawDataArray[0]);
-        if(rawDataArray.length == 2){
-            mde.setRawDataLink(rawDataArray[1]);
+    private void setRawDataLabelAndLink(MolecularDataEntryDTO mde, Sample sample) {
+        if (sample.getRawDataUrl() != null) {
+            String[]rawDataArray = sample.getRawDataUrl().split(",");
+            mde.setRawDataLabel(rawDataArray[0]);
+            if (rawDataArray.length == 2) {
+                mde.setRawDataLink(rawDataArray[1]);
+            } else {
+                mde.setRawDataLink("");
+            }
         } else {
             mde.setRawDataLink("");
         }
