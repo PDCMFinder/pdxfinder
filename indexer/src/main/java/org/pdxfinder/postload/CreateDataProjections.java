@@ -83,6 +83,9 @@ public class CreateDataProjections implements ApplicationContextAware{
     private TreeMap<String, Set<Long>> frequentlyMutatedMarkers = new TreeMap<>();
     private List<MutatedMarkerData> frequentlyMutatedMarkersDP = new ArrayList<>();
 
+    //name of drugs to model
+    private Map<String, Set<Long>> drugDosingDP = new HashMap<>();
+
     //"treatment name"=>"set of model ids"
     private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
 
@@ -1367,6 +1370,8 @@ public class CreateDataProjections implements ApplicationContextAware{
             String drug = drugName.replaceAll("[^a-zA-Z0-9 _-]","");
             String response = responseVal.replaceAll("[^a-zA-Z0-9 _-]","");
 
+            addToDrugDosingDp(drug, modelId);
+
             if(modelDrugResponseDP.containsKey(drug)){
 
                 if(modelDrugResponseDP.get(drug).containsKey(response)){
@@ -1408,6 +1413,14 @@ public class CreateDataProjections implements ApplicationContextAware{
             set.add(modelId);
             frequentlyMutatedMarkers.put(marker, set);
         }
+    }
+
+    private void addToDrugDosingDp(String drug, Long modelId){
+
+        if(!drugDosingDP.containsKey(drug)){
+            drugDosingDP.put(drug, new HashSet<>());
+        }
+        drugDosingDP.get(drug).add(modelId);
     }
 
     private void saveDataProjections(){
@@ -1491,9 +1504,14 @@ public class CreateDataProjections implements ApplicationContextAware{
             ptDP.setLabel("patient treatment");
         }
 
+        DataProjection ddDP = dataImportService.findDataProjectionByLabel("drug dosing counter");
 
+        if(ddDP == null){
+            ddDP = new DataProjection();
+            ddDP.setLabel("drug dosing counter");
+        }
 
-        JSONObject json;//1 ,j2, j3, j4, j5, j6, j7,j8;
+        JSONObject json;
 
 
         try{
@@ -1591,6 +1609,16 @@ public class CreateDataProjections implements ApplicationContextAware{
             log.error(expressionDP.toString());
         }
 
+        try{
+            json = new JSONObject(drugDosingDP.toString());
+            ddDP.setValue(json.toString());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(drugDosingDP.toString());
+        }
+
 
         dataImportService.saveDataProjection(pmvmDP);
         dataImportService.saveDataProjection(mvDP);
@@ -1602,6 +1630,7 @@ public class CreateDataProjections implements ApplicationContextAware{
         dataImportService.saveDataProjection(ptDP);
         dataImportService.saveDataProjection(cytoDP);
         dataImportService.saveDataProjection(expDP);
+        dataImportService.saveDataProjection(ddDP);
 
     }
 

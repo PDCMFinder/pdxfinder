@@ -67,7 +67,7 @@ public class AjaxController {
     @GetMapping("/modelcountperdrug")
     public List<CountDTO> getModelCountByDrug() {
 
-        return  drugService.getModelCountByDrugAndComponentType("Drug");
+        return  drugService.getModelCountByDrugs();
     }
 
     @GetMapping("/modelcountpergene")

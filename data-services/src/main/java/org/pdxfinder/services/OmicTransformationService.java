@@ -28,33 +28,36 @@ public class OmicTransformationService {
 
     public void convertListOfNcbiToHgnc(List<String> geneList){
         String fileOut = "ncbiToHugoAccesions";
-        BufferedWriter out = null;
+
         FileWriter fstream = null;
         try {
             fstream = new FileWriter(fileOut, true);
-            out = new BufferedWriter(fstream);
-            BufferedWriter finalOut = out;
-            geneList.forEach(g ->
-                    {
-                        try {
-                            String conversionRow = String.format("%s\t%s\n", g, ncbiGeneIdToHgncSymbol(g));
-                            finalOut.write(conversionRow);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+
+            try(BufferedWriter out = new BufferedWriter(fstream)) {
+                BufferedWriter finalOut = out;
+                geneList.forEach(g ->
+                        {
+                            try {
+                                String conversionRow = String.format("%s\t%s\n", g, ncbiGeneIdToHgncSymbol(g));
+                                finalOut.write(conversionRow);
+                            } catch (IOException e) {
+                                log.error("Exception in conversion ",e);
+                            }
                         }
-                    }
-            );
-            out.flush();
-            out.close();
+                );
+                out.flush();
+            }
+            catch(Exception e){
+                log.error("Bufferedwriter exception ", e);
+            }
         } catch(IOException e){
             log.error("Failure opening output file %n {}", e.toString());
         }
         finally{
             try {
                 if (fstream != null) fstream.close();
-                if (out != null) out.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                log.error("Exception ", ex);
             }
         }
     }
