@@ -54,7 +54,7 @@ public class ReferenceDbService {
             referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
             markerDataMap = clusterReferenceDataByMarker(referenceData);
         }catch (Exception e){
-            log.info("Reference Database could not be retrieved {}", e);
+            log.info("Reference Database could not be retrieved");
         }
         return  markerDataMap;
     }
