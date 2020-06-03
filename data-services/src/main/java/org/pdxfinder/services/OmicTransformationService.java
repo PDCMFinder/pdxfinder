@@ -41,14 +41,14 @@ public class OmicTransformationService {
                                 String conversionRow = String.format("%s\t%s\n", g, ncbiGeneIdToHgncSymbol(g));
                                 finalOut.write(conversionRow);
                             } catch (IOException e) {
-                                log.error("Exception in conversion {}",e);
+                                log.error("Exception in conversion ",e);
                             }
                         }
                 );
                 out.flush();
             }
             catch(Exception e){
-                log.error("Bufferedwriter exception {}", e);
+                log.error("Bufferedwriter exception ", e);
             }
         } catch(IOException e){
             log.error("Failure opening output file %n {}", e.toString());
@@ -57,7 +57,7 @@ public class OmicTransformationService {
             try {
                 if (fstream != null) fstream.close();
             } catch (IOException ex) {
-                log.error("Exception {}", ex);
+                log.error("Exception ", ex);
             }
         }
     }
