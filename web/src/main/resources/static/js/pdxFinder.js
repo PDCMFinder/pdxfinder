@@ -549,18 +549,21 @@ function displayMolecularDataTable(tableData, clickedData) {
 
 function referenceDatabase(dataObject) {
 
+    let result = '';
     let symbol = dataObject.symbol;
     let referenceDBs = dataObject.refData;
-    let databases = Object.keys(referenceDBs);
-    let result = '';
-    databases.forEach((database) => {
-        result += `<span class="small">
+
+    if (referenceDBs){
+        let databases = Object.keys(referenceDBs);
+        databases.forEach((database) => {
+            result += `<span class="small">
                         <a target="_blank" href="${referenceDBs[database]}" 
                             style="text-decoration:none; color:#06369d; text-transform: uppercase;"> 
                                 ${database} <i class="icon icon-generic small" data-icon="x"> </i> 
                           </a>
                     </span>&nbsp;`;
-    });
+        });
+    }
     return `${symbol} <br> ${result}`;
 }
 
@@ -594,9 +597,3 @@ function customizeDatatable(dTable, presentData) {
     })
 
 }
-
-
-
-
-
-

@@ -8,6 +8,8 @@ import org.pdxfinder.services.graphqlclient.Condition;
 import org.pdxfinder.services.graphqlclient.GraphQlBuilder;
 import org.pdxfinder.services.graphqlclient.Operator;
 import org.pdxfinder.services.graphqlclient.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +19,7 @@ import java.util.*;
 @Service
 public class ReferenceDbService {
 
+    private Logger log = LoggerFactory.getLogger(ReferenceDbService.class);
     private RestTemplate restTemplate;
 
     public ReferenceDbService(RestTemplate restTemplate) {
@@ -43,9 +46,22 @@ public class ReferenceDbService {
                 .table("gene")
                 .conditions(conditions);
         String graphQlQuery = GraphQlBuilder.selectQuery(select);
-
         HttpEntity<Object> request = new HttpEntity<>(graphQlQuery);
-        ReferenceData referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
+
+        ReferenceData referenceData = new ReferenceData();
+        Map<String, MarkerData> markerDataMap = new HashMap<>();
+        try{
+            referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
+            markerDataMap = clusterReferenceDataByMarker(referenceData);
+        }catch (Exception e){
+            log.info("Reference Database could not be retrieved");
+        }
+        return  markerDataMap;
+    }
+
+
+
+    private Map<String, MarkerData> clusterReferenceDataByMarker(ReferenceData referenceData){
 
         Map<String, Map<String, String>> dataMap = new HashMap<>();
         referenceData.getData().getGene().forEach(gene -> {
