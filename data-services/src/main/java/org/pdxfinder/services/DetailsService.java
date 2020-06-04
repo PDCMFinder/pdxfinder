@@ -5,7 +5,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.dto.*;
-import org.pdxfinder.services.dto.pdxgun.MarkerData;
+import org.pdxfinder.services.dto.pdxgun.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -470,13 +470,12 @@ public class DetailsService {
     private List<MolecularDataRowDTO> getMolecularDataRow(String sampleId, List<MolecularData> molecularDataList){
 
         List<String> markerList = referenceDbService.getMarkerListFromMolecularData(molecularDataList);
-        Map<String, MarkerData> referenceData = referenceDbService.getReferenceDataForMarkerList(markerList);
+        Map<String, Reference> referenceData = referenceDbService.getReferenceDataForMarkerList(markerList);
         List<MolecularDataRowDTO> tableData = new ArrayList<>();
         molecularDataList.forEach(md -> {
 
-            String hgncSymbol = md.getMarker();
-            Optional<MarkerData> optionalMarkerData = Optional.ofNullable(referenceData.get(hgncSymbol));
-            MarkerData markerData = optionalMarkerData.orElse(new MarkerData(hgncSymbol));
+            Reference markerData = referenceDbService.getMarkerReference(md.getMarker(), referenceData);
+            Reference variantTypeData = referenceDbService.getVariantTypeReference(md.getVariantClass());
 
             MolecularDataRowDTO dataRow = new MolecularDataRowDTO();
             dataRow.setSampleId(sampleId)
@@ -496,7 +495,7 @@ public class DetailsService {
                     .setSeqEndPosition( md.getSeqEndPosition())
                     .setRefAllele(md.getRefAllele())
                     .setAltAllele(md.getAltAllele())
-                    .setVariantType(md.getVariantClass())
+                    .setVariantType(variantTypeData)
                     .setEnsemblTranscriptId( md.getEnsemblTranscriptId())
                     .setEnsemblTranscriptId(md.getEnsemblGeneId())
                     .setUcscTranscriptId(md.getUcscGeneId())

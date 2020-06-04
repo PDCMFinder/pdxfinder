@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.pdxfinder.services.dto.pdxgun.MarkerData;
+import org.pdxfinder.services.dto.pdxgun.Reference;
 
 
 @JsonPropertyOrder({
@@ -46,13 +46,13 @@ public class MolecularDataRowDTO {
     private String refAllele;
     private String altAllele;
     private String consequence;
-    private MarkerData hgncSymbol;
+    private Reference hgncSymbol;
     protected String rnaSeqCount;
     private String zscore;
     private String aminoAcidChange;
     private String readDepth;
     private String alleleFrequency;
-    private String variantType;
+    private Reference variantType;
     private String nucleotideChange;
     private String genomeAssembly;
     private String seqStartPosition;
@@ -144,12 +144,12 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("HGNC Symbol")
-    public MarkerData getHgncSymbol() {
+    public Reference getHgncSymbol() {
         return hgncSymbol;
     }
 
     @JsonProperty("HGNC Symbol")
-    public MolecularDataRowDTO setHgncSymbol(MarkerData hgncSymbol) {
+    public MolecularDataRowDTO setHgncSymbol(Reference hgncSymbol) {
         this.hgncSymbol = hgncSymbol;
         return this;
     }
@@ -210,12 +210,12 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Variant Type")
-    public String getVariantType() {
+    public Reference getVariantType() {
         return variantType;
     }
 
     @JsonProperty("Variant Type")
-    public MolecularDataRowDTO setVariantType(String variantType) {
+    public MolecularDataRowDTO setVariantType(Reference variantType) {
         this.variantType = variantType;
         return this;
     }

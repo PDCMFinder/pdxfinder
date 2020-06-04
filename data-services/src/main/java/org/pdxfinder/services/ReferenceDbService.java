@@ -2,7 +2,7 @@ package org.pdxfinder.services;
 
 import org.pdxfinder.graph.dao.MolecularData;
 import org.pdxfinder.services.constants.DataUrl;
-import org.pdxfinder.services.dto.pdxgun.MarkerData;
+import org.pdxfinder.services.dto.pdxgun.Reference;
 import org.pdxfinder.services.dto.pdxgun.ReferenceData;
 import org.pdxfinder.services.graphqlclient.Condition;
 import org.pdxfinder.services.graphqlclient.GraphQlBuilder;
@@ -19,6 +19,8 @@ import java.util.*;
 @Service
 public class ReferenceDbService {
 
+    private static final String COSM_PREFIX = "COSM";
+    private static final String COSMIC = "COSMIC";
     private Logger log = LoggerFactory.getLogger(ReferenceDbService.class);
     private RestTemplate restTemplate;
 
@@ -36,7 +38,7 @@ public class ReferenceDbService {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public Map<String, MarkerData> getReferenceDataForMarkerList(List<String> markerList){
+    public Map<String, Reference> getReferenceDataForMarkerList(List<String> markerList){
 
         Map<String, Condition> conditions = new LinkedHashMap<>();
         conditions.put("name", new Condition().setOperator(Operator.IN).setValue(markerList));
@@ -49,7 +51,7 @@ public class ReferenceDbService {
         HttpEntity<Object> request = new HttpEntity<>(graphQlQuery);
 
         ReferenceData referenceData = new ReferenceData();
-        Map<String, MarkerData> markerDataMap = new HashMap<>();
+        Map<String, Reference> markerDataMap = new HashMap<>();
         try{
             referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
             markerDataMap = clusterReferenceDataByMarker(referenceData);
@@ -59,9 +61,7 @@ public class ReferenceDbService {
         return  markerDataMap;
     }
 
-
-
-    private Map<String, MarkerData> clusterReferenceDataByMarker(ReferenceData referenceData){
+    private Map<String, Reference> clusterReferenceDataByMarker(ReferenceData referenceData){
 
         Map<String, Map<String, String>> dataMap = new HashMap<>();
         referenceData.getData().getGene().forEach(gene -> {
@@ -79,15 +79,32 @@ public class ReferenceDbService {
             }
         });
 
-        Map<String, MarkerData> markerDataMap = new HashMap<>();
+        Map<String, Reference> markerDataMap = new HashMap<>();
         dataMap.forEach((key, value)->{
-            MarkerData markerData = new MarkerData();
-            markerData.setSymbol(key)
-                    .setRefData(value)
+            Reference reference = new Reference();
+            reference.setLabel(key)
+                    .setReferenceDbs(value)
                     .build();
-            markerDataMap.put(key, markerData);
+            markerDataMap.put(key, reference);
         });
 
         return markerDataMap;
     }
+
+    public Reference getMarkerReference(String symbol, Map<String, Reference> referenceDataMap){
+        Optional<Reference> optionalMarkerData = Optional.ofNullable(referenceDataMap.get(symbol));
+        return optionalMarkerData.orElse(new Reference(symbol));
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public Reference getVariantTypeReference(String label){
+
+        Map<String, Object> dbUrl = new HashMap<>();
+        if (label.contains(COSM_PREFIX)){
+            String cosmValue = label.split(COSM_PREFIX)[1];
+            dbUrl.put(COSMIC, String.format("%s=%s", DataUrl.COSMIC_URL.get(), cosmValue));
+        }
+        return new Reference(label).setReferenceDbs(dbUrl);
+    }
+
 }

@@ -550,8 +550,8 @@ function displayMolecularDataTable(tableData, clickedData) {
 function referenceDatabase(dataObject) {
 
     let result = '';
-    let symbol = dataObject.symbol;
-    let referenceDBs = dataObject.refData;
+    let label = dataObject.label;
+    let referenceDBs = dataObject.referenceDbs;
 
     if (referenceDBs){
         let databases = Object.keys(referenceDBs);
@@ -564,7 +564,7 @@ function referenceDatabase(dataObject) {
                     </span>&nbsp;`;
         });
     }
-    return `${symbol} <br> ${result}`;
+    return `${label} <br> ${result}`;
 }
 
 
