@@ -100,11 +100,16 @@ public class ReferenceDbService {
     public Reference getVariantTypeReference(String label){
 
         Map<String, Object> dbUrl = new HashMap<>();
-        if (label.contains(COSM_PREFIX)){
-            String cosmValue = label.split(COSM_PREFIX)[1];
-            dbUrl.put(COSMIC, String.format("%s=%s", DataUrl.COSMIC_URL.get(), cosmValue));
+        Reference reference = null;
+
+        if (Optional.ofNullable(label).isPresent()){
+            if (label.contains(COSM_PREFIX)){
+                String cosmValue = label.split(COSM_PREFIX)[1];
+                dbUrl.put(COSMIC, String.format("%s=%s", DataUrl.COSMIC_URL.get(), cosmValue));
+            }
+            return new Reference(label).setReferenceDbs(dbUrl);
         }
-        return new Reference(label).setReferenceDbs(dbUrl);
+        return reference;
     }
 
 }
