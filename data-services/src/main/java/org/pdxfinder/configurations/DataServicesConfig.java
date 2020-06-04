@@ -7,15 +7,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class DataServicesConfig {
-
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-
-        return restTemplateBuilder
-                .setConnectTimeout(80000)
-                .setReadTimeout(80000)
-                .build();
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
-
-
 }

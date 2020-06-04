@@ -1,24 +1,15 @@
 package org.pdxfinder.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.graph.dao.MolecularData;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.dto.pdxgun.Reference;
 import org.pdxfinder.services.dto.pdxgun.ReferenceData;
-import org.pdxfinder.services.graphqlclient.Condition;
-import org.pdxfinder.services.graphqlclient.GraphQlBuilder;
-import org.pdxfinder.services.graphqlclient.Operator;
-import org.pdxfinder.services.graphqlclient.Select;
+import org.pdxfinder.services.graphqlclient.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.*;
 import java.util.*;
 
 @Service
@@ -27,11 +18,6 @@ public class ReferenceDbService {
     private static final String COSM_PREFIX = "COSM";
     private static final String COSMIC = "COSMIC";
     private Logger log = LoggerFactory.getLogger(ReferenceDbService.class);
-    private RestTemplate restTemplate;
-
-    public ReferenceDbService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     @SuppressWarnings("WeakerAccess")
     public List<String> getMarkerListFromMolecularData(List<MolecularData> molecularDataList){
@@ -47,24 +33,25 @@ public class ReferenceDbService {
 
         Map<String, Condition> conditions = new LinkedHashMap<>();
         conditions.put("name", new Condition().setOperator(Operator.IN).setValue(markerList));
-
         Select select = new Select()
                 .columns(Arrays.asList("name", "url", "resource{name}"))
                 .table("gene")
                 .conditions(conditions);
         String graphQlQuery = GraphQlBuilder.selectQuery(select);
-        HttpEntity<Object> request = new HttpEntity<>(graphQlQuery);
 
-        ReferenceData referenceData = new ReferenceData();
         Map<String, Reference> markerDataMap = new HashMap<>();
         try{
-            referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
+            String response = OkHttpRequest.client(DataUrl.K8_SERVICE_URL.get(), graphQlQuery);
+            ObjectMapper mapper = new ObjectMapper();
+            ReferenceData referenceData = mapper.readValue(response, ReferenceData.class);
+
             markerDataMap = clusterReferenceDataByMarker(referenceData);
         }catch (Exception e){
-            log.info("Reference Database could not be retrieved {}", e);
+            log.info("Reference Database could not be retrieved");
         }
         return  markerDataMap;
     }
+
 
     private Map<String, Reference> clusterReferenceDataByMarker(ReferenceData referenceData){
 
@@ -92,13 +79,7 @@ public class ReferenceDbService {
                     .build();
             markerDataMap.put(key, reference);
         });
-
         return markerDataMap;
-    }
-
-    public Reference getMarkerReference(String symbol, Map<String, Reference> referenceDataMap){
-        Optional<Reference> optionalMarkerData = Optional.ofNullable(referenceDataMap.get(symbol));
-        return optionalMarkerData.orElse(new Reference(symbol));
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -106,7 +87,6 @@ public class ReferenceDbService {
 
         Map<String, Object> dbUrl = new HashMap<>();
         Reference reference = null;
-
         if (Optional.ofNullable(label).isPresent()){
             if (label.contains(COSM_PREFIX)){
                 String cosmValue = label.split(COSM_PREFIX)[1];
@@ -115,6 +95,11 @@ public class ReferenceDbService {
             return new Reference(label).setReferenceDbs(dbUrl);
         }
         return reference;
+    }
+
+    public Reference getMarkerReference(String symbol, Map<String, Reference> referenceDataMap){
+        Optional<Reference> optionalMarkerData = Optional.ofNullable(referenceDataMap.get(symbol));
+        return optionalMarkerData.orElse(new Reference(symbol));
     }
 
 }
