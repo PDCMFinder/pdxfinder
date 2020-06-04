@@ -469,13 +469,12 @@ public class DetailsService {
 
     private List<MolecularDataRowDTO> getMolecularDataRow(String sampleId, List<MolecularData> molecularDataList){
 
-        // List<String> markerList = referenceDbService.getMarkerListFromMolecularData(molecularDataList);
-        // Map<String, Reference> referenceData = referenceDbService.getReferenceDataForMarkerList(markerList);
-
+        List<String> markerList = referenceDbService.getMarkerListFromMolecularData(molecularDataList);
+        Map<String, Reference> referenceData = referenceDbService.getReferenceDataForMarkerList(markerList);
         List<MolecularDataRowDTO> tableData = new ArrayList<>();
         molecularDataList.forEach(md -> {
 
-            Reference markerData = new Reference(md.getMarker()); //referenceDbService.getMarkerReference(md.getMarker(), referenceData);
+            Reference markerData = referenceDbService.getMarkerReference(md.getMarker(), referenceData);
             Reference variantTypeData = referenceDbService.getVariantTypeReference(md.getVariantClass());
 
             MolecularDataRowDTO dataRow = new MolecularDataRowDTO();

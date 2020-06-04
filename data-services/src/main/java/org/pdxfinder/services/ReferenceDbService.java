@@ -40,24 +40,41 @@ public class ReferenceDbService {
     @SuppressWarnings("WeakerAccess")
     public Map<String, Reference> getReferenceDataForMarkerList(List<String> markerList){
 
+//        Map<String, Condition> conditions = new LinkedHashMap<>();
+//        conditions.put("name", new Condition().setOperator(Operator.IN).setValue(markerList));
+//
+//        Select select = new Select()
+//                .columns(Arrays.asList("name", "url", "resource{name}"))
+//                .table("gene")
+//                .conditions(conditions);
+
         Map<String, Condition> conditions = new LinkedHashMap<>();
-        conditions.put("name", new Condition().setOperator(Operator.IN).setValue(markerList));
+        conditions.put("hgnc_acc_id", new Condition().setOperator(Operator.IN).setValue(Collections.singletonList("HGNC:34")));
 
         Select select = new Select()
-                .columns(Arrays.asList("name", "url", "resource{name}"))
-                .table("gene")
+                .columns(Arrays.asList("hgnc_acc_id", "human_assert_acc_ids", "human_chr"))
+                .table("hcop")
                 .conditions(conditions);
         String graphQlQuery = GraphQlBuilder.selectQuery(select);
         HttpEntity<Object> request = new HttpEntity<>(graphQlQuery);
 
+        log.info(graphQlQuery);
+        try{
+            Object x = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, Object.class);
+            log.info(String.valueOf(x));
+        }catch (Exception e){
+            log.info("Reference Database could not be retrieved {}", e);
+        }
+
+
         ReferenceData referenceData = new ReferenceData();
         Map<String, Reference> markerDataMap = new HashMap<>();
-        try{
-            referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
-            markerDataMap = clusterReferenceDataByMarker(referenceData);
-        }catch (Exception e){
-            log.info("Reference Database could not be retrieved");
-        }
+//        try{
+//            referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
+//            markerDataMap = clusterReferenceDataByMarker(referenceData);
+//        }catch (Exception e){
+//            log.info("Reference Database could not be retrieved {}", e);
+//        }
         return  markerDataMap;
     }
 
