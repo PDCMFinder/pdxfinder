@@ -1,5 +1,9 @@
 package org.pdxfinder.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.graph.dao.MolecularData;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.dto.pdxgun.Reference;
@@ -14,8 +18,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.*;
 import java.util.*;
-import okhttp3.*;
 
 @Service
 public class ReferenceDbService {
@@ -48,50 +52,17 @@ public class ReferenceDbService {
                 .columns(Arrays.asList("name", "url", "resource{name}"))
                 .table("gene")
                 .conditions(conditions);
-
         String graphQlQuery = GraphQlBuilder.selectQuery(select);
-        //HttpEntity<Object> request = new HttpEntity<>(graphQlQuery);
-
-
-
-
-
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/graphql");
-        RequestBody body = RequestBody.create(mediaType, graphQlQuery);
-
-        Request request = new Request.Builder()
-                .url(DataUrl.K8_SERVICE_URL.get())
-                .post(body)
-                .build();
-
-        try{
-            Response response = client.newCall(request).execute();
-            log.info(response.body().string());
-        }catch (Exception e){
-            log.info("Reference Database could not be retrieved {}", e);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
+        HttpEntity<Object> request = new HttpEntity<>(graphQlQuery);
 
         ReferenceData referenceData = new ReferenceData();
         Map<String, Reference> markerDataMap = new HashMap<>();
-//        try{
-//            referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
-//            markerDataMap = clusterReferenceDataByMarker(referenceData);
-//        }catch (Exception e){
-//            log.info("Reference Database could not be retrieved {}", e);
-//        }
+        try{
+            referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
+            markerDataMap = clusterReferenceDataByMarker(referenceData);
+        }catch (Exception e){
+            log.info("Reference Database could not be retrieved {}", e);
+        }
         return  markerDataMap;
     }
 
