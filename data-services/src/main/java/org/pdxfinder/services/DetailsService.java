@@ -496,7 +496,7 @@ public class DetailsService {
                     .setSeqEndPosition( md.getSeqEndPosition())
                     .setRefAllele(md.getRefAllele())
                     .setAltAllele(md.getAltAllele())
-                    .setRsidVariants(md.getVariantClass())
+                    .setVariantType(md.getVariantClass())
                     .setEnsemblTranscriptId( md.getEnsemblTranscriptId())
                     .setEnsemblTranscriptId(md.getEnsemblGeneId())
                     .setUcscTranscriptId(md.getUcscGeneId())

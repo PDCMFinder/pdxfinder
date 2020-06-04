@@ -25,7 +25,7 @@ import org.pdxfinder.services.dto.pdxgun.MarkerData;
         "Seq. End Position",
         "Ref. Allele",
         "Alt Allele",
-        "Rs Id Variant",
+        "Variant Type",
         "Ensembl Transcript Id",
         "Ensembl Gene Id",
         "Ucsc Gene Id",
@@ -52,7 +52,7 @@ public class MolecularDataRowDTO {
     private String aminoAcidChange;
     private String readDepth;
     private String alleleFrequency;
-    private String rsidVariants;
+    private String variantType;
     private String nucleotideChange;
     private String genomeAssembly;
     private String seqStartPosition;
@@ -209,14 +209,14 @@ public class MolecularDataRowDTO {
         return this;
     }
 
-    @JsonProperty("Rs Id Variant")
-    public String getRsidVariants() {
-        return rsidVariants;
+    @JsonProperty("Variant Type")
+    public String getVariantType() {
+        return variantType;
     }
 
-    @JsonProperty("Rs Id Variant")
-    public MolecularDataRowDTO setRsidVariants(String rsidVariants) {
-        this.rsidVariants = rsidVariants;
+    @JsonProperty("Variant Type")
+    public MolecularDataRowDTO setVariantType(String variantType) {
+        this.variantType = variantType;
         return this;
     }
 
