@@ -48,6 +48,7 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
     }
 
     private void reportMissingColumnsInRelation(Map<String, Table> tableSet, Relation relation, String provider) {
+        if (tableSet.get(relation.rightTable()) == null || tableSet.get(relation.rightTable()) == null) return;
         if (missingLeftColumn(tableSet, relation)) {
             errors.add(
                 create(
