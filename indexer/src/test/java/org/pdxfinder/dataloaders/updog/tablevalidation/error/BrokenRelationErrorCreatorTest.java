@@ -46,12 +46,16 @@ public class BrokenRelationErrorCreatorTest {
     public void checkRelationsValid_givenNoRightTable_noExceptionThrown() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.put(RIGHT_TABLE, null);
+        assertThat(brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(),
+            is(true));
     }
 
     @Test(expected = Test.None.class)
     public void checkRelationsValid_givenNoLeftTable_noExceptionThrown() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
         tableSetWithSimpleJoin.put(LEFT_TABLE, null);
+        assertThat(brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(),
+            is(true));
     }
 
     @Test public void checkRelationsValid_givenValidOneToManyJoin_emptyErrorList() {
