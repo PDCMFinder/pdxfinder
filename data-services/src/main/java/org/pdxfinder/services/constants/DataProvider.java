@@ -25,7 +25,8 @@ public enum DataProvider {
     NKI("NKI"),
     PDMR_XDOG("PDMR-XDOG"),
     JAX_XDOG("JAX-XDOG"),
-    SJCRH("SJCRH");
+    SJCRH("SJCRH"),
+    UMCG("UMCG");
 
     private String name;
     DataProvider(String name) {
