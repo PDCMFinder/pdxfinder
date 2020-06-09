@@ -1,5 +1,7 @@
 package org.pdxfinder.graph.dao;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import javax.persistence.GeneratedValue;
@@ -245,4 +247,31 @@ public class PatientSnapshot {
         return String.format("[%s at age %s]", getPatient().getExternalId(), getAgeAtCollection());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PatientSnapshot that = (PatientSnapshot) o;
+
+        return new EqualsBuilder()
+            .append(getAgeAtCollection(), that.getAgeAtCollection())
+            .append(getDateAtCollection(), that.getDateAtCollection())
+            .append(getCollectionEvent(), that.getCollectionEvent())
+            .append(getElapsedTime(), that.getElapsedTime())
+            .append(getPatient(), that.getPatient())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getAgeAtCollection())
+            .append(getDateAtCollection())
+            .append(getCollectionEvent())
+            .append(getElapsedTime())
+            .append(getPatient())
+            .toHashCode();
+    }
 }
