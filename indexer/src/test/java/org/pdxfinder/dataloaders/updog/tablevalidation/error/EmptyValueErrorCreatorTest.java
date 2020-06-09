@@ -3,6 +3,7 @@ package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
+import org.pdxfinder.dataloaders.updog.TableUtilities;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
@@ -18,7 +19,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 public class EmptyValueErrorCreatorTest {
@@ -52,11 +52,13 @@ public class EmptyValueErrorCreatorTest {
 
     @Test public void checkAllNonEmptyValuesPresent_givenNoMissingValues_emptyErrorList() {
         Map<String, Table> fileSetWithValidTable = new HashMap<>();
-        Table tableWithNoMissingValues = completeTableSet.get(TABLE_1).addColumns(
-            StringColumn.create("required_col", Collections.singletonList("required_value")));
+        Table tableWithNoMissingValues = TableUtilities.fromString(
+            TABLE_1,
+            "required_col",
+            "required_value");
         fileSetWithValidTable.put(TABLE_1, tableWithNoMissingValues);
-        assertThat(emptyValueErrorCreator.generateErrors(fileSetWithValidTable, requireColumn)
-            .isEmpty(), is(true));
+
+        assertTrue(emptyValueErrorCreator.generateErrors(fileSetWithValidTable, requireColumn).isEmpty());
     }
 
     @Test public void checkAllNonEmptyValuesPresent_givenMissingValue_addsMissingValueErrorToErrorList() {
