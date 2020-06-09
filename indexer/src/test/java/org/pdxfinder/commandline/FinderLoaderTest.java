@@ -165,20 +165,20 @@ public class FinderLoaderTest extends BaseTest {
     }
 
     @Test public void load_givenOntologyCache_skipLoadingRegimens() {
-        givenEmptyOntologyCache(isFalse);
+        givenEmptyOntologyCache(isFalse, "treatment");
         finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadNCITDrugs, never()).loadRegimens();
     }
 
     @Test public void load_givenNoOntologyCache_loadRegimens() {
-        givenEmptyOntologyCache(isTrue);
+        givenEmptyOntologyCache(isTrue, "treatment");
         finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
     }
 
     @Test public void load_givenOntologyCacheButReloadRequested_reloadRegimens() {
-        givenEmptyOntologyCache(isFalse);
+        givenEmptyOntologyCache(isFalse, "treatment");
         finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isTrue, isFalse, isFalse);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
@@ -186,6 +186,10 @@ public class FinderLoaderTest extends BaseTest {
 
     private void givenEmptyOntologyCache(boolean b) {
         when(this.dataImportService.ontologyCacheIsEmpty()).thenReturn(b);
+    }
+
+    private void givenEmptyOntologyCache(boolean b, String type) {
+        when(this.dataImportService.ontologyCacheIsEmptyByType(type)).thenReturn(b);
     }
 
     private void givenEmptyMarkerCache(boolean b) {
