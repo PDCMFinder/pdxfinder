@@ -475,7 +475,7 @@ public class DetailsService {
         molecularDataList.forEach(md -> {
 
             Reference markerData = referenceDbService.getMarkerReference(md.getMarker(), referenceData);
-            Reference variantTypeData = referenceDbService.getVariantTypeReference(md.getVariantClass());
+            Reference variantTypeData = referenceDbService.getVariantTypeReference(md.getExistingVariations());
 
             MolecularDataRowDTO dataRow = new MolecularDataRowDTO();
             dataRow.setSampleId(sampleId)
@@ -495,6 +495,7 @@ public class DetailsService {
                     .setSeqEndPosition( md.getSeqEndPosition())
                     .setRefAllele(md.getRefAllele())
                     .setAltAllele(md.getAltAllele())
+                    .setVariantClass(md.getVariantClass())
                     .setVariantType(variantTypeData)
                     .setEnsemblTranscriptId( md.getEnsemblTranscriptId())
                     .setEnsemblTranscriptId(md.getEnsemblGeneId())

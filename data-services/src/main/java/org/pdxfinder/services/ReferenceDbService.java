@@ -1,15 +1,24 @@
 package org.pdxfinder.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pdxfinder.graph.dao.MolecularData;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.dto.pdxgun.Reference;
 import org.pdxfinder.services.dto.pdxgun.ReferenceData;
-import org.pdxfinder.services.graphqlclient.*;
+import org.pdxfinder.services.graphqlclient.Condition;
+import org.pdxfinder.services.graphqlclient.GraphQlBuilder;
+import org.pdxfinder.services.graphqlclient.Operator;
+import org.pdxfinder.services.graphqlclient.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.*;
 import java.util.*;
 
 @Service
@@ -18,6 +27,11 @@ public class ReferenceDbService {
     private static final String COSM_PREFIX = "COSM";
     private static final String COSMIC = "COSMIC";
     private Logger log = LoggerFactory.getLogger(ReferenceDbService.class);
+    private RestTemplate restTemplate;
+
+    public ReferenceDbService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @SuppressWarnings("WeakerAccess")
     public List<String> getMarkerListFromMolecularData(List<MolecularData> molecularDataList){
@@ -28,26 +42,27 @@ public class ReferenceDbService {
         return markerList;
     }
 
+
     @SuppressWarnings("WeakerAccess")
     public Map<String, Reference> getReferenceDataForMarkerList(List<String> markerList){
 
         Map<String, Condition> conditions = new LinkedHashMap<>();
         conditions.put("name", new Condition().setOperator(Operator.IN).setValue(markerList));
+
         Select select = new Select()
                 .columns(Arrays.asList("name", "url", "resource{name}"))
                 .table("gene")
                 .conditions(conditions);
         String graphQlQuery = GraphQlBuilder.selectQuery(select);
+        HttpEntity<Object> request = new HttpEntity<>(graphQlQuery);
 
+        ReferenceData referenceData = new ReferenceData();
         Map<String, Reference> markerDataMap = new HashMap<>();
         try{
-            String response = OkHttpRequest.client(DataUrl.K8_SERVICE_URL.get(), graphQlQuery);
-            ObjectMapper mapper = new ObjectMapper();
-            ReferenceData referenceData = mapper.readValue(response, ReferenceData.class);
-
+            referenceData = restTemplate.postForObject(DataUrl.K8_SERVICE_URL.get(), request, ReferenceData.class);
             markerDataMap = clusterReferenceDataByMarker(referenceData);
         }catch (Exception e){
-            log.info("Reference Database could not be retrieved");
+            log.info("Reference Database could not be retrieved {}", e);
         }
         return  markerDataMap;
     }

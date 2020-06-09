@@ -26,6 +26,7 @@ import org.pdxfinder.services.dto.pdxgun.Reference;
         "Ref. Allele",
         "Alt Allele",
         "Variant Type",
+        "Variant Class",
         "Ensembl Transcript Id",
         "Ensembl Gene Id",
         "Ucsc Gene Id",
@@ -53,6 +54,7 @@ public class MolecularDataRowDTO {
     private String readDepth;
     private String alleleFrequency;
     private Reference variantType;
+    private String variantClass;
     private String nucleotideChange;
     private String genomeAssembly;
     private String seqStartPosition;
@@ -217,6 +219,17 @@ public class MolecularDataRowDTO {
     @JsonProperty("Variant Type")
     public MolecularDataRowDTO setVariantType(Reference variantType) {
         this.variantType = variantType;
+        return this;
+    }
+
+    @JsonProperty("Variant Class")
+    public String getVariantClass() {
+        return variantClass;
+    }
+
+    @JsonProperty("Variant Class")
+    public MolecularDataRowDTO setVariantClass(String variantClass) {
+        this.variantClass = variantClass;
         return this;
     }
 
