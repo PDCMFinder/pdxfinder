@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -94,7 +95,7 @@ public class TransController {
     }
 
 
-    @RequestMapping("/pdmr/genomics")
+    @RequestMapping(path = "/pdmr/genomics", method = RequestMethod.GET)
     public Object transformPdmrGenomicData() {
 
         List transformedData = transformerService.transformOncoKB();
