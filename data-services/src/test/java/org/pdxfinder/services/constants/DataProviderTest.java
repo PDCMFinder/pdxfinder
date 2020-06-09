@@ -66,6 +66,8 @@ public class DataProviderTest extends BaseTest {
                     break;
                 case SJCRH:
                     break;
+                case UMCG:
+                    break;
                 default:
                     message = String.format("%s %s", ASSERTION_ERROR, option);
                     expected = false;
