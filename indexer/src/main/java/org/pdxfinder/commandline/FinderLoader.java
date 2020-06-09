@@ -152,7 +152,7 @@ public class FinderLoader {
     }
 
     private void loadRegimens(boolean loadCacheRequested) {
-        if (dataImportService.ontologyCacheIsEmpty() || loadCacheRequested) {
+        if (dataImportService.ontologyCacheIsEmptyByType("treatment") || loadCacheRequested) {
             try {
                 loadNCITDrugs.loadRegimens();
             } catch (Exception e) {

@@ -976,8 +976,16 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumber();
     }
 
+    public int countAllOntologyTermsByType(String type){
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
+
     public boolean ontologyCacheIsEmpty() {
         return countAllOntologyTerms() == 0;
+    }
+
+    public boolean ontologyCacheIsEmptyByType(String type){
+        return countAllOntologyTermsByType(type) == 0;
     }
 
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
