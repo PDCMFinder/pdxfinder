@@ -1,5 +1,8 @@
 package org.pdxfinder.graph.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MolecularData {
 
 
@@ -569,5 +572,17 @@ public class MolecularData {
 
     public void setMarkerStatusComment(String markerStatusComment) {
         this.markerStatusComment = markerStatusComment;
+    }
+
+    public static List<String> getAminoAcidChangesFromMolecularDataList(List<MolecularData> molecularDataList){
+        List<String> markerList = new ArrayList<>();
+        molecularDataList.forEach( mData -> markerList.add(mData.getAminoAcidChange()) );
+        return markerList;
+    }
+
+    public static List<String> getMarkersFromMolecularDataList(List<MolecularData> molecularDataList){
+        List<String> markerList = new ArrayList<>();
+        molecularDataList.forEach( mData -> markerList.add(mData.getMarker()) );
+        return markerList;
     }
 }

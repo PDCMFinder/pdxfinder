@@ -41,23 +41,6 @@ public class DetailsService {
     private PatientService patientService;
     private PublicationService publicationService;
 
-    private final String JAX_URL = "http://tumor.informatics.jax.org/mtbwi/pdxDetails.do?modelID=";
-    private final String JAX_URL_TEXT = "View data at JAX";
-    private final String IRCC_URL = "mailto:andrea.bertotti@unito.it?subject=";
-    private final String IRCC_URL_TEXT = "Contact IRCC here";
-    private final String PDMR_URL = "https://pdmdb.cancer.gov/pls/apex/f?p=101:41";
-    private final String PDMR_URL_TEXT = "View data at PDMR";
-
-    private final String HCI_URL = "";
-    private final String HCI_DS = "PDXNet-HCI-BCM";
-    private final String WISTAR_URL = "";
-
-    private final String WISTAR_DS = "PDXNet-Wistar-MDAnderson-Penn";
-    private final String MDA_URL = "";
-    private final String MDA_DS = "PDXNet-MDAnderson";
-    private final String WUSTL_URL = "";
-    private final String WUSTL_DS = "PDXNet-WUSTL";
-
     private final static Logger log = LoggerFactory.getLogger(DetailsService.class);
     private ReferenceDbService referenceDbService;
 
@@ -134,18 +117,14 @@ public class DetailsService {
         }
 
         if (currentPatientSnapshot != null && currentPatientSnapshot.getAgeAtCollection() != null) {
-
             dto.setAgeAtTimeOfCollection(currentPatientSnapshot.getAgeAtCollection());
         } else {
-
             dto.setAgeAtTimeOfCollection("Not specified");
         }
 
         if (patient.getRace() != null && !patient.getRace().isEmpty()) {
-
             dto.setRace(patient.getRace());
         } else {
-
             dto.setRace("Not specified");
         }
 
@@ -469,18 +448,27 @@ public class DetailsService {
 
     private List<MolecularDataRowDTO> getMolecularDataRow(String sampleId, List<MolecularData> molecularDataList){
 
-        List<String> markerList = referenceDbService.getMarkerListFromMolecularData(molecularDataList);
-        Map<String, Reference> referenceData = referenceDbService.getReferenceDataForMarkerList(markerList);
+        List<String> markerList = MolecularData.getMarkersFromMolecularDataList(molecularDataList);
+        List<String> aminoAcidChangeList = MolecularData.getAminoAcidChangesFromMolecularDataList(molecularDataList);
+
+        Map<String, Reference> variantsData = referenceDbService.getReferenceData(aminoAcidChangeList, "variant");
+        Map<String, Reference> referenceData = referenceDbService.getReferenceData(markerList, "gene");
+
         List<MolecularDataRowDTO> tableData = new ArrayList<>();
         molecularDataList.forEach(md -> {
 
-            Reference markerData = referenceDbService.getMarkerReference(md.getMarker(), referenceData);
-            Reference variantTypeData = referenceDbService.getVariantTypeReference(md.getExistingVariations());
+            Reference markerData = referenceDbService.getReference(md.getMarker(), referenceData);
+            Reference aminoAcid = referenceDbService.getAminoAcidChangeReference(md.getAminoAcidChange(), variantsData,
+                                                                                       md.getExistingVariations(),
+                                                                                       md.getChromosome(),
+                                                                                       md.getSeqStartPosition(),
+                                                                                       md.getRefAllele(),
+                                                                                       md.getAltAllele());
 
             MolecularDataRowDTO dataRow = new MolecularDataRowDTO();
             dataRow.setSampleId(sampleId)
                     .setHgncSymbol(markerData)
-                    .setAminoAcidChange(md.getAminoAcidChange())
+                    .setAminoAcidChange(aminoAcid)
                     .setConsequence(md.getConsequence())
                     .setNucleotideChange(md.getNucleotideChange())
                     .setReadDepth(md.getReadDepth() == null ? "" : md.getReadDepth())
@@ -492,11 +480,11 @@ public class DetailsService {
                     .setCnaGisticValue(md.getCnaGisticValue())
                     .setChromosome(md.getChromosome())
                     .setSeqStartPosition(md.getSeqStartPosition())
-                    .setSeqEndPosition( md.getSeqEndPosition())
+                    .setSeqEndPosition(md.getSeqEndPosition())
                     .setRefAllele(md.getRefAllele())
                     .setAltAllele(md.getAltAllele())
+                    .setExistingVariation(md.getExistingVariations())
                     .setVariantClass(md.getVariantClass())
-                    .setVariantType(variantTypeData)
                     .setEnsemblTranscriptId( md.getEnsemblTranscriptId())
                     .setEnsemblTranscriptId(md.getEnsemblGeneId())
                     .setUcscTranscriptId(md.getUcscGeneId())

@@ -26,7 +26,6 @@ import org.pdxfinder.services.dto.pdxgun.Reference;
         "Ref. Allele",
         "Alt Allele",
         "Variant Type",
-        "Variant Class",
         "Ensembl Transcript Id",
         "Ensembl Gene Id",
         "Ucsc Gene Id",
@@ -35,7 +34,8 @@ import org.pdxfinder.services.dto.pdxgun.Reference;
         "Z-Score",
         "Genome Assembly",
         "Result",
-        "Illumina HGEA Exp"
+        "Illumina HGEA Exp",
+        "Rs Id Variant"
 })
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MolecularDataRowDTO {
@@ -50,11 +50,11 @@ public class MolecularDataRowDTO {
     private Reference hgncSymbol;
     protected String rnaSeqCount;
     private String zscore;
-    private String aminoAcidChange;
+    private Reference aminoAcidChange;
     private String readDepth;
     private String alleleFrequency;
-    private Reference variantType;
     private String variantClass;
+    private String existingVariation;
     private String nucleotideChange;
     private String genomeAssembly;
     private String seqStartPosition;
@@ -179,12 +179,12 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Amino Acid Change")
-    public String getAminoAcidChange() {
+    public Reference getAminoAcidChange() {
         return aminoAcidChange;
     }
 
     @JsonProperty("Amino Acid Change")
-    public MolecularDataRowDTO setAminoAcidChange(String aminoAcidChange) {
+    public MolecularDataRowDTO setAminoAcidChange(Reference aminoAcidChange) {
         this.aminoAcidChange = aminoAcidChange;
         return this;
     }
@@ -212,24 +212,24 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Variant Type")
-    public Reference getVariantType() {
-        return variantType;
-    }
-
-    @JsonProperty("Variant Type")
-    public MolecularDataRowDTO setVariantType(Reference variantType) {
-        this.variantType = variantType;
-        return this;
-    }
-
-    @JsonProperty("Variant Class")
     public String getVariantClass() {
         return variantClass;
     }
 
-    @JsonProperty("Variant Class")
+    @JsonProperty("Variant Type")
     public MolecularDataRowDTO setVariantClass(String variantClass) {
         this.variantClass = variantClass;
+        return this;
+    }
+
+    @JsonProperty("Rs Id Variant")
+    public String getExistingVariation() {
+        return existingVariation;
+    }
+
+    @JsonProperty("Rs Id Variant")
+    public MolecularDataRowDTO setExistingVariation(String existingVariation) {
+        this.existingVariation = existingVariation;
         return this;
     }
 

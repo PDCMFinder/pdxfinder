@@ -7,7 +7,7 @@ import java.util.Map;
 public class Reference {
 
     private String label;
-    private Map referenceDbs;
+    private Map<String, String> referenceDbs;
 
     public Reference() {
         // Empty Constructor
@@ -26,11 +26,11 @@ public class Reference {
         return this;
     }
 
-    public Map getReferenceDbs() {
+    public Map<String, String> getReferenceDbs() {
         return referenceDbs;
     }
 
-    public Reference setReferenceDbs(Map referenceDbs) {
+    public Reference setReferenceDbs(Map<String, String> referenceDbs) {
         this.referenceDbs = referenceDbs;
         return this;
     }

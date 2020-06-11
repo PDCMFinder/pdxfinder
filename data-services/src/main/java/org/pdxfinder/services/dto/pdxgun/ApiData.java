@@ -3,7 +3,7 @@ package org.pdxfinder.services.dto.pdxgun;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Gene {
+public class ApiData {
 
     private String name;
     private String url;
