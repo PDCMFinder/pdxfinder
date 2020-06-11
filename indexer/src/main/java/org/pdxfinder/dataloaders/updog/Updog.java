@@ -64,13 +64,24 @@ public class Updog {
         }
     }
 
-    private void reportAnyErrors(List<ValidationError> validationErrors) {
-        if (CollectionUtils.isNotEmpty(validationErrors))
-            for (ValidationError error : validationErrors) {
-                log.debug(error.message());
+    private void reportAnyErrors(List<ValidationError> validationErrors, int limitTo) {
+        List<ValidationError> truncatedList = truncateLargeList(validationErrors, limitTo);
+        if (CollectionUtils.isNotEmpty(validationErrors)) {
+            log.error("{} validation errors found:", validationErrors.size());
+            log.info("Limiting output to the first {} errors:", limitTo);
+            for (ValidationError error : truncatedList) {
+                log.error(error.message());
             }
-        else
+        } else
             log.info("There were no validation errors raised, great!");
+    }
+
+    private <E> List<E> truncateLargeList(List<E> list, int size) {
+        if (list.size() > size) {
+            return list.subList(0, size);
+        } else {
+            return list;
+        }
     }
 
     private Map<String, Table> readPdxTablesFromPath(Path updogProviderDirectory) {
