@@ -1,6 +1,9 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
+import org.apache.commons.lang3.StringUtils;
+import org.pdxfinder.dataloaders.updog.Reader;
 import org.pdxfinder.dataloaders.updog.TSV;
+import org.pdxfinder.dataloaders.updog.TableSetCleaner;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
@@ -11,6 +14,7 @@ import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,10 +22,13 @@ import java.util.stream.Collectors;
 public class DomainObjectCreator {
 
     private Map<String, Map<String, Object>> domainObjects;
+    private Map<String, Set<Long>> sampleMolcharMap;
     private DataImportService dataImportService;
     private GroupCreator groupCreator;
     private PatientCreator patientCreator;
     private ModelCreationCreator modelCreationCreator;
+    private Reader reader;
+    private TableSetCleaner tableSetCleaner;
     private static final Logger log = LoggerFactory.getLogger(DomainObjectCreator.class);
 
     Map<String, Table> pdxDataTables;
@@ -43,16 +50,21 @@ public class DomainObjectCreator {
         DataImportService dataImportService,
         GroupCreator groupCreator,
         PatientCreator patientCreator,
-        ModelCreationCreator modelCreationCreator
+        ModelCreationCreator modelCreationCreator,
+        Reader reader,
+        TableSetCleaner tableSetCleaner
     ) {
         this.dataImportService = dataImportService;
         this.groupCreator = groupCreator;
         this.patientCreator = patientCreator;
         this.modelCreationCreator = modelCreationCreator;
+        this.reader = reader;
+        this.tableSetCleaner = tableSetCleaner;
         domainObjects = new HashMap<>();
+        sampleMolcharMap = new HashMap<>();
     }
 
-    public void loadDomainObjects(Map<String, Table> pdxDataTables) {
+    public void loadDomainObjects(Map<String, Table> pdxDataTables, Path targetDirectory) {
         //: Do not change the order of these unless you want to risk 1. the universe to collapse OR 2. missing nodes in the db
 
         this.pdxDataTables = pdxDataTables;
@@ -64,9 +76,20 @@ public class DomainObjectCreator {
         createSharingData(pdxDataTables);
         createSamplePlatformData(pdxDataTables);
         createTreatmentData(pdxDataTables);
-        createOmicData(pdxDataTables);
+        createDrugDosingData(pdxDataTables);
+
+        List<Path> omicFiles = reader.getOmicFilePaths(targetDirectory);
+        for(Path omicFile: omicFiles) {
+            Table omicTable = reader.readOmicTable(omicFile);
+            omicTable = tableSetCleaner.cleanOmicsTable(omicTable);
+            String dataType = reader.getOmicDataType(omicFile);
+            createMolecularData(omicTable, dataType);
+            persistMolecularData(false);
+        }
+        persistMolecularData(true);
         persistNodes();
     }
+
 
     public void callCreators(Map<String, Table> tableSet) {
         Group provider = patientCreator.createDependencies(tableSet);
@@ -123,20 +146,20 @@ public class DomainObjectCreator {
         Table sampleTable = pdxDataTables.get("metadata-sample.tsv");
         Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
         for (Row row : sampleTable) {
-            String patientId = row.getString(TSV.Metadata.patient_id.name());
-            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String patientId = getCellAsText(row, TSV.Metadata.patient_id.name());
+            String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
             String dateOfCollection = row.getString(TSV.Metadata.collection_date.name());
-            String ageAtCollection = row.getString(TSV.Metadata.age_in_years_at_collection.name());
-            String collectionEvent = row.getString(TSV.Metadata.collection_event.name());
-            String elapsedTime = row.getString(TSV.Metadata.months_since_collection_1.name());
+            String ageAtCollection = getCellAsText(row, TSV.Metadata.age_in_years_at_collection.name());
+            String collectionEvent = getCellAsText(row, TSV.Metadata.collection_event.name());
+            String elapsedTime = getCellAsText(row, TSV.Metadata.months_since_collection_1.name());
             String primarySiteName = row.getString(TSV.Metadata.primary_site.name());
             String virologyStatus = row.getString(TSV.Metadata.virology_status.name());
             String treatmentNaive = row.getString(TSV.Metadata.treatment_naive_at_collection.name());
 
             Patient patient = (Patient) getDomainObject(PATIENTS, patientId);
             if (patient == null) {
-                log.error("Patient not found {}", patientId);
-                throw new NullPointerException();}
+                log.error("Patient id is present in sample tab but not in patient tab {}", patientId);
+                continue;}
 
             PatientSnapshot patientSnapshot = patient.getSnapShotByCollection(
                     ageAtCollection,
@@ -175,21 +198,29 @@ public class DomainObjectCreator {
         Table modelTable = pdxDataTables.get("metadata-model.tsv");
         Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
         for (Row row : modelTable) {
-            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
             String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
-            String passageNum = row.getString(TSV.Metadata.passage_number.name());
+            String passageString = getCellAsText(row, TSV.Metadata.passage_number.name());
+            String publications = getCellAsText(row, TSV.Metadata.publications.name());
 
             ModelCreation modelCreation = new ModelCreation();
             modelCreation.setSourcePdxId(modelId);
             modelCreation.setDataSource(providerGroup.getAbbreviation());
             addDomainObject(MODELS, modelId, modelCreation);
 
-            Specimen specimen = modelCreation.getSpecimenByPassageAndHostStrain(passageNum, hostStrainNomenclature);
-            if (specimen == null) {
-                specimen = createSpecimen(row, row.getRowNumber());
-                modelCreation.addSpecimen(specimen);
-                modelCreation.addRelatedSample(specimen.getSample());
+            createPublication(modelCreation, publications);
+
+            String[] passageArr = passageString.split(",");
+
+            for(String passage: passageArr){
+                Specimen specimen = modelCreation.getSpecimenByPassageAndHostStrain(passage, hostStrainNomenclature);
+                if (specimen == null) {
+                    specimen = createSpecimen(row, passage);
+                    modelCreation.addSpecimen(specimen);
+                    modelCreation.addRelatedSample(specimen.getSample());
+                }
             }
+
         }
         createModelValidationData(pdxDataTables);
     }
@@ -198,10 +229,10 @@ public class DomainObjectCreator {
 
         Table modelValidationTable = pdxDataTables.get("metadata-model_validation.tsv");
         for (Row row : modelValidationTable) {
-            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
             String validationTechnique = row.getString(TSV.Metadata.validation_technique.name());
             String description = row.getString(TSV.Metadata.description.name());
-            String passagesTested = row.getString(TSV.Metadata.passages_tested.name());
+            String passagesTested = getCellAsText(row, TSV.Metadata.passages_tested.name());
             String hostStrainFull = row.getString(TSV.Metadata.validation_host_strain_full.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
@@ -231,7 +262,7 @@ public class DomainObjectCreator {
         Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
 
         for (Row row : sharingTable) {
-            String modelId = row.getString(TSV.Metadata.model_id.name());
+            String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
             String providerType = row.getString(TSV.Metadata.provider_type.name());
             String accessibility = row.getString(TSV.Metadata.accessibility.name());
             String europdxAccessModality = row.getString(TSV.Metadata.europdx_access_modality.name());
@@ -246,11 +277,10 @@ public class DomainObjectCreator {
             List<ExternalUrl> externalUrls = getExternalUrls(email, formUrl, databaseUrl);
             modelCreation.setExternalUrls(externalUrls);
 
-            Optional.ofNullable(project).ifPresent(
-                    s -> {
-                        Group projectGroup = dataImportService.getProjectGroup(s);
-                        modelCreation.addGroup(projectGroup);
-                    });
+            if(!StringUtils.isBlank(project)){
+                Group projectGroup = dataImportService.getProjectGroup(project);
+                modelCreation.addGroup(projectGroup);
+            }
 
             if (eitherIsPresent(accessibility, europdxAccessModality)) {
                 Group access = dataImportService.getAccessibilityGroup(accessibility, europdxAccessModality);
@@ -269,33 +299,69 @@ public class DomainObjectCreator {
         if (samplePlatformTable == null) return;
 
         for (Row row : samplePlatformTable) {
+
+            String sampleId = getCellAsText(row, TSV.SamplePlatform.sample_id.name());
             String sampleOrigin = row.getString(TSV.SamplePlatform.sample_origin.name());
             String platformName = row.getString(TSV.SamplePlatform.platform.name());
             String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
+            String rawDataUrl = formatAccessionToURL(row.getString(TSV.SamplePlatform.raw_data_file.name()));
+            String platformUrl = row.getString(TSV.SamplePlatform.internal_protocol_url.name());
+
             Sample sample = null;
 
             if (sampleOrigin.equals(PATIENTS)) {
                 sample = getPatientSample(row);
             } else if (sampleOrigin.equals("xenograft")) {
                 sample = getOrCreateSpecimen(row).getSample();
+                if (sample.getSourceSampleId().equals("")){
+                    sample.setSourceSampleId(sampleId);
+                }
             }
             if (sample == null) throw new NullPointerException();
-            getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+            sample.setRawDataUrl(rawDataUrl);
+            getOrCreateMolecularCharacterization(sample, platformName, molCharType, platformUrl);
         }
     }
 
+    public String formatAccessionToURL(String rawDataUrl) {
+        String formattedAccesionLink = "";
+        String ENAprojectRe = "^PRJ[EDN][A-Z][0-9]{0,15}$";
+        String ENAaccessionRe = "^[EDS]R[SXRP][0-9]{6,}$";
+        String EGAaccessionRe = "^EGA[A-Za-z0-9]+$";
+        String GEOaccessionRe = "^GSM[A-Za-z0-9]+$";
+
+        if (rawDataUrl.matches(ENAaccessionRe) || rawDataUrl.matches(ENAprojectRe)){
+            formattedAccesionLink = String.format("https://www.ebi.ac.uk/ena/data/view/%s", rawDataUrl);
+        }
+        else if(rawDataUrl.matches(EGAaccessionRe)){
+            formattedAccesionLink = String.format("https://www.ebi.ac.uk/ega/search/site/%s", rawDataUrl);
+        }
+        else if(rawDataUrl.matches(GEOaccessionRe)){
+            formattedAccesionLink = String.format("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=%s", rawDataUrl);
+        } else
+            rawDataUrl = "";
+
+        return (!rawDataUrl.equals("")) ? String.format("%s,%s", rawDataUrl, formattedAccesionLink) : "";
+    }
+
     void createTreatmentData(Map<String, Table> pdxDataTables){
-        log.info("Creating patient treatments");
+
         Table treatmentTable = pdxDataTables.get("patienttreatment-Sheet1.tsv");
 
         if(treatmentTable != null){
+            log.info("Creating patient treatments");
            for(Row row : treatmentTable){
-                String patientId = getStringFromRowAndColumn(row, TSV.Metadata.patient_id.name());
+                String patientId = getCellAsText(row, TSV.Metadata.patient_id.name());
                 Patient patient = (Patient) getDomainObject(PATIENTS, patientId);
                 if(patient != null) {
-                    PatientSnapshot patientSnapshot = patient.getLastSnapshot();
-                    TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
-                    patientSnapshot.addTreatmentProtocol(treatmentProtocol);
+                    try{
+                        PatientSnapshot patientSnapshot = patient.getLastSnapshot();
+                        TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
+                        patientSnapshot.addTreatmentProtocol(treatmentProtocol);
+                    }
+                    catch (Exception e){
+                        log.error("Exception when loading treatment for patient {}",patientId);
+                    }
                 }
            }
         }
@@ -304,12 +370,26 @@ public class DomainObjectCreator {
     void createDrugDosingData(Map<String, Table> pdxDataTables){
         Table drugdosingTable = pdxDataTables.get("drugdosing-Sheet1.tsv");
         if(drugdosingTable != null){
+            log.info("Creating drug dosing data");
             for(Row row : drugdosingTable){
-                String modelId = getStringFromRowAndColumn(row, TSV.Metadata.model_id.name());
+                String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
                 ModelCreation model = (ModelCreation) getDomainObject(MODELS, modelId);
                 if(model == null) throw new NullPointerException();
                 TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
                 model.addTreatmentProtocol(treatmentProtocol);
+            }
+        }
+    }
+
+    void createPublication(ModelCreation modelCreation, String publications ){
+
+        if(!StringUtils.isBlank(publications)){
+            String[] publicationArr = publications.split(",");
+            for(String publication:publicationArr){
+                if(!StringUtils.isBlank(publication)){
+                    Group publicationGroup = dataImportService.getPublicationGroup(publication);
+                    modelCreation.addGroup(publicationGroup);
+                }
             }
         }
     }
@@ -319,6 +399,7 @@ public class DomainObjectCreator {
         createMutationData(pdxDataTables);
         createCnaData(pdxDataTables);
         createCytogeneticsData(pdxDataTables);
+        createExpressionData(pdxDataTables);
     }
 
     private void createMutationData(Map<String, Table> pdxDataTables){
@@ -358,30 +439,57 @@ public class DomainObjectCreator {
         }
     }
 
+    private void createExpressionData(Map<String, Table> pdxDataTables){
+        Table expressionTable = pdxDataTables.get("expression.tsv");
+        if (expressionTable != null) {
+            createMolecularData(expressionTable, "expression");
+        } else {
+            Map<String, Object> models = domainObjects.get(MODELS);
+            for(Map.Entry<String, Object> entry : models.entrySet()){
+                ModelCreation modelCreation = (ModelCreation) entry.getValue();
+                String expModelId = "expression_"+modelCreation.getSourcePdxId()+".tsv";
+                expressionTable = pdxDataTables.get(expModelId);
+                if(expressionTable != null){
+                    log.info(modelCreation.getSourcePdxId());
+                    createMolecularData(expressionTable, "expression");
+                }
+            }
+        }
+    }
+
     private void createCytogeneticsData(Map<String, Table> pdxDataTables){
         Table cytoTable = pdxDataTables.get("cytogenetics-Sheet1.tsv");
-        if (cytoTable != null)
+        if (cytoTable != null){
+            log.info("Creating cytogenetics");
             createMolecularData(cytoTable, "cytogenetics");
+        }
     }
 
     private void createMolecularData(Table table, String molcharType){
 
-        MolecularCharacterization molecularCharacterization = null;
-
+       MarkerAssociation markerAssociation = null;
         for (Row row : table) {
-            molecularCharacterization = getMolcharByType(row, molcharType);
-            MolecularData molecularData = createMolecularData(molecularCharacterization, row);
-            if (molecularData.hasMarker()){
 
-                molecularCharacterization.getFirstMarkerAssociation().addMolecularData(molecularData);
+            if(row.getRowNumber() != 1){
+                MolecularCharacterization molecularCharacterization = getMolcharByType(row, molcharType);
+                markerAssociation = molecularCharacterization.getFirstMarkerAssociation();
+                if(markerAssociation == null){
+                    markerAssociation = new MarkerAssociation();
+                    molecularCharacterization.addMarkerAssociation(markerAssociation);
+                }
+
+
+                MolecularData molecularData = createMolecularDataObject(molecularCharacterization, row);
+                if (molecularData.hasMarker())
+                    markerAssociation.addMolecularData(molecularData);
+
             }
         }
-
-        //addDomainObject("molecular_characterization", molcharType, molecularCharacterization);
     }
 
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
 
+        String sampleId = getCellAsText(row, "sample_id");
         String sampleOrigin = row.getString("sample_origin");
         String platformName = row.getString(PLATFORMS);
         Sample sample = null;
@@ -390,13 +498,16 @@ public class DomainObjectCreator {
             sample = getPatientSample(row);
         } else if (sampleOrigin.equalsIgnoreCase("xenograft")) {
             sample = getOrCreateSpecimen(row).getSample();
+            if(StringUtils.isEmpty(sample.getSourceSampleId())) {
+                sample.setSourceSampleId(sampleId);
+            }
         }
 
         if (sample == null) {
             log.error(sampleOrigin);
             throw new NullPointerException();}
 
-        return getOrCreateMolecularCharacterization(sample, platformName, molCharType);
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "Not Available");
     }
 
     private Set getMarkers(MarkerAssociation markerAssociation) {
@@ -409,20 +520,24 @@ public class DomainObjectCreator {
 
     private Sample getPatientSample(Row row) {
 
-        String modelId = row.getString(TSV.Mutation.model_id.name());
+        String modelId = getCellAsText(row, TSV.Mutation.model_id.name());
         ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
-        if (modelCreation == null) throw new NullPointerException();
+        if (modelCreation == null)
+        {
+            log.error(modelId);
+            throw new NullPointerException();
+        }
 
         return modelCreation.getSample();
     }
 
     private Specimen getOrCreateSpecimen(Row row) {
         // For Mutation
-        String modelId = row.getString(TSV.Mutation.model_id.name());
+        String modelId = getCellAsText(row, TSV.Mutation.model_id.name());
         String hostStrainSymbol = row.getString(TSV.Mutation.host_strain_nomenclature.name());
-        String passage = getStringFromRowAndColumn(row, TSV.Mutation.passage.name());
+        String passage = getCellAsText(row, TSV.Mutation.passage.name());
         if(hostStrainSymbol.equals("")) hostStrainSymbol = NOT_SPECIFIED;
-        String sampleId = row.getString(TSV.Mutation.sample_id.name());
+        String sampleId = getCellAsText(row, TSV.Mutation.sample_id.name());
         ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
         if (modelCreation == null){
             log.error("Model not found: {}", modelId);
@@ -434,7 +549,7 @@ public class DomainObjectCreator {
             specimen = new Specimen();
             specimen.setPassage(passage);
 
-            HostStrain hostStrain = getOrCreateHostStrain(NOT_SPECIFIED, hostStrainSymbol, row.getRowNumber());
+            HostStrain hostStrain = getOrCreateHostStrain(NOT_SPECIFIED, hostStrainSymbol);
             specimen.setHostStrain(hostStrain);
 
             Sample sample = new Sample();
@@ -446,21 +561,20 @@ public class DomainObjectCreator {
         return specimen;
     }
 
-    private MolecularCharacterization getOrCreateMolecularCharacterization(Sample sample, String platformName, String molCharType) {
+    private MolecularCharacterization getOrCreateMolecularCharacterization(Sample sample, String platformName,
+                                                                           String molCharType, String platformUrl) {
 
         MolecularCharacterization molecularCharacterization = sample.getMolecularCharacterization(molCharType, platformName);
         if (molecularCharacterization == null) {
             molecularCharacterization = new MolecularCharacterization();
             molecularCharacterization.setType(molCharType);
-            molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType));
-            MarkerAssociation ma = new MarkerAssociation();
-            molecularCharacterization.addMarkerAssociation(ma);
+            molecularCharacterization.setPlatform(getOrCreatePlatform(platformName, molCharType, platformUrl));
             sample.addMolecularCharacterization(molecularCharacterization);
         }
         return molecularCharacterization;
     }
 
-    private Platform getOrCreatePlatform(String platformName, String molCharType) {
+    private Platform getOrCreatePlatform(String platformName, String molCharType, String platformUrl) {
 
         Group providerGroup = (Group) getDomainObject(PROVIDER_GROUPS, FIRST);
         String platformId = molCharType + platformName;
@@ -469,18 +583,19 @@ public class DomainObjectCreator {
             platform = new Platform();
             platform.setGroup(providerGroup);
             platform.setName(platformName);
+            platform.setUrl(platformUrl);
             addDomainObject(PLATFORMS, platformId, platform);
         }
         return platform;
     }
 
-    private MolecularData createMolecularData(
+    private MolecularData createMolecularDataObject (
         MolecularCharacterization molecularCharacterization,
         Row row
     ) {
         MolecularData molecularData = new MolecularData();
-        String hgncSymbol = row.getString("symbol");
-        String modelId = row.getString("model_id");
+        String hgncSymbol = getCellAsText(row, "symbol");
+        String modelId = getCellAsText(row, "model_id");
         Group provider = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
         String dataSource = provider.getAbbreviation();
         NodeSuggestionDTO nodeSuggestionDTO = dataImportService.getSuggestedMarker(
@@ -497,7 +612,6 @@ public class DomainObjectCreator {
                 row,
                 (Marker) nodeSuggestionDTO.getNode());
         }
-
         return molecularData;
     }
 
@@ -518,8 +632,8 @@ public class DomainObjectCreator {
             case "copy number alteration":
                 molecularData = getCNAProperties(row, marker);
                 break;
-            case "transcriptomics":
-                molecularData = getTranscriptomicProperties(row, marker);
+            case "expression":
+                molecularData = getExpressionProperties(row, marker);
                 break;
             default:
                 molecularData = new MolecularData();
@@ -530,25 +644,25 @@ public class DomainObjectCreator {
     private MolecularData getMutationProperties(Row row, Marker marker) {
         MolecularData ma = new MolecularData();
         try {
-            ma.setBiotype(getStringFromRowAndColumn(row,TSV.Mutation.biotype.name()));
-            ma.setCodingSequenceChange(getStringFromRowAndColumn(row,TSV.Mutation.coding_sequence_change.name()));
-            ma.setVariantClass(getStringFromRowAndColumn(row,TSV.Mutation.variant_class.name()));
-            ma.setCodonChange(getStringFromRowAndColumn(row,TSV.Mutation.codon_change.name()));
-            ma.setAminoAcidChange(getStringFromRowAndColumn(row, TSV.Mutation.amino_acid_change.name()));
-            ma.setConsequence(getStringFromRowAndColumn(row, TSV.Mutation.consequence.name()));
-            ma.setFunctionalPrediction(getStringFromRowAndColumn(row,TSV.Mutation.functional_prediction.name()));
-            ma.setReadDepth(getStringFromRowAndColumn(row, TSV.Mutation.read_depth.name()));
-            ma.setAlleleFrequency(getStringFromRowAndColumn(row, TSV.Mutation.allele_frequency.name()));
-            ma.setChromosome(getStringFromRowAndColumn(row, TSV.Mutation.chromosome.name()));
-            ma.setSeqStartPosition(getStringFromRowAndColumn(row, TSV.Mutation.seq_start_position.name()));
-            ma.setRefAllele(getStringFromRowAndColumn(row, TSV.Mutation.ref_allele.name()));
-            ma.setAltAllele(getStringFromRowAndColumn(row, TSV.Mutation.alt_allele.name()));
-            ma.setUcscGeneId(getStringFromRowAndColumn(row,TSV.Mutation.ucsc_gene_id.name()));
-            ma.setNcbiGeneId(getStringFromRowAndColumn(row,TSV.Mutation.ncbi_gene_id.name()));
-            ma.setNcbiTranscriptId(getStringFromRowAndColumn(row,TSV.Mutation.ncbi_transcript_id.name()));
-            ma.setEnsemblTranscriptId(getStringFromRowAndColumn(row, TSV.Mutation.ensembl_transcript_id.name()));
-            ma.setExistingVariations(getStringFromRowAndColumn(row, TSV.Mutation.variation_id.name()));
-            ma.setGenomeAssembly(getStringFromRowAndColumn(row, TSV.Mutation.genome_assembly.name()));
+            ma.setBiotype(getCellAsText(row,TSV.Mutation.biotype.name()));
+            ma.setCodingSequenceChange(getCellAsText(row,TSV.Mutation.coding_sequence_change.name()));
+            ma.setVariantClass(getCellAsText(row,TSV.Mutation.variant_class.name()));
+            ma.setCodonChange(getCellAsText(row,TSV.Mutation.codon_change.name()));
+            ma.setAminoAcidChange(getCellAsText(row, TSV.Mutation.amino_acid_change.name()));
+            ma.setConsequence(getCellAsText(row, TSV.Mutation.consequence.name()));
+            ma.setFunctionalPrediction(getCellAsText(row,TSV.Mutation.functional_prediction.name()));
+            ma.setReadDepth(getCellAsText(row, TSV.Mutation.read_depth.name()));
+            ma.setAlleleFrequency(getCellAsText(row, TSV.Mutation.allele_frequency.name()));
+            ma.setChromosome(getCellAsText(row, TSV.Mutation.chromosome.name()));
+            ma.setSeqStartPosition(getCellAsText(row, TSV.Mutation.seq_start_position.name()));
+            ma.setRefAllele(getCellAsText(row, TSV.Mutation.ref_allele.name()));
+            ma.setAltAllele(getCellAsText(row, TSV.Mutation.alt_allele.name()));
+            ma.setUcscGeneId(getCellAsText(row,TSV.Mutation.ucsc_gene_id.name()));
+            ma.setNcbiGeneId(getCellAsText(row,TSV.Mutation.ncbi_gene_id.name()));
+            ma.setNcbiTranscriptId(getCellAsText(row,TSV.Mutation.ncbi_transcript_id.name()));
+            ma.setEnsemblTranscriptId(getCellAsText(row, TSV.Mutation.ensembl_transcript_id.name()));
+            ma.setExistingVariations(getCellAsText(row, TSV.Mutation.variation_id.name()));
+            ma.setGenomeAssembly(getCellAsText(row, TSV.Mutation.genome_assembly.name()));
 
             ma.setNucleotideChange("");
             ma.setMarker(marker.getHgncSymbol());
@@ -561,35 +675,35 @@ public class DomainObjectCreator {
     private MolecularData getCNAProperties(Row row, Marker marker){
 
         MolecularData ma = new MolecularData();
-        ma.setChromosome(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.chromosome.name()));
-        ma.setSeqStartPosition(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.seq_start_position.name()));
-        ma.setSeqEndPosition(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.seq_end_position.name()));
-        ma.setCnaLog10RCNA(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.log10r_cna.name()));
-        ma.setCnaLog2RCNA(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.log2r_cna.name()));
-        ma.setCnaCopyNumberStatus(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.copy_number_status.name()));
-        ma.setCnaGisticValue(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.gistic_value.name()));
-        ma.setCnaPicnicValue(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.picnic_value.name()));
-        ma.setGenomeAssembly(getStringFromRowAndColumn(row, TSV.CopyNumberAlteration.genome_assembly.name()));
+        ma.setChromosome(getCellAsText(row, TSV.CopyNumberAlteration.chromosome.name()));
+        ma.setSeqStartPosition(getCellAsText(row, TSV.CopyNumberAlteration.seq_start_position.name()));
+        ma.setSeqEndPosition(getCellAsText(row, TSV.CopyNumberAlteration.seq_end_position.name()));
+        ma.setCnaLog10RCNA(getCellAsText(row, TSV.CopyNumberAlteration.log10r_cna.name()));
+        ma.setCnaLog2RCNA(getCellAsText(row, TSV.CopyNumberAlteration.log2r_cna.name()));
+        ma.setCnaCopyNumberStatus(getCellAsText(row, TSV.CopyNumberAlteration.copy_number_status.name()));
+        ma.setCnaGisticValue(getCellAsText(row, TSV.CopyNumberAlteration.gistic_value.name()));
+        ma.setCnaPicnicValue(getCellAsText(row, TSV.CopyNumberAlteration.picnic_value.name()));
+        ma.setGenomeAssembly(getCellAsText(row, TSV.CopyNumberAlteration.genome_assembly.name()));
         ma.setMarker(marker.getHgncSymbol());
         return  ma;
     }
 
-    private MolecularData getTranscriptomicProperties(Row row, Marker marker){
+    private MolecularData getExpressionProperties(Row row, Marker marker){
 
         MolecularData ma = new MolecularData();
-        ma.setChromosome("");
-        ma.setSeqStartPosition("");
-        ma.setSeqEndPosition("");
-        ma.setRnaSeqCoverage("");
-        ma.setRnaSeqFPKM("");
-        ma.setRnaSeqTPM("");
-        ma.setRnaSeqCount("");
-        ma.setAffyHGEAProbeId("");
-        ma.setAffyHGEAExpressionValue("");
-        ma.setIlluminaHGEAProbeId("");
-        ma.setIlluminaHGEAExpressionValue("");
-        ma.setGenomeAssembly("");
-        ma.setZscore("");
+        ma.setChromosome(getCellAsText(row, TSV.Expression.chromosome.name()));
+        ma.setSeqStartPosition(getCellAsText(row, TSV.Expression.seq_start_position.name()));
+        ma.setSeqEndPosition(getCellAsText(row, TSV.Expression.seq_end_position.name()));
+        ma.setRnaSeqCoverage(getCellAsText(row, TSV.Expression.rnaseq_coverage.name()));
+        ma.setRnaSeqFPKM(getCellAsText(row, TSV.Expression.rnaseq_fpkm.name()));
+        ma.setRnaSeqTPM(getCellAsText(row, TSV.Expression.rnaseq_tpm.name()));
+        ma.setRnaSeqCount(getCellAsText(row, TSV.Expression.rnaseq_count.name()));
+        ma.setAffyHGEAProbeId(getCellAsText(row, TSV.Expression.affy_hgea_probe_id.name()));
+        ma.setAffyHGEAExpressionValue(getCellAsText(row, TSV.Expression.affy_hgea_expression_value.name()));
+        ma.setIlluminaHGEAProbeId(getCellAsText(row, TSV.Expression.illumina_hgea_probe_id.name()));
+        ma.setIlluminaHGEAExpressionValue(getCellAsText(row, TSV.Expression.illumina_hgea_expression_value.name()));
+        ma.setGenomeAssembly(getCellAsText(row, TSV.Expression.genome_assembly.name()));
+        ma.setZscore(getCellAsText(row, TSV.Expression.z_score.name()));
         ma.setMarker(marker.getHgncSymbol());
         return  ma;
     }
@@ -598,6 +712,7 @@ public class DomainObjectCreator {
 
         MolecularData ma = new MolecularData();
         try {
+            ma.setCytogeneticsResult(getCellAsText(row, "marker_status"));
             ma.setMarker(marker.getHgncSymbol());
         } catch (Exception e) {
         }
@@ -625,21 +740,22 @@ public class DomainObjectCreator {
         return externalUrls;
     }
 
-    private Specimen createSpecimen(Row row, int rowNumber) {
+    private Specimen createSpecimen(Row row, String passage) {
 
         String hostStrainName = row.getString(TSV.Metadata.host_strain.name());
         String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
         String engraftmentSiteName = row.getString(TSV.Metadata.engraftment_site.name());
         String engraftmentTypeName = row.getString(TSV.Metadata.engraftment_type.name());
         String sampleType = row.getString(TSV.Metadata.sample_type.name());
-        String passageNum = row.getString(TSV.Metadata.passage_number.name());
+        String passageNum = passage.trim();
 
-        HostStrain hostStrain = getOrCreateHostStrain(hostStrainName, hostStrainNomenclature, rowNumber);
+        HostStrain hostStrain = getOrCreateHostStrain(hostStrainName, hostStrainNomenclature);
         EngraftmentSite engraftmentSite = getOrCreateEngraftment(engraftmentSiteName);
         EngraftmentType engraftmentType = getOrCreateEngraftmentType(engraftmentTypeName);
         EngraftmentMaterial engraftmentMaterial = getOrCreateEngraftmentMaterial(sampleType);
 
         Sample xenoSample = new Sample();
+        xenoSample.setSourceSampleId("");
         Specimen specimen = new Specimen();
         specimen.setPassage(passageNum);
         specimen.setHostStrain(hostStrain);
@@ -678,7 +794,7 @@ public class DomainObjectCreator {
         return engraftmentSite;
     }
 
-    private HostStrain getOrCreateHostStrain(String hostStrainName, String hostStrainNomenclature, int rowNumber) {
+    private HostStrain getOrCreateHostStrain(String hostStrainName, String hostStrainNomenclature) {
         HostStrain hostStrain = (HostStrain) getDomainObject(HOST_STRAINS, hostStrainNomenclature);
         if (hostStrain == null) {
             try {
@@ -694,13 +810,13 @@ public class DomainObjectCreator {
     private Sample createPatientSample(Row row) {
 
         String diagnosis = row.getString(TSV.Metadata.diagnosis.name());
-        String sampleId = row.getString(TSV.Metadata.sample_id.name());
+        String sampleId = getCellAsText(row, TSV.Metadata.sample_id.name());
         String tumorTypeName = row.getString(TSV.Metadata.tumour_type.name());
         String primarySiteName = row.getString(TSV.Metadata.primary_site.name());
         String collectionSiteName = row.getString(TSV.Metadata.collection_site.name());
-        String stage = row.getString(TSV.Metadata.stage.name());
+        String stage = getCellAsText(row, TSV.Metadata.stage.name());
         String stagingSystem = row.getString(TSV.Metadata.staging_system.name());
-        String grade = row.getString(TSV.Metadata.grade.name());
+        String grade = getCellAsText(row, TSV.Metadata.grade.name());
         String gradingSystem = row.getString(TSV.Metadata.grading_system.name());
 
         Tissue primarySite = getOrCreateTissue(primarySiteName);
@@ -713,7 +829,7 @@ public class DomainObjectCreator {
         sample.setOriginTissue(primarySite);
 
         sample.setSourceSampleId(sampleId);
-        sample.setDiagnosis(diagnosis);
+        sample.setDiagnosis(diagnosis.trim());
         sample.setStage(stage);
         sample.setStageClassification(stagingSystem);
         sample.setGrade(grade);
@@ -740,38 +856,90 @@ public class DomainObjectCreator {
         return primarySite;
     }
 
+    private void persistMolecularData(boolean persistEmptyMolchars){
+
+        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Object> entry = iter.next();
+            ModelCreation model = (ModelCreation) entry.getValue();
+            //persist molchar data for patient sample
+            Sample patientSample = model.getSample();
+            String patientSampleKey = model.getSourcePdxId()+ "__patient";
+            encodeMolecularDataFor(patientSample, patientSampleKey, persistEmptyMolchars);
+
+            //persist molchar data for xenograft sample(s)
+            if (model.hasSpecimens())
+                for (Specimen s : model.getSpecimens()) {
+                    String passage = s.getPassage();
+                    String hostStrain = s.getHostStrain().getSymbol();
+                    String xenoSampleKey = model.getSourcePdxId()+"__xenograft__"+passage+"__"+hostStrain;
+                    encodeMolecularDataFor(s.getSample(), xenoSampleKey, persistEmptyMolchars);
+                }
+        }
+    }
+
+
+
     private void persistNodes() {
+
+        Iterator<Map.Entry<String, Object>> iter = domainObjects.get(MODELS).entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,Object> entry = iter.next();
+            ModelCreation model = (ModelCreation) entry.getValue();
+            //persist molchar data for patient sample
+            Sample patientSample = model.getSample();
+            String patientSampleKey = model.getSourcePdxId()+ "__patient";
+            linkMolcharDataToSample(patientSample, patientSampleKey);
+
+            //persist molchar data for xenograft sample(s)
+            if (model.hasSpecimens())
+                for (Specimen s : model.getSpecimens()) {
+                    String passage = s.getPassage();
+                    String hostStrain = s.getHostStrain().getSymbol();
+                    String xenoSampleKey = model.getSourcePdxId()+"__xenograft__"+passage+"__"+hostStrain;
+                    linkMolcharDataToSample(s.getSample(), xenoSampleKey);
+                }
+            dataImportService.saveModelCreation(model);
+        }
+
         persistPatients();
-        persistModels();
+
+
     }
 
     public void persistPatients(){
 
         log.info("Persisiting patients");
-        Map<String, Object> patients = domainObjects.get(PATIENTS);
-        for (Object pat : patients.values()) {
-            Patient patient = (Patient) pat;
-            for(PatientSnapshot ps: patient.getSnapshots()){
-                for(Sample patientSample : ps.getSamples())
-                    encodeMolecularDataFor(patientSample);
+        String patientId = "";
+        try {
+            Iterator<Map.Entry<String, Object>> iter = domainObjects.get(PATIENTS).entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, Object> entry = iter.next();
+                Patient patient = (Patient) entry.getValue();
+                patientId = patient.getExternalId();
+                dataImportService.savePatient(patient);
+                iter.remove();
             }
-            dataImportService.savePatient(patient);
+        }
+        catch(Exception e){
+            log.error("Exception when saving patient {}",patientId);
         }
     }
 
-    public void persistModels(){
 
-        log.info("Persisiting models");
-        Map<String, Object> models = domainObjects.get(MODELS);
-        for (Object modelObject : models.values()) {
-            ModelCreation model = (ModelCreation) modelObject;
-            if (model.hasSpecimens())
-                for (Specimen s : model.getSpecimens()) encodeMolecularDataFor(s);
+    private void linkMolcharDataToSample(Sample sample, String sampleKey){
+        sampleKey = sampleKey.replaceAll("[^A-Za-z0-9 _-]", "");
+        if(sampleMolcharMap.containsKey(sampleKey)) {
+            Set<Long> molcharIds = sampleMolcharMap.get(sampleKey);
+            Set<MolecularCharacterization> molchars = dataImportService.getMolcharsById(molcharIds);
+            sample.setMolecularCharacterizations(molchars);
+        }
+        else{
+            //log.error("Molchar not found for: "+sampleKey);
 
-            log.debug("Saving model {}", (model.getSourcePdxId()));
-            dataImportService.saveModelCreation(model);
         }
     }
+
 
     public void addDomainObject(String key1, String key2, Object object) {
         if (domainObjects.containsKey(key1)) {
@@ -791,16 +959,28 @@ public class DomainObjectCreator {
         }
     }
 
-    private void encodeMolecularDataFor(Specimen specimen) {
-        if (specimen.getSample() != null)
-            encodeMolecularDataFor(specimen.getSample());
-    }
 
-    private void encodeMolecularDataFor(Sample sample) {
-        if (sample.hasMolecularCharacterizations())
-            for (MolecularCharacterization mc : sample.getMolecularCharacterizations()) encodeMolecularDataFor(mc);
-    }
+    private void encodeMolecularDataFor(Sample sample, String sampleKey, boolean persistEmptyMolchars) {
 
+        try {
+            if (sample.hasMolecularCharacterizations()) {
+
+                Iterator<MolecularCharacterization> iter = sample.getMolecularCharacterizations().iterator();
+                while (iter.hasNext()) {
+                    MolecularCharacterization mc = iter.next();
+                    if(mc.hasMarkerAssociations() || persistEmptyMolchars) {
+                        encodeMolecularDataFor(mc, sampleKey);
+                        Long molcharId = dataImportService.saveMolecularCharacterization(mc).getId();
+                        addIdToSampleMolcharMap(sampleKey, molcharId);
+                        iter.remove();
+                    }
+                }
+            }
+        }
+        catch(Exception e){
+            log.error("Exception with key "+sampleKey);
+        }
+    }
     private void encodeMolecularDataFor(MolecularCharacterization mc) {
         if (mc.hasMarkerAssociations()) {
             mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
@@ -808,15 +988,42 @@ public class DomainObjectCreator {
         }
     }
 
+    private void encodeMolecularDataFor(MolecularCharacterization mc, String sampleKey) {
+        if (mc.hasMarkerAssociations()) {
+            mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
+            mc.getFirstMarkerAssociation().encodeMolecularData();
+        }
+    }
+
+    private void addIdToSampleMolcharMap(String sampleKey, Long molcharId){
+        sampleKey = sampleKey.replaceAll("[^A-Za-z0-9 _-]", "");
+        if(sampleMolcharMap.containsKey(sampleKey)){
+            sampleMolcharMap.get(sampleKey).add(molcharId);
+        }
+        else{
+            Set<Long> s = new HashSet();
+            s.add(molcharId);
+            sampleMolcharMap.put(sampleKey, s);
+
+        }
+    }
+
+
     private TreatmentProtocol getTreatmentProtocol(Row row){
 
-        String drugString = "";
-        String doseString = "";
-        String response = "";
-        String responseClassification = "";
+        String drugString = row.getString(TSV.Treatment.treatment_name.name());
+        String doseString = getCellAsText(row, TSV.Treatment.treatment_dose.name());
+        String responseString = row.getString(TSV.Treatment.treatment_response.name());
+        String responseClassificationString = row.getString(TSV.Treatment.response_classification.name());
         String[] drugArray = drugString.split("\\+");
         String[] doseArray = doseString.split(";");
+
+
         TreatmentProtocol tp = new TreatmentProtocol();
+        Response response = new Response();
+        response.setDescription(responseString);
+        response.setDescriptionClassification(responseClassificationString);
+        tp.setResponse(response);
         if(drugArray.length == doseArray.length){
             for(int i=0;i<drugArray.length;i++){
                 Treatment treatment = new Treatment();
@@ -827,41 +1034,44 @@ public class DomainObjectCreator {
                 tp.addTreatmentComponent(tc);
             }
             return tp;
-        } else if(drugArray.length != doseArray.length && doseArray.length == 1){
+        } else if(drugArray.length != doseArray.length ){
 
             for(int i=0;i<drugArray.length;i++){
                 Treatment treatment = new Treatment();
                 treatment.setName(drugArray[i].trim());
                 TreatmentComponent tc = new TreatmentComponent();
-                tc.setDose(doseArray[0].trim());
+                tc.setDose(doseString.trim());
                 tc.setTreatment(treatment);
                 tp.addTreatmentComponent(tc);
             }
             return tp;
         }
+
         return null;
     }
 
-    private String getStringFromRowAndColumn(Row row, String columnName){
+    public String getCellAsText(Row row, String columnName){
 
         try {
             if (row.getColumnType(columnName) == ColumnType.STRING) {
                 return row.getString(columnName);
+            } else if(row.getColumnType(columnName) == ColumnType.TEXT){
+                return row.getText(columnName);
             } else if (row.getColumnType(columnName) == ColumnType.DOUBLE) {
                 return Double.toString(row.getDouble(columnName));
             } else if (row.getColumnType(columnName) == ColumnType.INTEGER) {
                 return Integer.toString(row.getInt(columnName));
             }
+            else {
+                throw new IllegalArgumentException(
+                    String.format("Tried to parse %s for row %s as a string " +
+                            "but didn't recognise the column type: %s", columnName, row.getRowNumber(), row.getColumnType(columnName)));
+            }
+        } catch (Exception e){
+            log.error("Could not access column {} in row {}", columnName, row.getRowNumber(), e);
         }
-        catch(Exception e){
-           //column is not present, so return null
-           return null;
-        }
-        return null;
-    }
-
-    private String getMolecularTypeKey(String s){
         return "";
     }
+
 
 }

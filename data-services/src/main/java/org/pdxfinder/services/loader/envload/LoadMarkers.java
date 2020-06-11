@@ -1,23 +1,22 @@
 package org.pdxfinder.services.loader.envload;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.graph.dao.Marker;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashSet;
-
+import java.time.*;
+import java.util.*;
 
 @Service
 public class LoadMarkers {
 
-    Logger log = LoggerFactory.getLogger(LoadMarkers.class);
+    private Logger log = LoggerFactory.getLogger(LoadMarkers.class);
 
     private DataImportService dataImportService;
 
@@ -25,25 +24,23 @@ public class LoadMarkers {
         this.dataImportService = dataImportService;
     }
 
-
     public void loadGenes(String dataURL) {
+        Instant start = Instant.now();
 
-        long startTime = System.currentTimeMillis();
+        log.info("Downloading latest marker data from {}...", dataURL);
+        BufferedReader reader = downloadDataFromURL(dataURL);
+        List<Marker> markers = parseMarkers(reader);
+        dataImportService.saveAllMarkers(markers);
 
-        log.info("************************* Creating Markers ***************************** ");
+        Instant finish = Instant.now();
+        log.info("{} markers retrieved and loaded in {} seconds",
+            markers.size(),
+            Duration.between(start, finish).getSeconds());
+    }
 
-        String[] rowData = new String[0];
-        String[] prevSymbols;
-        String[] synonyms;
-
-        String symbol;
-        String hgncId;
-        String ensemblId;
-
-        int rows = 0;
-
-        try {
-
+    private BufferedReader downloadDataFromURL(String dataURL){
+        BufferedReader reader = null;
+        try{
             URL url = new URL(dataURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -51,98 +48,68 @@ public class LoadMarkers {
             if (conn.getResponseCode() != 200) {
                 log.error("Failed : HTTP error code : {}", conn.getResponseCode());
             }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
+            reader = new BufferedReader(new InputStreamReader(
                     (conn.getInputStream())));
+        } catch (IOException e) {
+            log.error("There was an error attempting to connect to {}", dataURL, e);
+        }
+        return reader;
+    }
 
-            String line;
+    private List<Marker> parseMarkers(BufferedReader reader) {
+        List<Marker> markers = new ArrayList<>();
+        int rowNumber = 0;
+
+        String line;
+        String[] rowData = new String[0];
+        String[] prevSymbols;
+        String[] synonyms;
+
+        String symbol;
+        String hgncId;
+        String ensemblId;
+        String ncbiId;
+
+        if (reader == null)
+            throw new IllegalArgumentException("Buffered Reader cannot be null");
+
+        try {
             while ((line = reader.readLine()) != null) {
-                //HGNC_ID APPR_SYMBOL PREV_SYMBOLS SYNONYMS ENTREZ_ID ENSEMBL_ID
-                //HGNC ID[0]	Approved symbol[1]	Approved name[2]	Status[3]	Previous symbols[4]	Synonyms[5]	Accession numbers[6]	RefSeq IDs[7]	Name synonyms[8]	Ensembl gene ID[9]
+                rowNumber ++;
+                if (rowNumber == 1) continue; // Skip header
+
                 rowData = line.split("\t");
-                //rowData[1] = symbol, if it is not empty and if it is not a withdrawn symbol
-                if (rowData[1] != null && !rowData[1].isEmpty()) {
+                symbol = parseHugoFile(rowData, 1);
+                if (StringUtils.isNotEmpty(symbol)) {
 
-                    symbol = rowData[1];
+                    hgncId = parseHugoFile(rowData, 0);
+                    prevSymbols = parseHugoFile(rowData, 4).split(",");
+                    synonyms = parseHugoFile(rowData, 5).split(",");
+                    ensemblId = parseHugoFile(rowData, 9);
+                    ncbiId = parseHugoFile(rowData, 10);
 
-                    if (rowData[0] != null && !rowData[0].isEmpty()) {
-                        hgncId = rowData[0];
-                    } else {
-                        hgncId = "";
-                    }
-
-                    if (rowData.length > 4 && rowData[4] != null && !rowData[4].isEmpty()) {
-                        prevSymbols = rowData[4].split(", ");
-                    } else {
-                        prevSymbols = new String[0];
-                    }
-
-                    if (rowData.length > 5 && rowData[5] != null && !rowData[5].isEmpty()) {
-                        synonyms = rowData[5].split(", ");
-                    } else {
-                        synonyms = new String[0];
-                    }
-
-                    if (rowData.length > 9 && rowData[9] != null && !rowData[9].isEmpty()) {
-                        ensemblId = rowData[9];
-                    } else {
-                        ensemblId = "";
-                    }
-
-                    //put it in the hashmap with all of its prev symbols
-
-                    if (!symbol.isEmpty()) {
-
-                        Marker m = new Marker();
-                        m.setHgncSymbol(symbol);
-
-                        if (!ensemblId.isEmpty()) {
-                            m.setEnsemblGeneId(ensemblId);
-                        }
-                        if (!hgncId.isEmpty()) {
-                            m.setHgncId(hgncId);
-                        }
-
-                        if (synonyms.length > 0) {
-
-                            m.setAliasSymbols(new HashSet<>(Arrays.asList(synonyms)));
-                        }
-
-                        if (prevSymbols.length > 0) {
-
-                            m.setPrevSymbols(new HashSet<>(Arrays.asList(prevSymbols)));
-                        }
-
-                        dataImportService.saveMarker(m);
-
-                    } else {
-                        log.error("Empty symbol found in row {} ", rows);
-                    }
-
-                    if (rows != 0 && rows % 200 == 0) log.info("Loaded {} markers", rows);
-
+                    markers.add(Marker.createMarker(symbol, ensemblId, hgncId, ncbiId, synonyms, prevSymbols));
+                    if (rowNumber % 200 == 0)
+                        System.out.print(String.format("Parsed %s markers...\r", rowNumber));
                 }
-
-                rows++;
             }
-
         } catch (Exception e) {
-            log.warn(e.getMessage());
-            log.error(Arrays.toString(rowData));
+            log.error("Error parsing HGNC file for row {}", Arrays.toString(rowData), e);
         }
 
-        log.info("******************************************************");
-        log.info("* Finished creating markers                          *");
-        log.info("******************************************************");
-
-
-        long endTime = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
-
-        int seconds = (int) (totalTime / 1000) % 60;
-        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
-
-        log.info(" {} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
-
+        return markers;
     }
+
+    private String parseHugoFile(String[] rowData, int column){
+        String cellValue = "";
+        if (cellIsNotEmptyAndIsCorrectLen(rowData, column)) {
+            cellValue = rowData[column];
+        }
+        return cellValue;
+    }
+
+    private boolean cellIsNotEmptyAndIsCorrectLen(String[] rowData, int column){
+        return rowData.length > column && rowData[column] != null && !rowData[column].isEmpty();
+    }
+
 }

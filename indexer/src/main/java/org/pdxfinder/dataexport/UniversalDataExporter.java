@@ -2,31 +2,31 @@ package org.pdxfinder.dataexport;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.nio.file.Files;
 
 
 /*
  * Created by csaba on 02/10/2019.
  */
-
+@Service
 public class UniversalDataExporter {
 
     private static final Logger log = LoggerFactory.getLogger(UniversalDataExporter.class);
 
     protected UtilityService utilityService;
-
     protected DataImportService dataImportService;
 
     protected String templateDir;
@@ -38,21 +38,20 @@ public class UniversalDataExporter {
     private List<List<String>> pdxModelValidationSheetDataExport;
     private List<List<String>> samplePlatformDescriptionSheetDataExport;
     private List<List<String>> sharingAndContactSheetDataExport;
-    private List<List<String>> cytogeneticsSheetDataExport;
     private List<List<String>> loaderRelatedDataSheetDataExport;
     private List<List<String>> drugDosingSheetDataExport;
 
     private List<List<String>> mutationSheetDataExport;
     private List<List<String>> cnaSheetDataExport;
+    private List<List<String>> cytogeneticsSheetDataExport;
+    private List<List<String>> expressionSheetDataExport;
 
     private Group ds;
 
     private static String notSpecified = "Not Specified";
     private static String patientOrigin = "patient";
 
-    public UniversalDataExporter() {
-    }
-
+    @Autowired
     public UniversalDataExporter(DataImportService dataImportService, UtilityService utilityService) {
 
         this.dataImportService = dataImportService;
@@ -69,6 +68,8 @@ public class UniversalDataExporter {
 
         mutationSheetDataExport = new ArrayList<>();
         cnaSheetDataExport = new ArrayList<>();
+        cytogeneticsSheetDataExport = new ArrayList<>();
+        expressionSheetDataExport = new ArrayList<>();
     }
 
     public Group getDs() {
@@ -101,44 +102,45 @@ public class UniversalDataExporter {
 
         initSamplePlatformDescription();
 
-        initMutationData();
-        initCNAData();
-        initCytoData();
-
+        initOmicData();
     }
 
     public void export(String exportDir) throws IOException {
 
-        XSSFWorkbook metadataWorkbook = getWorkbook(templateDir+"/metadata_template.xlsx");
-        XSSFWorkbook samplePlatformWorkbook = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
-        XSSFWorkbook mutationWorkbook = getWorkbook(templateDir+"/mutation_template.xlsx");
-        XSSFWorkbook cnaWorkbook = getWorkbook(templateDir+"/cna_template.xlsx");
+        XSSFWorkbook metadataTemplate = getWorkbook(templateDir+"/metadata_template.xlsx");
+        XSSFWorkbook samplePlatformTemplate = getWorkbook(templateDir+"/sampleplatform_template.xlsx");
+        XSSFWorkbook mutationTemplate = getWorkbook(templateDir+"/mutation_template.xlsx");
+        XSSFWorkbook cnaTemplate = getWorkbook(templateDir+"/cna_template.xlsx");
+        XSSFWorkbook cytoTemplate = getWorkbook(templateDir + "/cytogenetics_template.xlsx");
+        XSSFWorkbook exprTemplate = getWorkbook(templateDir + "/expression_template.xlsx");
 
-        if (metadataWorkbook != null && noMetaDataSheetsAreNull()) {
-            updateSheetWithData(metadataWorkbook.getSheetAt(1), patientSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(2), patientTumorSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(3), pdxModelSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(4), pdxModelValidationSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2);
-            updateSheetWithData(metadataWorkbook.getSheetAt(6), loaderRelatedDataSheetDataExport, 6, 2);
+        if (metadataTemplate != null && noMetaDataSheetsAreNull()) {
+            updateSheetWithData(metadataTemplate.getSheetAt(1), patientSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(2), patientTumorSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(3), pdxModelSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(4), pdxModelValidationSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(5), sharingAndContactSheetDataExport, 6, 2);
+            updateSheetWithData(metadataTemplate.getSheetAt(6), loaderRelatedDataSheetDataExport, 6, 2);
         }
 
-        if (samplePlatformWorkbook != null && samplePlatformDescriptionSheetDataExport != null) {
-            updateSheetWithData(samplePlatformWorkbook.getSheetAt(0), samplePlatformDescriptionSheetDataExport, 6, 1);
+        if (samplePlatformTemplate != null && samplePlatformDescriptionSheetDataExport != null) {
+            updateSheetWithData(samplePlatformTemplate.getSheetAt(0), samplePlatformDescriptionSheetDataExport, 6, 1);
         }
 
         Path exportProviderDir = Paths.get(exportDir + "/" + ds.getAbbreviation());
         Files.createDirectories(exportProviderDir);
 
         try {
-            if(metadataWorkbook != null && noMetaDataSheetsAreNull()) {
-                writeFileFromWorkbook(metadataWorkbook, exportProviderDir + "/metadata.xlsx");
+            if(metadataTemplate != null && noMetaDataSheetsAreNull()) {
+                writeFileFromWorkbook(metadataTemplate, exportProviderDir + "/metadata.xlsx");
             }
-            if(samplePlatformWorkbook != null && samplePlatformDescriptionSheetDataExport != null) {
-                writeFileFromWorkbook(samplePlatformWorkbook, exportProviderDir + "/sampleplatform.xlsx");
+            if(samplePlatformTemplate != null && samplePlatformDescriptionSheetDataExport != null) {
+                writeFileFromWorkbook(samplePlatformTemplate, exportProviderDir + "/sampleplatform.xlsx");
             }
-            writeOmicFileFromWorkbook(mutationWorkbook, mutationSheetDataExport, exportProviderDir + "/mut/", "_mut.tsv");
-            writeOmicFileFromWorkbook(cnaWorkbook, cnaSheetDataExport, exportProviderDir + "/cna/", "_cna.tsv" );
+            writeOmicFileFromWorkbook(mutationTemplate, mutationSheetDataExport, exportProviderDir + "/mut/", "_mut.tsv");
+            writeOmicFileFromWorkbook(cnaTemplate, cnaSheetDataExport, exportProviderDir + "/cna/", "_cna.tsv" );
+            writeOmicFileFromWorkbook(cytoTemplate, cytogeneticsSheetDataExport, exportProviderDir + "/cyto/", "_cyto.tsv" );
+            writeOmicFileFromWorkbook(exprTemplate, expressionSheetDataExport, exportProviderDir + "/expr/", "_expr.tsv");
         } catch (Exception e) {
             log.error("error", e);
         }
@@ -159,7 +161,7 @@ public class UniversalDataExporter {
     }
 
     private void writeOmicFileFromWorkbook(XSSFWorkbook omicWorkbook,List<List<String>> exportSheet, String fileLocation, String suffix ) throws IOException {
-        if ((omicWorkbook != null) && (exportSheet != null)) {
+        if (omicWorkbook != null && exportSheet != null && !exportSheet.isEmpty()) {
             if (!Paths.get(fileLocation).toFile().exists()) {
                 Files.createDirectory(Paths.get(fileLocation));
             }
@@ -206,7 +208,6 @@ public class UniversalDataExporter {
 
         for(Patient patient : patients){
 
-
             String patientId = patient.getExternalId();
 
             for(PatientSnapshot patientSnapshot : patient.getSnapshots()){
@@ -238,7 +239,7 @@ public class UniversalDataExporter {
                         modelId = dataImportService.findModelBySample(sample).getSourcePdxId();
                     }
                     catch (Exception e){
-                        log.error("Sample: {}", sampleId);
+                        log.error("Error getting model Id from sample: {}", sampleId);
                     }
 
                     dataRow.add(patientId);
@@ -403,31 +404,21 @@ public class UniversalDataExporter {
 
     }
 
-    public void initMutationData(){
-
-        initGenomicData(mutationSheetDataExport, "mutation");
-
-    }
-
-    public void initCNAData(){
-
-        initGenomicData(cnaSheetDataExport, "copy number alteration");
-    }
-
-   public void initCytoData() {
-       initGenomicData(cytogeneticsSheetDataExport, "cytogenetics");
+    public void initOmicData(){
+    initGenomicData(mutationSheetDataExport, "mutation");
+    initGenomicData(cnaSheetDataExport, "copy number alteration");
+    initGenomicData(cytogeneticsSheetDataExport, "cytogenetics");
+    initGenomicData(expressionSheetDataExport, "expression");
    }
 
 
     private void initGenomicData(List<List<String>> sheetData, String molcharType){
 
-
+        //TODO, these queries could be optimized to reduce db interactions
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
 
         for(ModelCreation m: models){
-
-            ModelCreation model = dataImportService.
-              findModelWithMolecularDataByDSAndIdAndMolcharType(
+            ModelCreation model = dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
                   ds.getAbbreviation(),
                   m.getSourcePdxId(),
                   molcharType);
@@ -440,9 +431,7 @@ public class UniversalDataExporter {
                 initPatientGenomicData(model, sheetData);
                 initXenoGenomicData(model, sheetData);
             }
-
         }
-
     }
 
     private void insertOmicDataToSheet(
@@ -455,22 +444,16 @@ public class UniversalDataExporter {
         List<List<String>> sheetData){
 
         for(MarkerAssociation ma: mc.getMarkerAssociations()){
-
-            List<String> rowData = new ArrayList<>();
-
             List<MolecularData> molecularData;
             try{
-                ma.decodeMolecularData();
-                molecularData = ma.getMolecularDataList();
+                molecularData = ma.decodeMolecularData();
             }
-            catch (Exception e){
-                log.error("No molecular data");
+            catch(Exception e){
+                log.error("No molecular data in Marker Association on Sample {}", sampleId);
                 molecularData = new ArrayList<>();
             }
-
             for(MolecularData md : molecularData){
-
-                rowData.add(model.getDataSource());
+                List<String> rowData = new ArrayList<>();
                 rowData.add(model.getSourcePdxId());
                 rowData.add(sampleId);
                 rowData.add(sampleOrigin);
@@ -492,47 +475,82 @@ public class UniversalDataExporter {
                     }
                 }
 
-                //then get the MA data inserted
-
-                if(molcharType.equals("mutation")){
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getAminoAcidChange());
-                    rowData.add(md.getNucleotideChange());
-                    rowData.add(md.getConsequence());
-                    rowData.add(md.getReadDepth());
-                    rowData.add(md.getAlleleFrequency());
-                    rowData.add(md.getChromosome());
-                    rowData.add(md.getSeqStartPosition());
-                    rowData.add(md.getRefAllele());
-                    rowData.add(md.getAltAllele());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    //no transcript id
-                    rowData.add("");
-                    rowData.add(md.getExistingVariations());
-                    rowData.add(md.getGenomeAssembly());
-                    rowData.add(mc.getPlatform().getName());
-
-                }else if(molcharType.equals("copy number alteration")){
-
-                    rowData.add(md.getChromosome());
-                    rowData.add(md.getSeqStartPosition());
-                    rowData.add(md.getSeqEndPosition());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getMarker());
-                    rowData.add(md.getCnaLog10RCNA());
-                    rowData.add(md.getCnaLog2RCNA());
-                    rowData.add(md.getFold_change());
-                    rowData.add(md.getCnaCopyNumberStatus());
-                    rowData.add(md.getCnaGisticValue());
-                    rowData.add(md.getCnaPicnicValue());
-                    rowData.add(md.getGenomeAssembly());
-                    rowData.add(mc.getPlatform().getName());
+                switch (molcharType) {
+                    case "mutation":
+                        rowData.add(md.getMarker());
+                        rowData.add(md.getAminoAcidChange());
+                        rowData.add(md.getBiotype());
+                        rowData.add(md.getCodingSequenceChange());
+                        rowData.add(md.getVariantClass());
+                        rowData.add(md.getNucleotideChange());
+                        rowData.add(md.getCodonChange());
+                        rowData.add(md.getAminoAcidChange());
+                        rowData.add(md.getConsequence());
+                        rowData.add(md.getReadDepth());
+                        rowData.add(md.getAlleleFrequency());
+                        rowData.add(md.getChromosome());
+                        rowData.add(md.getSeqStartPosition());
+                        rowData.add(md.getRefAllele());
+                        rowData.add(md.getAltAllele());
+                        rowData.add(md.getUcscGeneId());
+                        rowData.add(md.getNcbiGeneId());
+                        rowData.add(md.getNcbiTranscriptId());
+                        rowData.add(md.getEnsemblGeneId());
+                        rowData.add(md.getEnsemblTranscriptId());
+                        rowData.add(md.getExistingVariations());
+                        rowData.add(md.getGenomeAssembly());
+                        rowData.add(mc.getPlatform().getName());
+                        break;
+                    case "copy number alteration":
+                        rowData.add(md.getChromosome());
+                        rowData.add(md.getSeqStartPosition());
+                        rowData.add(md.getSeqEndPosition());
+                        rowData.add(md.getMarker());
+                        rowData.add(md.getUcscGeneId());
+                        rowData.add(md.getNcbiGeneId());
+                        rowData.add(md.getEnsemblGeneId());
+                        rowData.add(md.getCnaLog10RCNA());
+                        rowData.add(md.getCnaLog2RCNA());
+                        rowData.add(md.getFold_change());
+                        rowData.add(md.getCnaCopyNumberStatus());
+                        rowData.add(md.getCnaGisticValue());
+                        rowData.add(md.getCnaPicnicValue());
+                        rowData.add(md.getGenomeAssembly());
+                        rowData.add(mc.getPlatform().getName());
+                        break;
+                    case "cytogenetics":
+                        rowData.add("");
+                        rowData.add(md.getMarker());
+                        rowData.add(md.getCytogeneticsResult());
+                        rowData.add(md.getMarkerStatusComment());
+                        rowData.add(mc.getPlatform().getName());
+                        rowData.add("");
+                        rowData.add("");
+                        break;
+                    case "expression":
+                        rowData.add(md.getChromosome());
+                        rowData.add("");
+                        rowData.add(md.getSeqStartPosition());
+                        rowData.add(md.getSeqEndPosition());
+                        rowData.add(md.getMarker());
+                        rowData.add("");
+                        rowData.add("");
+                        rowData.add("");
+                        rowData.add(md.getRnaSeqCoverage());
+                        rowData.add(md.getRnaSeqFPKM());
+                        rowData.add(md.getRnaSeqTPM());
+                        rowData.add(md.getRnaSeqCount());
+                        rowData.add(md.getAffyHGEAProbeId());
+                        rowData.add(md.getAffyHGEAExpressionValue());
+                        rowData.add(md.getIlluminaHGEAProbeId());
+                        rowData.add(md.getIlluminaHGEAExpressionValue());
+                        rowData.add(md.getZscore());
+                        rowData.add(md.getGenomeAssembly());
+                        rowData.add(mc.getPlatform().getName());
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Inappropriate Molecular data type passed");
                 }
-
                 sheetData.add(rowData);
             }
         }
@@ -555,7 +573,7 @@ public class UniversalDataExporter {
                     sheet.getRow(rowIndex).createCell(columnIndex);
 
 
-                    Cell cell = null;
+                    Cell cell;
                     try {
                         cell = sheet.getRow(rowIndex).getCell(columnIndex);
                         cell.setCellValue(data.get(i).get(j));
@@ -568,12 +586,12 @@ public class UniversalDataExporter {
         }
     }
 
-    public void readSheetAndWriteOmicTsvFile(Sheet sheet, List<List<String>> data, String omicTsvDir) throws IOException {
+    public void readSheetAndWriteOmicTsvFile(Sheet xlsxTemplate, List<List<String>> exportSheet, String omicTsvDir) {
 
         try(FileWriter fileWriter = new FileWriter(omicTsvDir)) {
-            if (data != null) {
-                copyHeadersFromSheetToTsv(sheet, data, fileWriter);
-                writeDataToTsv(sheet, data, fileWriter);
+            if (exportSheet != null) {
+                copyHeadersFromSheetToTsv(xlsxTemplate,fileWriter);
+                writeDataToTsv(xlsxTemplate, exportSheet, fileWriter);
             }
         } catch(Exception e) {
             log.error(String.format("IO Error from reading omic TSV %s",e.toString()));
@@ -581,12 +599,12 @@ public class UniversalDataExporter {
     }
 
 
-    private void copyHeadersFromSheetToTsv(Sheet sheet, List<List<String>> data, FileWriter fileWriter) throws IOException {
+    private void copyHeadersFromSheetToTsv(Sheet xlsxTemplate, FileWriter fileWriter) throws IOException {
 
-        for (int j = 0; j < data.get(0).size(); j++) {
-            Cell cell = null;
+        for (int j = 0; j < xlsxTemplate.getRow(0).getLastCellNum(); j++) {
+            Cell cell;
             try {
-                cell = sheet.getRow(0).getCell(j);
+                cell = xlsxTemplate.getRow(0).getCell(j);
                 fileWriter.append(cell.toString());
                 fileWriter.append("\t");
             } catch (Exception e) {
@@ -597,17 +615,14 @@ public class UniversalDataExporter {
     }
 
     private void writeDataToTsv(Sheet sheet, List<List<String>> data, FileWriter fileWriter) throws IOException {
-        for (int i = 0; i < data.size(); i++) {
-            int rowIndex = i;
-            for (int j = 0; j < data.get(i).size(); j++) {
-                int columnIndex = j;
+        for (int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
+            for (int columnIndex = 0; columnIndex < data.get(rowIndex).size(); columnIndex++) {
                 try {
-                    fileWriter.append(data.get(i).get(j));
+                    fileWriter.append(data.get(rowIndex).get(columnIndex));
                     fileWriter.append("\t");
-                } catch (Exception e) {
+                } catch (IOException e) {
                     log.error("Exception in {}  {}:{}", sheet.getSheetName(), rowIndex, columnIndex);
                 }
-
             }
             fileWriter.append("\n");
         }
@@ -616,7 +631,7 @@ public class UniversalDataExporter {
 
     private String getPubmedIDs(ModelCreation model){
 
-        StringBuilder pubmedIDs = new StringBuilder("");
+        StringBuilder pubmedIDs = new StringBuilder();
 
         if(model.getGroups() != null){
 
@@ -727,7 +742,7 @@ public class UniversalDataExporter {
         }
     }
 
-    private void getExternalUrlData(LinkedHashMap map, Collection<ExternalUrl> urls){
+    private void getExternalUrlData(LinkedHashMap<String, String> map, Collection<ExternalUrl> urls){
 
         map.put("contactEmail",  "");
         map.put("contactName",  "");
@@ -852,7 +867,6 @@ public class UniversalDataExporter {
                         dataRow.add(model.getSourcePdxId());
                         dataRow.add(hostStrainName);
                         dataRow.add(hostStrainNomenclature);
-
                         dataRow.add(mc.getType());
                         dataRow.add(mc.getPlatform().getName());
                         dataRow.add(mc.getTechnology());
@@ -873,7 +887,6 @@ public class UniversalDataExporter {
 
     private void initPatientGenomicData(ModelCreation model, List<List<String>> sheetData){
 
-        //check for molchars on patient sample
         if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
 
             String sampleId = model.getSample().getSourceSampleId();
@@ -882,6 +895,8 @@ public class UniversalDataExporter {
 
                 insertOmicDataToSheet(model, sampleId, patientOrigin, mc.getType(), null, mc, sheetData);
             }
+        } else {
+            log.error("No molecular data on patient sample found for model {} \n", model.getSourcePdxId());
         }
     }
 
@@ -902,7 +917,7 @@ public class UniversalDataExporter {
                     }
                 }
             }
-        }
+        } else log.error("No specimens found for model {}", model.getId());
     }
 
 
@@ -921,7 +936,7 @@ public class UniversalDataExporter {
             return new XSSFWorkbook(fileInputStream);
 
         } catch (IOException e) {
-            log.error("There was a problem accessing the file: {}", e);
+            log.error("There was a problem accessing the file: {}", file, e);
         }
         return null;
     }

@@ -14,6 +14,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,9 +41,9 @@ public class LoadNCIT {
 
     public void loadOntology(String branchUrl){
 
-        long startTime = System.currentTimeMillis();
+        Instant start = Instant.now();
 
-        log.info("Loading all Neoplasm subnodes. ");
+        log.info("Loading all Neoplasm ontology subnodes");
 
         Set<String> loadedTerms = new HashSet<>();
         Set<OntologyTerm> discoveredTerms = new HashSet<>();
@@ -49,6 +51,7 @@ public class LoadNCIT {
         String diseaseRootLabel = "Cancer"; // Neoplasm
 
         int requestCounter = 0;
+        int replacedTerms = 0;
 
         //create cancer root term
         OntologyTerm ot = dataImportService.getOntologyTerm(branchUrl,diseaseRootLabel);
@@ -83,8 +86,11 @@ public class LoadNCIT {
             String json = utilityService.parseURL(url);
             requestCounter++;
 
-            if(requestCounter%200 == 0){
-                log.info("Terms loaded: {}", requestCounter);
+            if (requestCounter % 100 == 0){
+                System.out.print(String.format(
+                    "%s ontology terms loaded, %s replaced...\r",
+                    requestCounter,
+                    replacedTerms));
             }
 
             try {
@@ -114,12 +120,15 @@ public class LoadNCIT {
 
                     if (termLabel.matches(pattern)) {
                         updatedTermlabel = (termLabel.replaceAll(pattern, "\t$1$2Cancer$3")).trim();
-                        log.info("Replacing term label '{}' with '{}'", termLabel, updatedTermlabel);
+                        log.trace("Replacing term label '{}' with '{}'", termLabel, updatedTermlabel);
+                        replacedTerms ++;
                     }
 
                     termLabel = termLabel.replaceAll(",", "");
 
-                    OntologyTerm newTerm = dataImportService.getOntologyTerm(term.getString("iri"), updatedTermlabel != null ? updatedTermlabel : termLabel);
+                    OntologyTerm newTerm = dataImportService.getOntologyTerm(
+                        term.getString("iri"),
+                        updatedTermlabel != null ? updatedTermlabel : termLabel);
 
                     JSONArray synonyms = term.getJSONArray("synonyms");
                     Set<String> synonymsSet = new HashSet<>();
@@ -144,24 +153,13 @@ public class LoadNCIT {
             }
         }
 
-        if(requestCounter%200 != 0){
-            log.info("Terms loaded: {}", requestCounter);
-        }
-
-        long endTime = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
-
-        int seconds = (int) (totalTime / 1000) % 60;
-        int minutes = (int) ((totalTime / (1000 * 60)) % 60);
-
-        log.info("{} finished after {} minute(s) and {} second(s)", this.getClass().getSimpleName(), minutes, seconds);
+        Instant finish = Instant.now();
+        log.info("{} terms loaded in {} min {} sec",
+            requestCounter,
+            Duration.between(start, finish).toMinutes(),
+            Duration.between(start, finish).getSeconds() % 60);
 
     }
-
-
-
-
-
 
     public void loadNCITPreDef(String ncitFile){
 
@@ -247,7 +245,6 @@ public class LoadNCIT {
                     }
 
                     childTerm.setSynonyms(synonymsSet);
-
                     childTerm.addSubclass(parentTerm);
                     dataImportService.saveOntologyTerm(childTerm);
 

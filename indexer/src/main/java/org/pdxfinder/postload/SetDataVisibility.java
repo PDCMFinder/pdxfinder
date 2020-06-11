@@ -1,14 +1,10 @@
 package org.pdxfinder.postload;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.pdxfinder.graph.dao.MolecularCharacterization;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,13 +46,20 @@ public class SetDataVisibility {
 
         log.info("Disabling data visibility for "+datasourceAbbrev);
 
-        List<MolecularCharacterization> molChars = dataImportService.findAllMolcharByDataSource(datasourceAbbrev);
+        int molcharCounter = dataImportService.findMolcharNumberByDataSource(datasourceAbbrev);
 
-        for(MolecularCharacterization mc:molChars){
+        for(int i=0; i < molcharCounter; i+=50){
 
-            mc.setVisible(false);
-            dataImportService.saveMolecularCharacterization(mc);
+            List<MolecularCharacterization> molChars = dataImportService.findMolcharByDataSourceSkipLimit(datasourceAbbrev, i, 50);
+
+            for(MolecularCharacterization mc:molChars){
+
+                mc.setVisible(false);
+                dataImportService.saveMolecularCharacterization(mc);
+            }
+
         }
+
 
     }
 

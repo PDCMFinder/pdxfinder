@@ -2,6 +2,7 @@ package org.pdxfinder.commandline;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.Updog;
+import org.pdxfinder.mapping.InitMappingDatabase;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataProviderGroup;
 import org.pdxfinder.dataloaders.*;
@@ -37,7 +38,6 @@ public class FinderLoader {
 
     // DataProvider Loading Components
     private LoadHCI loadHCI;
-    private LoadIRCC loadIRCC;
     private LoadJAXData loadJAXData;
     private LoadMDAnderson loadMDAnderson;
     private LoadPDMRData loadPDMRData;
@@ -53,6 +53,8 @@ public class FinderLoader {
     private SetDataVisibility setDataVisibility;
     private ValidateDB validateDB;
 
+    private InitMappingDatabase initMappingDatabase;
+
     private DataImportService dataImportService;
 
     @Autowired
@@ -61,7 +63,6 @@ public class FinderLoader {
                         LoadNCIT loadNCIT,
 
                         LoadHCI loadHCI,
-                        LoadIRCC loadIRCC,
                         LoadJAXData loadJAXData,
                         LoadMDAnderson loadMDAnderson,
                         LoadPDMRData loadPDMRData,
@@ -76,14 +77,14 @@ public class FinderLoader {
                         SetDataVisibility setDataVisibility,
                         ValidateDB validateDB,
                         DataImportService dataImportService,
-                        ApplicationContext applicationContext) {
+                        ApplicationContext applicationContext,
+                        InitMappingDatabase initMappingDatabase) {
 
         this.loadMarkers = loadMarkers;
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
 
         this.loadHCI = loadHCI;
-        this.loadIRCC = loadIRCC;
         this.loadJAXData = loadJAXData;
         this.loadMDAnderson = loadMDAnderson;
         this.loadPDMRData = loadPDMRData;
@@ -98,6 +99,8 @@ public class FinderLoader {
         this.setDataVisibility = setDataVisibility;
         this.validateDB = validateDB;
 
+        this.initMappingDatabase = initMappingDatabase;
+
         this.dataImportService = dataImportService;
     }
 
@@ -111,24 +114,14 @@ public class FinderLoader {
         File dataDirectory,
         boolean validateOnlyRequested,
         boolean loadCacheRequested,
-        boolean keepDatabaseRequested,
-        boolean postLoadRequested
+        boolean postLoadRequested,
+        boolean initializeMappingDb
     ) {
 
-        this.keepDatabaseIfRequested(keepDatabaseRequested);
-        this.loadCache(loadCacheRequested);
-        this.loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
-        this.postLoad(dataProviders, postLoadRequested);
-    }
-
-    private void keepDatabaseIfRequested(boolean keepDatabaseRequested) {
-        if (keepDatabaseRequested) {
-            log.info("Using existing database: {}", databaseURI);
-        } else {
-            throw new UnsupportedOperationException(
-                "Removing the database on load is not yet supported, " +
-                    "please use `-k` or `--keep-db` for the time being.");
-        }
+        loadCache(loadCacheRequested);
+        loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
+        postLoad(dataProviders, postLoadRequested);
+        initializeMappingDb(initializeMappingDb);
     }
 
     private void loadCache(boolean loadCacheRequested) {
@@ -159,7 +152,7 @@ public class FinderLoader {
     }
 
     private void loadRegimens(boolean loadCacheRequested) {
-        if (dataImportService.ontologyCacheIsEmpty() || loadCacheRequested) {
+        if (dataImportService.ontologyCacheIsEmptyByType("treatment") || loadCacheRequested) {
             try {
                 loadNCITDrugs.loadRegimens();
             } catch (Exception e) {
@@ -183,7 +176,7 @@ public class FinderLoader {
     }
 
 
-    public void callRelevantLoader(
+    private void callRelevantLoader(
         DataProvider dataProvider,
         File dataDirectory,
         boolean validateOnlyRequested
@@ -224,13 +217,10 @@ public class FinderLoader {
         }
     }
 
-
     private void postLoad(List<DataProvider> providers, boolean postLoadRequested) {
 
         log.info("Running Post load Steps ...");
 
-        if (providers.contains(DataProvider.CRL))
-            loadAdditionalDatasets.run();
 
         if (CollectionUtils.isNotEmpty(providers) || postLoadRequested) {
             linkSamplesToNCITTerms.run();
@@ -239,8 +229,12 @@ public class FinderLoader {
             setDataVisibility.run();
             validateDB.run();
         }
-
-
     }
+    
+    private void initializeMappingDb(boolean initMappingDb){
+        if (initMappingDb)
+            initMappingDatabase.run();
+    }
+
 
 }

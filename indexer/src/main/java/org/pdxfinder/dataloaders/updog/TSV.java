@@ -109,6 +109,34 @@ public class TSV {
 
     }
 
+    public enum Expression{
+        model_id,
+        sample_id,
+        sample_origin,
+        passage,
+        host_strain_nomenclature,
+        chromosome,
+        strand,
+        seq_start_position,
+        seq_end_position,
+        symbol,
+        ucsc_gene_id,
+        ensembl_gene_id,
+        ensembl_transcript_id,
+        rnaseq_coverage,
+        rnaseq_fpkm,
+        rnaseq_tpm,
+        rnaseq_count,
+        affy_hgea_probe_id,
+        affy_hgea_expression_value,
+        illumina_hgea_probe_id,
+        illumina_hgea_expression_value,
+        z_score,
+        genome_assembly,
+        platform
+
+    }
+
     public enum SamplePlatform{
 
         sample_id,
@@ -120,8 +148,23 @@ public class TSV {
         host_strain_nomenclature,
         molecular_characterisation_type,
         platform,
+        raw_data_file,
         internal_protocol_url
 
+    }
+
+    public enum Treatment{
+
+        patient_id,
+        treatment_name,
+        treatment_dose,
+        treatment_starting_date,
+        treatment_duration,
+        treatment_event,
+        elapsed_time,
+        treatment_response,
+        response_classification,
+        model_id
     }
 
 }

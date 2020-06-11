@@ -7,21 +7,16 @@ import org.slf4j.LoggerFactory;
 import tech.tablesaw.api.Table;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
 public class Reader {
 
     private static final Logger log = LoggerFactory.getLogger(Reader.class);
-    private static final List<String> allowedOmicData = Arrays.asList("cna", "cyto", "mut");
+    private static final List<String> allowedOmicData = Arrays.asList("cna", "cyto", "mut", "expression");
     private static final List<String> allowedTreatmentData = Arrays.asList("treatment", "drug");
 
     Map<String, Table> readAllTsvFilesIn(Path targetDirectory, PathMatcher filter) {
@@ -72,6 +67,37 @@ public class Reader {
         return targetDirectory.resolve(subDirectoryName).toFile().exists() ?
             Optional.of(targetDirectory.resolve(subDirectoryName)) :
             Optional.empty();
+    }
+
+    public List<Path> getOmicFilePaths(Path targetDirectory) {
+        List<Path> paths = new ArrayList<>();
+        try(Stream<Path> walk = Files.walk(targetDirectory)) {
+            PathMatcher omicPatterns = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna,expression}/**.tsv");
+            return walk
+                .filter(omicPatterns::matches)
+                .collect(Collectors.toList());
+        } catch (IOException e) {
+            log.error("There was an error listing the files for {}", targetDirectory, e);
+        }
+        return paths;
+    }
+
+    public Table readOmicTable(Path path) {
+        return TableUtilities.readTsvOrReturnEmpty(path.toFile());
+    }
+
+    public String getOmicDataType(Path path) {
+        if (path.toString().contains("/cyto/")) {
+            return "cytogenetics";
+        } else if (path.toString().contains("/mut/")) {
+            return "mutation";
+        } else if (path.toString().contains("/cna/")) {
+            return "copy number alteration";
+        } else if (path.toString().contains("/expression/")) {
+            return "expression";
+        } else {
+            throw new IllegalArgumentException("No recognised omic data type in file path {}");
+        }
     }
 
 }

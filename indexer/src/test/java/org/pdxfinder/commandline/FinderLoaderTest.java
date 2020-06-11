@@ -57,6 +57,8 @@ public class FinderLoaderTest extends BaseTest {
     @Spy
     @InjectMocks
     private FinderLoader finderLoader;
+    private boolean isFalse = false;
+    private boolean isTrue = true;
 
     @Before
     public void setUp() throws Exception {
@@ -85,7 +87,7 @@ public class FinderLoaderTest extends BaseTest {
             Collections.singletonList(dataProvider),
             dataDirectory,
             NO_VALIDATION_ONLY,
-            false, true, false);
+            isFalse, isFalse, isFalse);
         verify(this.loadJAXData).run();
         verifyNoMoreInteractions(this.loadJAXData);
     }
@@ -95,7 +97,7 @@ public class FinderLoaderTest extends BaseTest {
             Collections.singletonList(updogDataProvider),
             dataDirectory,
             NO_VALIDATION_ONLY,
-            false, true, false);
+            isFalse, isFalse, isFalse);
         verify(this.updog).run(any(Path.class), anyString(), anyBoolean());
         verifyNoMoreInteractions(this.updog);
     }
@@ -105,7 +107,7 @@ public class FinderLoaderTest extends BaseTest {
             Arrays.asList(dataProvider, updogDataProvider),
             dataDirectory,
             NO_VALIDATION_ONLY,
-            false, true, false);
+            isFalse, isFalse, isFalse);
         verify(this.loadJAXData).run();
         verify(this.updog).run(any(Path.class), anyString(), anyBoolean());
         verifyNoMoreInteractions(this.loadJAXData);
@@ -116,73 +118,78 @@ public class FinderLoaderTest extends BaseTest {
         finderLoader.run(Arrays.asList(),
             dataDirectory,
             NO_VALIDATION_ONLY,
-            false, true, false);
+            isFalse, isFalse, isFalse);
         verify(this.loadJAXData, never()).run();
         verify(this.updog, never()).run(any(Path.class), anyString(), anyBoolean());
     }
 
     @Test public void load_givenMarkerCache_skipLoadingMarkers() {
-        givenEmptyMarkerCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
+        givenEmptyMarkerCache(isFalse);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory,
+                         NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadMarkers, never()).loadGenes(anyString());
     }
 
     @Test public void load_givenNoMarkerCache_loadMarkers() {
-        givenEmptyMarkerCache(true);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
+        givenEmptyMarkerCache(isTrue);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadMarkers).loadGenes(anyString());
         verifyNoMoreInteractions(this.loadMarkers);
     }
 
     @Test public void load_givenMarkerCacheButReloadRequested_reloadMarkers() {
-        givenEmptyMarkerCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, true, true, false);
+        givenEmptyMarkerCache(isFalse);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isTrue, isFalse, isFalse);
         verify(this.loadMarkers).loadGenes(anyString());
         verifyNoMoreInteractions(this.loadMarkers);
     }
 
     @Test public void load_givenOntologyCache_skipLoadingOntologyTerms() {
-        givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
+        givenEmptyOntologyCache(isFalse);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadMarkers, never()).loadGenes(anyString());
     }
 
     @Test public void load_givenNoOntologyCache_loadOntologyTerms() {
-        givenEmptyOntologyCache(true);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
+        givenEmptyOntologyCache(isTrue);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadNCIT).loadOntology(DataUrl.DISEASES_BRANCH_URL.get());
         verifyNoMoreInteractions(this.loadNCIT);
     }
 
     @Test public void load_givenOntologyCacheButReloadRequested_reloadOntologyTerms() {
-        givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, true, true, false);
+        givenEmptyOntologyCache(isFalse);
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isTrue, isFalse, isFalse);
         verify(this.loadNCIT).loadOntology(anyString());
         verifyNoMoreInteractions(this.loadNCIT);
     }
 
     @Test public void load_givenOntologyCache_skipLoadingRegimens() {
-        givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
+        givenEmptyOntologyCache(isFalse, "treatment");
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadNCITDrugs, never()).loadRegimens();
     }
 
     @Test public void load_givenNoOntologyCache_loadRegimens() {
-        givenEmptyOntologyCache(true);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, false, true, false);
+        givenEmptyOntologyCache(isTrue, "treatment");
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isFalse, isFalse, isFalse);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
     }
 
     @Test public void load_givenOntologyCacheButReloadRequested_reloadRegimens() {
-        givenEmptyOntologyCache(false);
-        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, true, true, false);
+        givenEmptyOntologyCache(isFalse, "treatment");
+        finderLoader.run(Collections.singletonList(dataProvider), dataDirectory, NO_VALIDATION_ONLY, isTrue, isFalse, isFalse);
         verify(this.loadNCITDrugs).loadRegimens();
         verifyNoMoreInteractions(this.loadNCITDrugs);
     }
 
     private void givenEmptyOntologyCache(boolean b) {
         when(this.dataImportService.ontologyCacheIsEmpty()).thenReturn(b);
+    }
+
+    private void givenEmptyOntologyCache(boolean b, String type) {
+        when(this.dataImportService.ontologyCacheIsEmptyByType(type)).thenReturn(b);
     }
 
     private void givenEmptyMarkerCache(boolean b) {

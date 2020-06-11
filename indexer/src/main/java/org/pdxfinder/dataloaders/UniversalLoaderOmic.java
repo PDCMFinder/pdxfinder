@@ -32,10 +32,16 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
     protected ReportManager reportManager;
 
+    Map<String, Platform> platformMap;
+    Map<String, MolecularCharacterization> existingMolcharNodes;
+    Map<String, MolecularCharacterization> toBeCreatedMolcharNodes;
+
     public UniversalLoaderOmic(UtilityService utilityService, DataImportService dataImportService) {
         this.utilityService = utilityService;
         this.dataImportService = dataImportService;
     }
+
+
 
 
     public void loadOmicData(ModelCreation modelCreation, Group providerGroup, String dataType, String providerRootDirectory) {  // csv or xlsx or json
@@ -44,7 +50,10 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
         log.trace("Loading {} data for model {} ", dataType, modelCreation.getSourcePdxId());
 
-        List<Map<String, String>> dataList = new ArrayList<>();
+        platformMap = new HashMap<>();
+        existingMolcharNodes = new HashMap<>();
+        toBeCreatedMolcharNodes = new HashMap<>();
+
 
         String omicDir = null;
 
@@ -65,9 +74,288 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             return;
         }
 
+        List<Map<String, String>> dataList = getDataList(modelCreation, providerRootDirectory, omicDir);
+        initExistingMolcharNodes(modelCreation);
+        String modelID = modelCreation.getSourcePdxId();
+
+
+        int totalData;
+        try {
+
+            totalData = dataList.size();
+        }catch (Exception e){
+
+            log.info(" ********* Model ID : {} has no {} data, so skip ********* ", modelID, dataType );
+            return;
+        }
+
+        log.info(totalData +" "+dataType+" gene variants for model " + modelID);
+
+        int count = 0;
+
+        //PHASE 1: ASSEMBLE OBJECTS IN MEMORY, REDUCING DB INTERACTIONS AS MUCH AS POSSIBLE
+        for (Map<String, String> data : dataList ) {
+
+            //STEP 1: GET THE PLATFORM AND CACHE IT
+            String platformName = data.get(omicPlatform);
+
+
+            //Skip loading fish!
+            if(platformName.equals("Other:_FISH")){
+                count++;
+                continue;
+            }
+
+            Platform platform = getPlatform(platformName, dataType, providerGroup);
+
+
+            // STEP 2: GET THE CACHED MOLCHAR OBJECT OR CREATE ONE IF IT DOESN'T EXIST IN THE MAP, KEY is model_origin__passage__platform__datatype
+
+            String passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
+            String origin = (data.get(omicSampleOrigin) == null)? "":data.get(omicSampleOrigin).toLowerCase().trim();
+            //String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + origin+"__"+dataType;
+            String molcharKey = modelID+"__"+origin + "__" + passage + "__" + data.get(omicPlatform)+ "__"+dataType;
+            String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
+
+            MolecularCharacterization molecularCharacterization = getMolecularCharacterization(molcharKey, dataType, platform);
+
+
+            //step 3: get the marker suggestion from the service
+            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation,
+                    modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), dataType, platformNameKey);
+
+            Marker marker;
+
+            if(nsdto.getNode() == null){
+
+                //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
+                //log.info(data.toString());
+
+                reportManager.addMessage(nsdto.getLogEntity());
+                count++;
+                continue;
+            }
+            else{
+
+                // step 4: assemble the MarkerAssoc object and add it to molchar
+                marker = (Marker) nsdto.getNode();
+                //if we have any message regarding the suggested marker, ie: prev symbol, synonym, etc, add it to the report
+                if(nsdto.getLogEntity() != null){
+                    reportManager.addMessage(nsdto.getLogEntity());
+                }
+                MolecularData md = getMolecularData(dataType, data, marker);
+                molecularCharacterization.getMarkerAssociations().get(0).getMolecularDataList().add(md);
+            }
+
+            count++;
+            if (count % 100 == 0) {
+                log.info("loaded {} {} ", count, dataType);
+            }
+        }
+        log.info("loaded " + totalData + " markers for " + modelID);
+
+
+        //PHASE 2: save existing molchars with new data
+        for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
+            MolecularCharacterization mc = mcEntry.getValue();
+            mc.getFirstMarkerAssociation().encodeMolecularData();
+            dataImportService.saveMolecularCharacterization(mc);
+
+        }
+
+
+        //PHASE 3: get objects from cache and persist them
+        for(Map.Entry<String, MolecularCharacterization> mcEntry : toBeCreatedMolcharNodes.entrySet()){
+
+            String mcKey = mcEntry.getKey();
+            MolecularCharacterization mc = mcEntry.getValue();
+
+            mc.getFirstMarkerAssociation().encodeMolecularData();
+
+            String[] mcKeyArr = mcKey.split("__");
+            //KEY is modelid__origin__passage__platform__datatype
+            //String sampleId = mcKeyArr[0];
+            String pass = getPassage(mcKeyArr[2]);
+            String sampleOrigin = mcKeyArr[1];
+
+            boolean foundSpecimen = false;
+
+            if(sampleOrigin.equalsIgnoreCase("patient tumor") || sampleOrigin.equalsIgnoreCase("patient")){
+
+                Sample patientSample = modelCreation.getSample();
+                patientSample.setSourceSampleId(modelID+"__patient");
+                patientSample.addMolecularCharacterization(mc);
+                continue;
+
+            }
+
+            if(modelCreation.getSpecimens() != null){
+
+                for(Specimen specimen : modelCreation.getSpecimens()){
+
+                    if(specimen.getPassage().equals(pass)){
+
+                        if(specimen.getSample() != null){
+
+                            Sample xenograftSample = specimen.getSample();
+                            xenograftSample.addMolecularCharacterization(mc);
+
+                            foundSpecimen = true;
+
+                        }
+                    }
+
+                }
+
+            }
+            //this passage is either not present yet or the linked sample has a different ID, create a specimen with sample and link mc
+            if(!foundSpecimen){
+                log.info("Creating new specimen for "+mcKey);
+
+                Sample xenograftSample = new Sample();
+                xenograftSample.setSourceSampleId(modelID+"__P"+pass);
+                xenograftSample.addMolecularCharacterization(mc);
+
+                Specimen specimen = new Specimen();
+                specimen.setPassage(pass);
+                specimen.setSample(xenograftSample);
+
+
+                modelCreation.addRelatedSample(xenograftSample);
+                modelCreation.addSpecimen(specimen);
+            }
+        }
+
+        dataImportService.saveModelCreation(modelCreation);
+
+    }
+
+    private MolecularData getMolecularData(String dataType, Map<String,String> data, Marker marker){
+
+        MolecularData md;
+        if (dataType.equals("mutation")){
+            md = setVariationProperties(data, marker);
+        }else if(dataType.equals("copy number alteration")) {
+            md = setCNAProperties(data, marker);
+        }
+        else if (dataType.equals("expression")){
+            md = setTranscriptomicProperties(data, marker);
+        }
+        else{
+            log.error("Unknown datatype: {}",dataType);
+            md = new MolecularData();
+        }
+
+        return md;
+    }
+
+    private MolecularCharacterization getMolecularCharacterization(String molcharKey, String dataType, Platform platform){
+
+        MolecularCharacterization molecularCharacterization;
+
+        if(existingMolcharNodes.containsKey(molcharKey)){
+            molecularCharacterization = existingMolcharNodes.get(molcharKey);
+        }
+        else if(toBeCreatedMolcharNodes.containsKey(molcharKey)){
+            molecularCharacterization = toBeCreatedMolcharNodes.get(molcharKey);
+        }
+        else{
+            log.info("Looking at molchar "+molcharKey);
+            //log.info("Existing keys: ");
+            //log.info(existingMolcharNodes.keySet().toString());
+            molecularCharacterization = new MolecularCharacterization();
+            molecularCharacterization.setType(dataType);
+            molecularCharacterization.setPlatform(platform);
+            MarkerAssociation markerAssociation = new MarkerAssociation();
+            molecularCharacterization.addMarkerAssociation(markerAssociation);
+            toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
+        }
+        return molecularCharacterization;
+    }
+
+
+    private Platform getPlatform(String platformName, String dataType, Group providerGroup){
+
+        Platform platform;
+
+        String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
+
+        if(platformMap.containsKey(platformNameKey)){
+
+            platform = platformMap.get(platformNameKey);
+        }
+        else{
+
+            String platformURLKey = platformName+"_"+dataType;
+
+            platform = dataImportService.getPlatform(platformName, dataType, providerGroup);
+
+            if(platform.getUrl()== null || platform.getUrl().isEmpty()){
+
+                platform.setUrl(platformURL.get(platformURLKey));
+            }
+
+            platformMap.put(platformNameKey, platform);
+        }
+        return platform;
+
+    }
+
+    private void initExistingMolcharNodes(ModelCreation modelCreation){
+
+
+        String modelID = modelCreation.getSourcePdxId();
+
+
+        //get existing molchar objects and put them in a map
+        //first the molchars of the patient sample
+        String passage = "";
+        if(modelCreation.getSample().getMolecularCharacterizations() != null){
+
+            for(MolecularCharacterization mc : modelCreation.getSample().getMolecularCharacterizations()){
+
+                if (mc != null && mc.getPlatform() != null){
+
+                    String molcharKey = modelID+"__patient__" + passage + "__" + mc.getPlatform().getName()+ "__"+mc.getType();
+                    existingMolcharNodes.put(molcharKey, mc);
+                }
+            }
+        }
+
+        //then all molchars related to xenograft samples
+
+        if(modelCreation.getSpecimens()!= null){
+
+            for(Specimen sp: modelCreation.getSpecimens()){
+
+                Sample sample = sp.getSample();
+
+                if(sample != null && sample.getMolecularCharacterizations() != null){
+
+                    for(MolecularCharacterization mc: sample.getMolecularCharacterizations()){
+
+                        if(sample.getSourceSampleId() == null ) log.error("Missing sampleid for "+modelID);
+                        if(sp.getPassage() == null) log.error("Missing passage for "+modelID);
+                        if(mc.getPlatform() == null) log.error("Missing platform for "+modelID);
+
+                        if(mc.getPlatform().getName() == null) log.error("Missing platform name for "+modelID);
+
+                        //String molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft__"+mc.getType();
+                        String molcharKey = modelID+"__xenograft__" + passage + "__" + mc.getPlatform().getName()+ "__"+mc.getType();
+                        existingMolcharNodes.put(molcharKey, mc);
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    private List<Map<String, String>> getDataList(ModelCreation modelCreation, String providerRootDirectory, String omicDir){
 
         String omicDataRootDirUrl = providerRootDirectory + "/"+omicDir;
         File dataRootDir = new File(omicDataRootDirUrl);
+        List<Map<String, String>> dataList = new ArrayList<>();
 
         if(dataRootDir.exists()){
 
@@ -130,275 +418,9 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             log.error("Directory doesn't exist: "+omicDataRootDirUrl);
         }
 
-
-
-
-        String modelID = modelCreation.getSourcePdxId();
-        Map<String, Platform> platformMap = new HashMap<>();
-        Map<String, MolecularCharacterization> existingMolcharNodes = new HashMap<>();
-        Map<String, MolecularCharacterization> toBeCreatedMolcharNodes = new HashMap<>();
-
-        //get existing molchar objects and put them in a map
-        //first the molchars of the patient sample
-        String passage = "";
-        if(modelCreation.getSample().getMolecularCharacterizations() != null){
-
-            for(MolecularCharacterization mc : modelCreation.getSample().getMolecularCharacterizations()){
-
-                if (mc != null && mc.getPlatform() != null){
-
-                    String molcharKey = modelCreation.getSample().getSourceSampleId() + "__" + passage + "__" + mc.getPlatform().getName()+ "__patient__"+mc.getType();
-                    existingMolcharNodes.put(molcharKey, mc);
-                }
-            }
-        }
-
-        //then all molchars related to xenograft samples
-
-        if(modelCreation.getSpecimens()!= null){
-
-            for(Specimen sp: modelCreation.getSpecimens()){
-
-                Sample sample = sp.getSample();
-
-                if(sample != null && sample.getMolecularCharacterizations() != null){
-
-                    for(MolecularCharacterization mc: sample.getMolecularCharacterizations()){
-
-                        if(sample.getSourceSampleId() == null ) log.error("Missing sampleid for "+modelID);
-                        if(sp.getPassage() == null) log.error("Missing passage for "+modelID);
-                        if(mc.getPlatform() == null) log.error("Missing platform for "+modelID);
-
-                        if(mc.getPlatform().getName() == null) log.error("Missing platform name for "+modelID);
-
-                        String molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft__"+mc.getType();
-                        existingMolcharNodes.put(molcharKey, mc);
-                    }
-                }
-            }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-        int totalData = 0;
-        try {
-
-            totalData = dataList.size();
-        }catch (Exception e){
-
-            log.info(" ********* Model ID : {} has no {} data, so skip ********* ", modelID, dataType );
-            return;
-        }
-
-        log.info(totalData +" "+dataType+" gene variants for model " + modelID);
-
-        int count = 0;
-
-        //PHASE 1: ASSEMBLE OBJECTS IN MEMORY, REDUCING DB INTERACTIONS AS MUCH AS POSSIBLE
-        for (Map<String, String> data : dataList ) {
-
-            //STEP 1: GET THE PLATFORM AND CACHE IT
-            String platformName = data.get(omicPlatform);
-            String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
-
-            //Skip loading fish!
-            if(platformName.equals("Other:_FISH")){
-                count++;
-                continue;
-            }
-
-            Platform platform;
-
-            if(platformMap.containsKey(platformNameKey)){
-
-                platform = platformMap.get(platformNameKey);
-            }
-            else{
-
-                String platformURLKey = platformName+"_"+dataType;
-
-                platform = dataImportService.getPlatform(platformName, dataType, providerGroup);
-
-                if(platform.getUrl()== null || platform.getUrl().isEmpty()){
-
-                    platform.setUrl(platformURL.get(platformURLKey));
-                }
-
-                platformMap.put(platformNameKey, platform);
-            }
-
-
-            // STEP 2: GET THE CACHED MOLCHAR OBJECT OR CREATE ONE IF IT DOESN'T EXIST IN THE MAP, KEY is sampleid__passage__technology
-            MolecularCharacterization molecularCharacterization = null;
-            passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
-
-            String origin = (data.get(omicSampleOrigin) == null)? "":data.get(omicSampleOrigin).toLowerCase().trim();
-
-            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + origin+"__"+dataType;
-
-
-
-
-            if(existingMolcharNodes.containsKey(molcharKey)){
-                molecularCharacterization = existingMolcharNodes.get(molcharKey);
-            }
-            else if(toBeCreatedMolcharNodes.containsKey(molcharKey)){
-                molecularCharacterization = toBeCreatedMolcharNodes.get(molcharKey);
-            }
-            else{
-                log.info("Looking at molchar "+molcharKey);
-                //log.info("Existing keys: ");
-                //log.info(existingMolcharNodes.keySet().toString());
-                molecularCharacterization = new MolecularCharacterization();
-                molecularCharacterization.setType(dataType);
-                molecularCharacterization.setPlatform(platform);
-                MarkerAssociation markerAssociation = new MarkerAssociation();
-                molecularCharacterization.addMarkerAssociation(markerAssociation);
-                toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
-            }
-
-
-            //step 3: get the marker suggestion from the service
-            NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), dataSourceAbbreviation, modelCreation.getSourcePdxId(), data.get(omicHgncSymbol), dataType, platformNameKey);
-
-            Marker marker;
-
-            if(nsdto.getNode() == null){
-
-                //log.info("Found an unrecognised Marker Symbol {} in Model: {}, Skipping This!!!! ", data.get(omicHgncSymbol), modelID);
-                //log.info(data.toString());
-
-                reportManager.addMessage(nsdto.getLogEntity());
-                count++;
-                continue;
-            }
-            else{
-
-
-                // step 4: assemble the MarkerAssoc object and add it to molchar
-                marker = (Marker) nsdto.getNode();
-
-                //if we have any message regarding the suggested marker, ie: prev symbol, synonym, etc, add it to the report
-                if(nsdto.getLogEntity() != null){
-                    reportManager.addMessage(nsdto.getLogEntity());
-                }
-
-                MarkerAssociation ma;
-                MolecularData md;
-                if (dataType.equals("mutation")){
-
-                    md = setVariationProperties(data, marker);
-                }else if(dataType.equals("copy number alteration")) {
-
-                    md = setCNAProperties(data, marker);
-                }
-                else if (dataType.equals("expression")){
-
-                    md = setTranscriptomicProperties(data, marker);
-                }
-                else{
-                    log.error("Unknown datatype: {}",dataType);
-                    md = new MolecularData();
-                }
-
-
-                molecularCharacterization.getMarkerAssociations().get(0).getMolecularDataList().add(md);
-
-            }
-
-            count++;
-            if (count % 100 == 0) {
-                log.info("loaded {} {} ", count, dataType);
-            }
-        }
-        log.info("loaded " + totalData + " markers for " + modelID);
-
-
-        //PHASE 2: save existing molchars with new data
-        log.info("Saving existing molchars for model "+modelID);
-        for(Map.Entry<String, MolecularCharacterization> mcEntry : existingMolcharNodes.entrySet()){
-            MolecularCharacterization mc = mcEntry.getValue();
-            mc.getFirstMarkerAssociation().encodeMolecularData();
-            dataImportService.saveMolecularCharacterization(mc);
-
-        }
-
-
-        log.info("Saving new molchars for model "+modelID);
-        //PHASE 3: get objects from cache and persist them
-        for(Map.Entry<String, MolecularCharacterization> mcEntry : toBeCreatedMolcharNodes.entrySet()){
-
-            String mcKey = mcEntry.getKey();
-            MolecularCharacterization mc = mcEntry.getValue();
-
-            mc.getFirstMarkerAssociation().encodeMolecularData();
-
-            String[] mcKeyArr = mcKey.split("__");
-            String sampleId = mcKeyArr[0];
-            String pass = getPassage(mcKeyArr[1]);
-            String sampleOrigin = mcKeyArr[3];
-
-            boolean foundSpecimen = false;
-
-            if(sampleOrigin.equalsIgnoreCase("patient tumor") || sampleOrigin.equalsIgnoreCase("patient")){
-
-                Sample patientSample = modelCreation.getSample();
-                patientSample.setSourceSampleId(sampleId);
-                patientSample.addMolecularCharacterization(mc);
-                continue;
-
-            }
-
-            if(modelCreation.getSpecimens() != null){
-
-                for(Specimen specimen : modelCreation.getSpecimens()){
-
-                    if(specimen.getPassage().equals(pass)){
-
-                        if(specimen.getSample() != null && specimen.getSample().getSourceSampleId().equals(sampleId)){
-
-                            Sample xenograftSample = specimen.getSample();
-                            xenograftSample.addMolecularCharacterization(mc);
-
-                            foundSpecimen = true;
-
-                        }
-                    }
-
-                }
-
-            }
-            //this passage is either not present yet or the linked sample has a different ID, create a specimen with sample and link mc
-            if(!foundSpecimen){
-                log.info("Creating new specimen for "+mcKey);
-
-                Sample xenograftSample = new Sample();
-                xenograftSample.setSourceSampleId(sampleId);
-                xenograftSample.addMolecularCharacterization(mc);
-
-                Specimen specimen = new Specimen();
-                specimen.setPassage(pass);
-                specimen.setSample(xenograftSample);
-
-
-                modelCreation.addRelatedSample(xenograftSample);
-                modelCreation.addSpecimen(specimen);
-            }
-        }
-
-        dataImportService.saveModelCreation(modelCreation);
+        return dataList;
 
     }
-
 
 
     private MolecularData setVariationProperties(Map<String,String> data, Marker marker){

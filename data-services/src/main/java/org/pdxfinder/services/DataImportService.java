@@ -645,6 +645,19 @@ public class DataImportService {
         return molecularCharacterizationRepository.findAllByDataSource(dataSource);
     }
 
+    public int findMolcharNumberByDataSource(String ds){
+        return molecularCharacterizationRepository.findNumberByDataSource(ds);
+    }
+    
+    public List<MolecularCharacterization> findMolcharByDataSourceSkipLimit(String ds, int skip, int limit){
+        return molecularCharacterizationRepository.findByDataSourceSkipLimit(ds, skip, limit);
+    }
+    
+    public Set<MolecularCharacterization> getMolcharsById(Set<Long> ids){
+
+        return molecularCharacterizationRepository.findByIds(ids);
+    }
+
     public Sample getHumanSample(String sampleId, String dataSource){
 
 
@@ -732,7 +745,6 @@ public class DataImportService {
     public Tissue getTissue(String t) {
         Tissue tissue = tissueRepository.findByName(t);
         if (tissue == null) {
-            log.info("Tissue '{}' not found. Creating.", t);
             tissue = new Tissue(t);
             tissueRepository.save(tissue);
         }
@@ -821,8 +833,8 @@ public class DataImportService {
         patientSnapshotRepository.save(ps);
     }
 
-    public void saveMolecularCharacterization(MolecularCharacterization mc) {
-        molecularCharacterizationRepository.save(mc);
+    public MolecularCharacterization saveMolecularCharacterization(MolecularCharacterization mc) {
+        return molecularCharacterizationRepository.save(mc);
     }
 
     public void saveQualityAssurance(QualityAssurance qa) {
@@ -964,8 +976,16 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumber();
     }
 
+    public int countAllOntologyTermsByType(String type){
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
+
     public boolean ontologyCacheIsEmpty() {
         return countAllOntologyTerms() == 0;
+    }
+
+    public boolean ontologyCacheIsEmptyByType(String type){
+        return countAllOntologyTermsByType(type) == 0;
     }
 
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
@@ -980,6 +1000,10 @@ public class DataImportService {
 
     public Marker saveMarker(Marker marker) {
         return markerRepository.save(marker);
+    }
+
+    public void saveAllMarkers(Collection<Marker> markers) {
+        markerRepository.save(markers);
     }
 
     public Collection<Marker> getAllMarkers() {
@@ -1622,4 +1646,7 @@ public class DataImportService {
     }
 
 
+    public Marker getMarkerbyNcbiGeneId(String ncbiGene) {
+        return markerRepository.findByNcbiGeneId(ncbiGene);
+    }
 }

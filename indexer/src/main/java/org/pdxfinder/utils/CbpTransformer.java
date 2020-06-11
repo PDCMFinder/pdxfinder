@@ -1,10 +1,13 @@
 package org.pdxfinder.utils;
 
+
 import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.graph.dao.Group;
+import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.services.UtilityService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,17 +17,27 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
+@Service
 public class CbpTransformer {
 
-    @Autowired
-    private UtilityService utilityService = new UtilityService();
-    private UniversalDataExporter universalDataExporter = new UniversalDataExporter();
+    private static final Logger log = LoggerFactory.getLogger(CbpTransformer.class);
+
+    private UtilityService utilityService;
+    private OmicTransformationService omicTransformationService;
+    private UniversalDataExporter universalDataExporter;
+
+    CbpTransformer(UtilityService utilityService, OmicTransformationService omicTransformationService, UniversalDataExporter universalDataExporter){
+        this.utilityService = utilityService;
+        this.omicTransformationService = omicTransformationService;
+        this.universalDataExporter = universalDataExporter;
+    }
 
     private static String notSpecified = "Not Specified";
     private static String patientId = "patientId";
     private static String sampleId = "sampleId";
+    private static String entrezGeneId = "EntrezGeneId";
 
     public enum cbioType {
         MUT,
@@ -34,7 +47,8 @@ public class CbpTransformer {
     public void exportCBP(File exportDir,File templateDir, File pathToJson, cbioType dataType) throws IOException {
 
         if (doesFileNotExist(exportDir) || doesFileNotExist(templateDir) || doesFileNotExist(pathToJson)) {
-            throw new IOException("A string argument passed to the exportCBP does not point to an existing file.");
+            throw new IOException(String.format("A string argument passed to the exportCBP does not point to an existing file." +
+                    "%s %n %s %n %s %n", exportDir, templateDir, pathToJson));
         }
             Group jsonGroup = createGroupWithJsonsFilename(pathToJson.getAbsolutePath());
 
@@ -60,25 +74,31 @@ public class CbpTransformer {
     }
 
     private List<List<String>> cbpMutJsonMapsToSheet(List<Map<String, Object>> jsonMap){
-
+        AtomicInteger rowCount = new AtomicInteger();
         List<List<String>> sheet = new ArrayList<>();
         jsonMap.forEach(f -> {
-            List<String> row = new LinkedList<>();
-            row.add(f.get(patientId).toString());
-            row.add(f.get(sampleId).toString());
-            row.add(notSpecified);
-            row.add(notSpecified);
-            row.add(notSpecified);
-            addBlanksToList(row,10);
-            row.add(f.get("chr").toString());
-            row.add(f.get("startPosition").toString());
-            row.add(f.get("referenceAllele").toString());
-            row.add(f.get("variantAllele").toString());
-            addBlanksToList(row,6);
-            row.add(f.get("ncbiBuild").toString());
-            row.add("");
+            try {
+                rowCount.incrementAndGet();
+                List<String> row = new LinkedList<>();
+                row.add(f.get(patientId).toString());
+                row.add(f.get(sampleId).toString());
+                row.add(notSpecified);
+                row.add(notSpecified);
+                row.add(notSpecified);
+                row.add(omicTransformationService.ncbiGeneIdToHgncSymbol(String.valueOf(f.get(entrezGeneId))));
+                addBlanksToList(row, 9);
+                row.add(f.get("chr").toString());
+                row.add(f.get("startPosition").toString());
+                row.add(f.get("referenceAllele").toString());
+                row.add(f.get("variantAllele").toString());
+                addBlanksToList(row, 6);
+                row.add(f.get("ncbiBuild").toString());
+                row.add("");
+                sheet.add(row);
+            }catch(NullPointerException e){
+                log.error(String.format("Missing value in Json Mut map. Skipping Json Map %d", rowCount.get()));
+            }
 
-            sheet.add(row);
         });
         return sheet;
     }
@@ -93,8 +113,9 @@ public class CbpTransformer {
             row.add(notSpecified);
             row.add(notSpecified);
             row.add(notSpecified);
-            addBlanksToList(row,4);
-            row.add(f.get("entrezGeneId").toString());
+            addBlanksToList(row,3);
+            row.add(omicTransformationService.ncbiGeneIdToHgncSymbol(String.valueOf(f.get(entrezGeneId))));
+            row.add(f.get(entrezGeneId).toString());
             addBlanksToList(row, 6);
             row.add(f.get("alteration").toString());
             addBlanksToList(row, 3);

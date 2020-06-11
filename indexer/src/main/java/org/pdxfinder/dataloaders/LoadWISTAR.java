@@ -198,8 +198,11 @@ public class LoadWISTAR {
         EngraftmentType it = dataImportService.getImplantationType(tumorPrep);
         specimen.setEngraftmentType(it);
 
-        specimen.setSample(sample);
-
+        Sample xenoSample = new Sample();
+        xenoSample.setSourceSampleId(modelCreation.getSourcePdxId());
+        specimen.setSample(xenoSample);
+        modelCreation.addRelatedSample(xenoSample);
+        modelCreation.addSpecimen(specimen);
         dataImportService.saveSpecimen(specimen);
 
         dataImportService.saveModelCreation(modelCreation);

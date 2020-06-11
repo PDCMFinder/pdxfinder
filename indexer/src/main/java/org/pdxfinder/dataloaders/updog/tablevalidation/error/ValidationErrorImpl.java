@@ -1,6 +1,6 @@
-package org.pdxfinder.dataloaders.updog;
+package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
 import tech.tablesaw.api.Table;
 
 import java.util.Objects;
@@ -8,14 +8,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class ValidationError {
+public class ValidationErrorImpl implements ValidationError {
     private String table;
     private String provider;
     private Type errorType;
     private String column;
-    private Pair<Pair<String, String>, Pair<String, String>> relation;
+    private Relation relation;
     private Table invalidRows;
     private String description;
+
+    public String message() {
+        return toString();
+    }
 
     public enum Type {
         GENERIC("Generic error"),
@@ -56,7 +60,7 @@ public class ValidationError {
         return Optional.ofNullable(provider);
     }
 
-    public Optional<Pair<Pair<String, String>, Pair<String, String>>> getRelation() {
+    public Optional<Relation> getRelation() {
         return Optional.ofNullable(relation);
     }
 
@@ -64,96 +68,85 @@ public class ValidationError {
         return Optional.ofNullable(invalidRows);
     }
 
-    private ValidationError(String table) {
+    private ValidationErrorImpl(String table) {
         this.table = table;
     }
 
-    public static ValidationError generic(String table) {
-        return new ValidationError(table).setType(Type.GENERIC);
+    public static ValidationErrorImpl generic(String table) {
+        return new ValidationErrorImpl(table).setType(Type.GENERIC);
     }
 
-    public static ValidationError missingFile(String tableName) {
-        return new ValidationError(tableName).setType(Type.MISSING_TABLE);
+    public static ValidationErrorImpl missingFile(String tableName) {
+        return new ValidationErrorImpl(tableName).setType(Type.MISSING_TABLE);
     }
 
-    public static ValidationError missingColumn(String tableName, String columnName) {
-        return new ValidationError(tableName).setType(Type.MISSING_COL).setColumn(columnName);
+    public static ValidationErrorImpl missingColumn(String tableName, String columnName) {
+        return new ValidationErrorImpl(tableName).setType(Type.MISSING_COL).setColumn(columnName);
     }
 
-    public static ValidationError missingRequiredValue(
+    public static ValidationErrorImpl missingRequiredValue(
         String tableName,
         String columnName,
         Table invalidRows
     ) {
-        return new ValidationError(tableName)
+        return new ValidationErrorImpl(tableName)
             .setType(Type.MISSING_REQ_VALUE)
             .setColumn(columnName)
             .setInvalidRows(invalidRows);
     }
 
-    public static ValidationError duplicateValue(
+    public static ValidationErrorImpl duplicateValue(
         String tableName,
         String columnName,
         Set duplicateValues
     ) {
-        return new ValidationError(tableName)
+        return new ValidationErrorImpl(tableName)
             .setType(Type.DUPLICATE_VALUE)
             .setColumn(columnName)
             .setDescription(duplicateValues.toString());
     }
 
-    public static ValidationError brokenRelation(
+    public static ValidationErrorImpl brokenRelation(
         String tableName,
-        Pair<Pair<String, String>, Pair<String, String>> relation,
+        Relation relation,
         Table invalidRows
     ) {
-        return new ValidationError(tableName)
+        return new ValidationErrorImpl(tableName)
             .setType(Type.BROKEN_RELATION)
             .setRelation(relation)
             .setInvalidRows(invalidRows);
     }
 
-    public ValidationError setDescription(String description) {
+    public ValidationErrorImpl setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    private ValidationError setInvalidRows(Table invalidRows) {
+    private ValidationErrorImpl setInvalidRows(Table invalidRows) {
         this.invalidRows = invalidRows;
         return this;
     }
 
-    public ValidationError setProvider(String provider) {
+    public ValidationErrorImpl setProvider(String provider) {
         this.provider = provider;
         return this;
     }
 
-    private ValidationError setColumn(String columnName) {
+    private ValidationErrorImpl setColumn(String columnName) {
         this.column = columnName;
         return this;
     }
 
-    private ValidationError setType(Type type) {
+    private ValidationErrorImpl setType(Type type) {
         this.errorType = type;
         return this;
     }
 
-    public ValidationError setRelation(
-        Pair<Pair<String, String>, Pair<String, String>> relation
+    public ValidationErrorImpl setRelation(
+        Relation relation
     ) {
         this.relation = relation;
         return this;
-    }
-
-    private String prettyPrintRelation(
-        Pair<Pair<String, String>, Pair<String, String>> relation
-    ) {
-        return String.format(
-            "(%s) %s -> %s (%s)",
-            relation.getLeft().getKey(),
-            relation.getLeft().getValue(),
-            relation.getRight().getValue(),
-            relation.getRight().getKey());
     }
 
     @Override
@@ -178,12 +171,11 @@ public class ValidationError {
                 break;
             case DUPLICATE_VALUE:
                 message.add(String.format(
-                    "Duplicate value(s) in required column [%s]",
+                    "Duplicates found in column [%s]",
                     getColumn().orElse(notSpecified)));
                 break;
             case BROKEN_RELATION:
-                message.add(String.format(
-                    "Broken relation [%s]", prettyPrintRelation(relation)));
+                message.add(String.format("Broken relation [%s]", relation));
                 break;
             case GENERIC:
                 message.add("Generic error");
@@ -198,7 +190,7 @@ public class ValidationError {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ValidationError that = (ValidationError) o;
+        ValidationErrorImpl that = (ValidationErrorImpl) o;
         return Objects.equals(getTable(), that.getTable()) &&
             Objects.equals(getProvider(), that.getProvider()) &&
             Objects.equals(getErrorType(), that.getErrorType()) &&

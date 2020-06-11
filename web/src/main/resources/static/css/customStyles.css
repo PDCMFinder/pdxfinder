@@ -298,6 +298,11 @@ h5{
     margin-top: 100px;
 }
 
+
+.top-space-n-20 {
+    margin-top: -20px;
+}
+
 .baseSpace2{
     margin-bottom: 20px;
 }
@@ -306,6 +311,9 @@ h5{
     min-width: 300px;
     font-size: 13px;
     float: right;
+}
+.bold{
+    font-weight: bold;
 }
 
 

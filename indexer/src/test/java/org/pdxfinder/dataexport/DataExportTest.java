@@ -1,17 +1,15 @@
 package org.pdxfinder.dataexport;
 
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.pdxfinder.services.DataImportService;;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,29 +18,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class DataExportTest extends BaseTest {
 
-
-    @MockBean
+    @Mock
     private DataImportService dataImportService;
-    @MockBean
-    protected UtilityService utilityService;
+
+    @InjectMocks
+    protected UniversalDataExporter universalDataExporter;
 
     Group providerGroup;
-    UniversalDataExporter universalDataExporter;
+
+    private static final String ncbiId = "XR_929159.2";
+    private static final String biotype = "protien_coding";
+    private static final String codingSequenceChange = "3154G>A";
+    private static final String variantClass = "SNV";
 
     @Before
     public void setUp() {
-
         providerGroup = Group.createProviderGroup("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
-
-        universalDataExporter = new UniversalDataExporter(dataImportService, utilityService);
-        //universalDataExporter.init("", providerGroup);
     }
 
     @Test
@@ -163,27 +161,25 @@ public class DataExportTest extends BaseTest {
     }
 
     @Test
-    public void Given_ModelsWithOmic_When_GetOmicSheetsAreCalled_Then_DataIsInRowOne(){
+    public void Given_ModelwithMutationData_When_initGenomicDataIsCalled_Then_MutationDataIsInRowOne(){
 
-        when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation()))
-          .thenReturn(getModelListForTest());
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "mutation"))
-          .thenReturn(getModelListForTest().get(0));
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(providerGroup.getAbbreviation(), "m123", "copy number alteration"))
-          .thenReturn(getModelListForTest().get(0));
+        List<ModelCreation> modelList = getModelListForTest();
+
+        when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
+                .thenReturn(modelList);
+
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
+                providerGroup.getAbbreviation(),"m123", "mutation"))
+                .thenReturn(modelList.get(0));
 
         universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initMutationData();
-        universalDataExporter.initCNAData();
-
+        universalDataExporter.initOmicData();
         List<List<String>> mutationData = universalDataExporter.getMutationSheetDataExport();
-        List<List<String>> cnaData = universalDataExporter.getCnaSheetDataExport();
 
-        Assert.assertEquals("m123", mutationData.get(0).get(1));
-        Assert.assertEquals("markersymbol", mutationData.get(0).get(6));
-
-        Assert.assertEquals("m123", cnaData.get(0).get(1));
-        Assert.assertEquals("markersymbol", cnaData.get(0).get(6));
+        Assert.assertTrue(mutationData.get(0).contains(ncbiId));
+        Assert.assertTrue(mutationData.get(0).contains(biotype));
+        Assert.assertTrue(mutationData.get(0).contains(codingSequenceChange));
+        Assert.assertTrue(mutationData.get(0).contains(variantClass));
 
     }
 
@@ -227,6 +223,7 @@ public class DataExportTest extends BaseTest {
         universalDataExporter.setDrugDosingSheetDataExport(genericSheet);
         universalDataExporter.setCnaSheetDataExport(genericSheet);
         universalDataExporter.setMutationSheetDataExport(genericSheet);
+
 
         Workbook metaDataXlsx = new XSSFWorkbook();
         Workbook samplePlatformXlsx = new XSSFWorkbook();
@@ -309,6 +306,17 @@ public class DataExportTest extends BaseTest {
         MolecularCharacterization molecularCharacterization = new MolecularCharacterization();
         molecularCharacterization.setType("mutation");
         molecularCharacterization.setTechnology("techtest");
+
+        MarkerAssociation ma = new MarkerAssociation();
+        ma.setMolecularDataString("[{\"biotype\": \"" + biotype + "\",\"codingSequenceChange\":\"" + codingSequenceChange + "\"," +
+                "\"variantClass\":\""+ variantClass + "\",\"codonChange\"" +
+                ":\"Gtt/Att\",\"aminoAcidChange\":\"E763*\",\"consequence\":\"\",\"functionalPrediction\":\"Nonsense_Mutation\"," +
+                "\"readDepth\":\"403\",\"alleleFrequency\":\"0.464\",\"chromosome\":\"5\",\"seqStartPosition\":\"112173578\"," +
+                "\"refAllele\":\"G\",\"altAllele\":\"T\",\"ucscGeneId\":\"\",\"ncbiGeneId\":\"" + ncbiId + "\",\"ncbiTranscriptId\":" +
+                "\"XR_929159.2\",\"existingVariations\":\"CM106354,COSM5010432\",\"genomeAssembly\":\"hg19\",\"nucleotideChange\"" +
+                ":\"\",\"marker\":\"APC\"}]");
+
+        molecularCharacterization.setMarkerAssociations(Collections.singletonList(ma));
         Platform platform = new Platform();
         platform.setName("platform");
         platform.setUrl("platformurl");
@@ -330,27 +338,12 @@ public class DataExportTest extends BaseTest {
 
         modelCreationList.add(model);
 
-
-        //setting up mutation data
-        MarkerAssociation ma = new MarkerAssociation();
-        MolecularData md = new MolecularData();
-        md.setAminoAcidChange("aminoacidchange");
-        Marker m = new Marker("markersymbol", "markername");
-        md.setMarker(m.getHgncSymbol());
-        ma.addMolecularData(md);
-        molecularCharacterization.addMarkerAssociation(ma);
-
         //setting up cna data
         MolecularCharacterization molecularCharacterization2 = new MolecularCharacterization();
         molecularCharacterization2.setType("copy number alteration");
         molecularCharacterization2.setPlatform(platform);
-        MarkerAssociation ma2 = new MarkerAssociation();
         MolecularData md2 = new MolecularData();
         md2.setCnaCopyNumberStatus("cnaStatus");
-        Marker m2 = new Marker("markersymbol", "markername");
-        md2.setMarker(m2.getHgncSymbol());
-        ma2.addMolecularData(md2);
-        molecularCharacterization2.addMarkerAssociation(ma2);
         xenoSample.addMolecularCharacterization(molecularCharacterization2);
 
         return modelCreationList;

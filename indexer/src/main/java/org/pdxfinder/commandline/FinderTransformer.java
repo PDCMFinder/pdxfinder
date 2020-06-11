@@ -1,8 +1,9 @@
 package org.pdxfinder.commandline;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.utils.CbpTransformer;
 import org.pdxfinder.utils.CbpTransformer.cbioType;
-;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,35 +12,47 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class FinderTransformer {
 
     private static final Logger log = LoggerFactory.getLogger(FinderTransformer.class);
 
+    private CbpTransformer cbioTransformer;
+    private OmicTransformationService omicTransformationService;
+
+
     @Value("${data-dir}")
     private String defaultDirectory;
     private String defaultTemplateDirectory;
     private String defaultExportDirectory;
-    private CbpTransformer cbioTransformer;
     private File rootDir;
     private File templateDir;
     private File exportDir;
-    private cbioType resolvedCbioType;
 
     @Autowired
-    FinderTransformer(CbpTransformer cbioTransformer){
+    FinderTransformer(CbpTransformer cbioTransformer, OmicTransformationService omicTransformationService){
        this.cbioTransformer = cbioTransformer;
+       this.omicTransformationService = omicTransformationService;
     }
 
-    void run(File dataDirectory, File overideTemplateDir, File overideExportDir, File ingestFile, String cmdCbioType) throws IOException {
-        resolveRootDir(dataDirectory);
-        resolveTemplateDir(overideTemplateDir);
-        resolveExportDir(overideExportDir);
+    void run(File dataDirectory, File overideTemplateDir, File overideExportDir, File ingestFile, CbpTransformer. cbioType cmdCbioType, List<String> entrezToHugo) throws IOException {
+        if(CollectionUtils.isNotEmpty(entrezToHugo)){
+            convertGenes(entrezToHugo);
+        } else {
+            resolveRootDir(dataDirectory);
+            resolveTemplateDir(overideTemplateDir);
+            resolveExportDir(overideExportDir);
 
-        if (cmdCbioType != null && !cmdCbioType.isEmpty()){
-           runCbioportal(ingestFile, cmdCbioType);
+            if (cmdCbioType != null){
+                runCbioportal(ingestFile, cmdCbioType);
+            }
         }
+    }
+
+    private void convertGenes(List<String> entrezGenes){
+        omicTransformationService.convertListOfNcbiToHgnc(entrezGenes);
     }
 
     private void resolveRootDir(File dataDirectory) throws IOException {
@@ -79,23 +92,11 @@ public class FinderTransformer {
         }
     }
 
-    private void runCbioportal(File ingestFile, String cmdCbioType) throws IOException {
-        resolveCbioType(cmdCbioType);
-        if (!(fileExists(ingestFile)))
-        {
-            throw new IOException("Ingest file directory does not exist");
-        }
-        cbioTransformer.exportCBP(exportDir,templateDir,ingestFile,resolvedCbioType);
+    private void runCbioportal(File ingestFile, cbioType cmdCbioType) throws IOException {
+        if (!(fileExists(ingestFile))) { throw new IOException("Ingest file directory does not exist"); }
+        cbioTransformer.exportCBP(exportDir,templateDir,ingestFile,cmdCbioType);
     }
 
-    private void resolveCbioType(String cmdCbioType){
-        if (cmdCbioType.equals(cbioType.MUT.name())){
-            resolvedCbioType = cbioType.MUT;
-        }
-        else if (cmdCbioType.equals(cbioType.GISTIC.name())){
-            resolvedCbioType = cbioType.GISTIC;
-        } else throw new IllegalArgumentException("Only MUT and GISTIC types are currently supported");
-    }
 
     private boolean fileExists(File file) {
         return file != null && file.exists();
@@ -103,8 +104,8 @@ public class FinderTransformer {
 
     public void setDefaultDirectories(String defaultDirectory) {
         this.defaultDirectory = defaultDirectory;
-         defaultTemplateDirectory = defaultDirectory + "/template";
-         defaultExportDirectory = defaultDirectory + "/export";
+        this.defaultTemplateDirectory = defaultDirectory + "/template";
+        this.defaultExportDirectory = defaultDirectory + "/export";
     }
     public void setDefaultDirectory(String defaultDirectory){
         this.defaultDirectory = defaultDirectory;

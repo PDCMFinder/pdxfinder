@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface to the molecular characterization experiments done
@@ -64,9 +65,22 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
             "RETURN mc")
     List<MolecularCharacterization> findAllByDataSource(@Param("ds") String dataSource);
 
+    @Query("MATCH (mc:MolecularCharacterization)-[cbr:CHARACTERIZED_BY]-(s:Sample)-[msr:MODEL_SAMPLE_RELATION]-(mod:ModelCreation) " +
+            "WHERE mod.dataSource = {ds} " +
+            "RETURN mc SKIP {skip} LIMIT {limit}")
+    List<MolecularCharacterization> findByDataSourceSkipLimit(@Param("ds") String dataSource, @Param("skip")int skip, @Param("limit")int limit);
+
+    @Query("MATCH (mc:MolecularCharacterization)-[cbr:CHARACTERIZED_BY]-(s:Sample)-[msr:MODEL_SAMPLE_RELATION]-(mod:ModelCreation) " +
+            "WHERE mod.dataSource = {ds} " +
+            "RETURN count(mc)")
+    int findNumberByDataSource(@Param("ds") String dataSource);
+
     @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
             "WHERE ID(mc) = {id} " +
             "RETURN sum(mAss.dataPoints) ")
     int findAssociationsNumberById(@Param("id") MolecularCharacterization mc);
+
+    @Query("MATCH (mc:MolecularCharacterization) WHERE id(mc) IN {ids} RETURN mc")
+    Set<MolecularCharacterization> findByIds(@Param("ids")Set<Long> ids);
 
 }

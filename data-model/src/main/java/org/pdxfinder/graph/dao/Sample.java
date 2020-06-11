@@ -1,8 +1,6 @@
 package org.pdxfinder.graph.dao;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import javax.persistence.GeneratedValue;
@@ -36,6 +34,8 @@ public class Sample {
 
     public Boolean normalTissue;
     private String dataSource;
+
+    private String rawDataUrl;
 
     @Relationship(type="MAPPED_TO")
     private SampleToOntologyRelationship sampleToOntologyRelationShip;
@@ -253,11 +253,12 @@ public class Sample {
 
         if(molecularCharacterizations == null) return null;
 
+        platformName = platformName.replaceAll("[^A-Za-z0-9 _-]", "");
         for(MolecularCharacterization mc : molecularCharacterizations){
 
             if(mc.getType().equals(type)){
 
-                if(mc.getPlatform() != null && mc.getPlatform().getName().equals(platformName)) {
+                if(mc.getPlatform() != null && mc.getPlatform().getName().replaceAll("[^A-Za-z0-9 _-]", "").equalsIgnoreCase(platformName)) {
 
                     return mc;
                 }
@@ -274,5 +275,13 @@ public class Sample {
 
     public void setDiagnosisNotes(String diagnosisNotes) {
         this.diagnosisNotes = diagnosisNotes;
+    }
+
+    public String getRawDataUrl() {
+        return rawDataUrl;
+    }
+
+    public void setRawDataUrl(String rawDataUrl) {
+        this.rawDataUrl = rawDataUrl;
     }
 }
