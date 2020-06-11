@@ -1,14 +1,9 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.OmicValidationRuleset;
-import org.pdxfinder.dataloaders.updog.tablevalidation.PdxValidationRuleset;
-import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.*;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
@@ -57,30 +52,10 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        reportAnyErrors(validationErrors, 50);
+        new ErrorReporter(validationErrors).truncate(50).logErrors();
 
         if (!validateOnly) {
             domainObjectCreator.loadDomainObjects(combinedTableSet, updogProviderDirectory);
-        }
-    }
-
-    private void reportAnyErrors(List<ValidationError> validationErrors, int limitTo) {
-        List<ValidationError> truncatedList = truncateLargeList(validationErrors, limitTo);
-        if (CollectionUtils.isNotEmpty(validationErrors)) {
-            log.error("{} validation errors found:", validationErrors.size());
-            log.info("Limiting output to the first {} errors:", limitTo);
-            for (ValidationError error : truncatedList) {
-                log.error(error.message());
-            }
-        } else
-            log.info("There were no validation errors raised, great!");
-    }
-
-    private <E> List<E> truncateLargeList(List<E> list, int size) {
-        if (list.size() > size) {
-            return list.subList(0, size);
-        } else {
-            return list;
         }
     }
 
