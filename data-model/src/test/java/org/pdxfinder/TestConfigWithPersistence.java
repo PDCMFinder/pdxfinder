@@ -18,13 +18,11 @@ public class TestConfigWithPersistence {
 
     @Bean
     public org.neo4j.ogm.config.Configuration getConfiguration() {
-        org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
-
-        String pathToDb = Paths.get(".").toAbsolutePath().normalize().toString() + "/target/test_graph.db";
-        config
-                .driverConfiguration()
-                .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver")
-                .setURI("file://" + pathToDb);
+        String testDatabasePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/target/test_graph.db";
+        org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration
+            .Builder()
+            .uri(String.format("file://%s", testDatabasePath))
+            .build();
 
         System.out.println(config);
 
