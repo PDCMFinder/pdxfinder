@@ -15,7 +15,7 @@ public class DataUrlTest extends BaseTest {
     @Test
     public void given_DataUrlEnumListCount_EnsureListIntegrity() {
 
-        final int DATA_URL_COUNT = 6;
+        final int DATA_URL_COUNT = 7;
 
         assertEquals(DATA_URL_COUNT, DataUrl.values().length);
     }
@@ -41,6 +41,8 @@ public class DataUrlTest extends BaseTest {
                 case K8_SERVICE_URL:
                     break;
                 case COSMIC_URL:
+                    break;
+                case CRAVAT_URL:
                     break;
                 default:
                     message = String.format("%s %s", ASSERTION_ERROR, option);
