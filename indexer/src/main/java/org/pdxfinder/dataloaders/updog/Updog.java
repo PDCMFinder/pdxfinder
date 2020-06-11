@@ -57,7 +57,7 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        reportAnyErrors(validationErrors);
+        reportAnyErrors(validationErrors, 50);
 
         if (!validateOnly) {
             domainObjectCreator.loadDomainObjects(combinedTableSet, updogProviderDirectory);
