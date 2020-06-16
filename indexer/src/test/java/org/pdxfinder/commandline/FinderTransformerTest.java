@@ -1,9 +1,6 @@
 package org.pdxfinder.commandline;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.*;
 import org.pdxfinder.BaseTest;
@@ -14,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.io.File;
 import java.io.IOException;
 
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 public class FinderTransformerTest extends BaseTest {

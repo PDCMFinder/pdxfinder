@@ -658,7 +658,9 @@ public class MappingService {
             for (String mappingLabel : mappingLabels) {
 
                 /* ZOOMA PROPERTY DATA */
-                Property property = new Property(mappingLabel, StringUtils.upperCase(mappingValues.get(mappingLabel)));
+                Property property = new org.pdxfinder.services.zooma.Property(
+                    mappingLabel,
+                    StringUtils.upperCase(mappingValues.get(mappingLabel)));
 
                 List<String> annotations = new ArrayList<>();
 

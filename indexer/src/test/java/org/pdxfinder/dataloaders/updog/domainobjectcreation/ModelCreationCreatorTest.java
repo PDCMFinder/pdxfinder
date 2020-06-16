@@ -1,17 +1,10 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
-import org.apache.catalina.Host;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.pdxfinder.dataloaders.updog.TSV;
-import org.pdxfinder.graph.dao.Group;
-import org.pdxfinder.graph.dao.HostStrain;
-import org.pdxfinder.graph.dao.ModelCreation;
-import org.pdxfinder.graph.dao.Sample;
-import org.pdxfinder.graph.dao.Specimen;
+import org.pdxfinder.graph.dao.*;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
