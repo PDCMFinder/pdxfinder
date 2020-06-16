@@ -1,6 +1,6 @@
 package org.pdxfinder.services.dto;
 
-import org.neo4j.ogm.json.JSONArray;
+import org.json.JSONArray;
 import org.pdxfinder.graph.dao.*;
 
 import java.util.HashMap;

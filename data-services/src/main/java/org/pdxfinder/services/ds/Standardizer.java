@@ -1,19 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.pdxfinder.services.ds;
-import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.graph.dao.Drug;
-import org.pdxfinder.graph.dao.Response;
-import org.pdxfinder.graph.dao.TreatmentComponent;
-import org.pdxfinder.graph.dao.TreatmentProtocol;
+
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.security.spec.ECField;
-import java.util.ArrayList;
 
 /**
  *

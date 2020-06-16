@@ -1,11 +1,8 @@
 package org.pdxfinder.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
+import org.json.*;
 import org.pdxfinder.services.TransformerService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;

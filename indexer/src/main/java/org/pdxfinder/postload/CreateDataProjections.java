@@ -1,7 +1,7 @@
 package org.pdxfinder.postload;
 
 import com.google.gson.Gson;
-import org.neo4j.ogm.json.JSONObject;
+import org.json.*;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;

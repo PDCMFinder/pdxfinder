@@ -1,7 +1,7 @@
 package org.pdxfinder.services;
 
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.dao.Sample;

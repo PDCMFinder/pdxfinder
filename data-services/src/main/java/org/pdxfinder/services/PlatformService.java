@@ -1,7 +1,6 @@
 package org.pdxfinder.services;
 
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
+import org.json.*;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.DataProjectionRepository;
 import org.pdxfinder.graph.repositories.ModelCreationRepository;
