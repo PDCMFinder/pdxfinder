@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,12 +51,10 @@ public class DatasourceConfig {
   public SessionFactory sessionFactory() throws IOException {
 
     this.refreshEmbeddedDBFromCache();
-    org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
-    config
-            .driverConfiguration()
-            .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver")
-            .setURI(embeddedDataDir);
-    config.autoIndexConfiguration().setAutoIndex("assert");
+    org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration.Builder()
+        .uri(embeddedDataDir)
+        .autoIndex("assert")
+        .build();
     return new SessionFactory(config, "org.pdxfinder.graph");
   }
 
@@ -75,8 +73,7 @@ public class DatasourceConfig {
   @Bean(name = "dataSource")
   @ConfigurationProperties(prefix = "spring.datasource")
   public DataSource dataSource() {
-    return DataSourceBuilder
-            .create().build();
+    return DataSourceBuilder.create().build();
   }
 
   @Bean
@@ -86,8 +83,9 @@ public class DatasourceConfig {
 
   @Autowired
   @Bean(name = "h2TransactionManager")
-  public JpaTransactionManager h2TransactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory)
-          throws Exception {
+  public JpaTransactionManager h2TransactionManager(
+      LocalContainerEntityManagerFactoryBean entityManagerFactory
+  ) throws Exception {
     return new JpaTransactionManager(entityManagerFactory.getObject());
   }
 
