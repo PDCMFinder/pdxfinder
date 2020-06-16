@@ -1,11 +1,12 @@
 package org.pdxfinder.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.pdxfinder.services.mapping.MappingContainer;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
@@ -13,9 +14,7 @@ import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.repositories.SampleRepository;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
-import org.pdxfinder.services.mapping.CSV;
-import org.pdxfinder.services.mapping.MappingEntityType;
-import org.pdxfinder.services.mapping.Status;
+import org.pdxfinder.services.mapping.*;
 import org.pdxfinder.services.zooma.*;
 import org.pdxfinder.utils.DamerauLevenshteinAlgorithm;
 import org.slf4j.Logger;
@@ -23,10 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
