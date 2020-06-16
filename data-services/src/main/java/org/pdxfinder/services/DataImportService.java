@@ -995,7 +995,7 @@ public class DataImportService {
     }
 
     public void saveAllMarkers(Collection<Marker> markers) {
-        markerRepository.save(markers);
+        markerRepository.saveAll(markers);
     }
 
     public Collection<Marker> getAllMarkers() {

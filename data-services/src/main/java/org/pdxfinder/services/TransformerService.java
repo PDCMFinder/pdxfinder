@@ -2,16 +2,9 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pdxfinder.rdbms.dao.PdmrPdxInfo;
-import org.pdxfinder.rdbms.dao.Sample;
-import org.pdxfinder.rdbms.dao.Treatment;
-import org.pdxfinder.rdbms.dao.Validation;
-import org.pdxfinder.rdbms.repositories.TransPdxInfoRepository;
-import org.pdxfinder.rdbms.repositories.TransSampleRepository;
-import org.pdxfinder.rdbms.repositories.TransTreatmentRepository;
-import org.pdxfinder.rdbms.repositories.TransValidationRepository;
-import org.pdxfinder.services.constants.OmicCSVColumn;
-import org.pdxfinder.services.constants.PdmrOmicCol;
+import org.pdxfinder.rdbms.dao.*;
+import org.pdxfinder.rdbms.repositories.*;
+import org.pdxfinder.services.constants.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -514,19 +507,19 @@ public class TransformerService {
                 for (Treatment treatment: treatments){
                     treatment.setPdmrPdxInfo(pdmrPdxInfo);
                 }
-                transTreatmentRepository.save(treatments);
+                transTreatmentRepository.saveAll(treatments);
 
                 // Update the Foreign Key pdxinfo_id for the corresponding validations
                 for (Validation validation : validations){
                     validation.setPdmrPdxInfo(pdmrPdxInfo);
                 }
-                transValidationRepository.save(validations);
+                transValidationRepository.saveAll(validations);
 
                 // Update the Foreign key pdxinfo_id for the corresponding samples
                 for (Sample sample : sampleList){
                     sample.setPdmrPdxInfo(pdmrPdxInfo);
                 }
-                transSampleRepository.save(sampleList);
+                transSampleRepository.saveAll(sampleList);
 
 
                 log.info("Loaded Record for Patient" + specimenSearch.get("PATIENTID"));

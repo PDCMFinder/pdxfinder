@@ -950,7 +950,7 @@ public class MappingService {
 
     public boolean checkExistence(Long entityId) {
 
-        return mappingEntityRepository.exists(entityId);
+        return mappingEntityRepository.existsByEntityId(entityId);
 
     }
 
