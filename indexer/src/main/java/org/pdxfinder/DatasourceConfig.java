@@ -50,12 +50,13 @@ public class DatasourceConfig {
   @Bean
   public SessionFactory sessionFactory() throws IOException {
 
-    this.refreshEmbeddedDBFromCache();
+    refreshEmbeddedDBFromCache();
     org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration.Builder()
         .uri(embeddedDataDir)
         .autoIndex("assert")
         .build();
-    return new SessionFactory(config, "org.pdxfinder.graph");
+    SessionFactory sessionFactory =  new SessionFactory(config, "org.pdxfinder.graph");
+    return sessionFactory;
   }
 
 

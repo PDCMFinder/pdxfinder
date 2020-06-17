@@ -64,16 +64,9 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Override neo4j version -->
         <dependency>
             <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            <version>3.1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
+            <artifactId>neo4j-ogm-embedded-driver</artifactId>
         </dependency>
 
         <dependency>
