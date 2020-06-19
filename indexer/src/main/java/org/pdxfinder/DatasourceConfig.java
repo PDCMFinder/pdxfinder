@@ -55,7 +55,7 @@ public class DatasourceConfig {
         .uri(embeddedDataDir)
         .autoIndex("assert")
         .build();
-    SessionFactory sessionFactory =  new SessionFactory(config, "org.pdxfinder.graph");
+    SessionFactory sessionFactory =  new SessionFactory("org.pdxfinder.graph");
     return sessionFactory;
   }
 
