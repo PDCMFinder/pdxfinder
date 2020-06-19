@@ -46,7 +46,7 @@ public enum DataProviderGroup {
                 DataProvider.VHIO_CRC,
                 DataProvider.DFCI_CPDM,
                 DataProvider.NKI,
-                DataProvider.PDMR_XDOG,
+                DataProvider.PDMR,
                 DataProvider.JAX_XDOG,
                 DataProvider.SJCRH,
                 DataProvider.UMCG,
