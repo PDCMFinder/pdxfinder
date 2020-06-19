@@ -40,7 +40,6 @@ public class FinderLoader {
     private LoadHCI loadHCI;
     private LoadJAXData loadJAXData;
     private LoadMDAnderson loadMDAnderson;
-    private LoadPDMRData loadPDMRData;
     private LoadWISTAR loadWISTAR;
     private LoadWUSTL loadWUSTL;
     private Updog updog;
@@ -87,7 +86,6 @@ public class FinderLoader {
         this.loadHCI = loadHCI;
         this.loadJAXData = loadJAXData;
         this.loadMDAnderson = loadMDAnderson;
-        this.loadPDMRData = loadPDMRData;
         this.loadWISTAR = loadWISTAR;
         this.loadWUSTL = loadWUSTL;
         this.updog = updog;
