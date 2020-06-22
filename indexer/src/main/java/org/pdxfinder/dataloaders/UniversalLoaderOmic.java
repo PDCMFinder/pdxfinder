@@ -113,8 +113,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
             String passage = (data.get(omicPassage) == null) ? findMyPassage(modelCreation, data.get(omicSampleID), data.get(omicSampleOrigin)) : data.get(omicPassage);
             String origin = (data.get(omicSampleOrigin) == null)? "":data.get(omicSampleOrigin).toLowerCase().trim();
-            //String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + origin+"__"+dataType;
-            String molcharKey = modelID+"__"+origin + "__" + passage + "__" + data.get(omicPlatform)+ "__"+dataType;
+            String molcharKey = data.get(omicSampleID) + "__" + passage + "__" + data.get(omicPlatform)+ "__" + origin+"__"+dataType;
             String platformNameKey = dataSourceAbbreviation+"__" + platformName +"__"+dataType;
 
             MolecularCharacterization molecularCharacterization = getMolecularCharacterization(molcharKey, dataType, platform);
@@ -173,17 +172,17 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
             mc.getFirstMarkerAssociation().encodeMolecularData();
 
             String[] mcKeyArr = mcKey.split("__");
-            //KEY is modelid__origin__passage__platform__datatype
-            //String sampleId = mcKeyArr[0];
-            String pass = getPassage(mcKeyArr[2]);
-            String sampleOrigin = mcKeyArr[1];
+            //KEY is molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft__"+mc.getType();
+            String sampleId = mcKeyArr[0];
+            String pass = getPassage(mcKeyArr[1]);
+            String sampleOrigin = mcKeyArr[3];
 
             boolean foundSpecimen = false;
 
             if(sampleOrigin.equalsIgnoreCase("patient tumor") || sampleOrigin.equalsIgnoreCase("patient")){
 
                 Sample patientSample = modelCreation.getSample();
-                patientSample.setSourceSampleId(modelID+"__patient");
+                patientSample.setSourceSampleId(sampleId);
                 patientSample.addMolecularCharacterization(mc);
                 continue;
 
@@ -195,7 +194,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                     if(specimen.getPassage().equals(pass)){
 
-                        if(specimen.getSample() != null){
+                        if(specimen.getSample() != null && specimen.getSample().getSourceSampleId().equals(sampleId)){
 
                             Sample xenograftSample = specimen.getSample();
                             xenograftSample.addMolecularCharacterization(mc);
@@ -213,7 +212,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
                 log.info("Creating new specimen for "+mcKey);
 
                 Sample xenograftSample = new Sample();
-                xenograftSample.setSourceSampleId(modelID+"__P"+pass);
+                xenograftSample.setSourceSampleId(sampleId);
                 xenograftSample.addMolecularCharacterization(mc);
 
                 Specimen specimen = new Specimen();
@@ -316,7 +315,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                 if (mc != null && mc.getPlatform() != null){
 
-                    String molcharKey = modelID+"__patient__" + passage + "__" + mc.getPlatform().getName()+ "__"+mc.getType();
+                    String molcharKey = modelCreation.getSample().getSourceSampleId() + "__" + passage + "__" + mc.getPlatform().getName()+ "__patient__"+mc.getType();
                     existingMolcharNodes.put(molcharKey, mc);
                 }
             }
@@ -340,8 +339,7 @@ public class UniversalLoaderOmic extends LoaderProperties implements Application
 
                         if(mc.getPlatform().getName() == null) log.error("Missing platform name for "+modelID);
 
-                        //String molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft__"+mc.getType();
-                        String molcharKey = modelID+"__xenograft__" + passage + "__" + mc.getPlatform().getName()+ "__"+mc.getType();
+                        String molcharKey = sample.getSourceSampleId() + "__" + sp.getPassage() + "__" + mc.getPlatform().getName()+ "__xenograft__"+mc.getType();
                         existingMolcharNodes.put(molcharKey, mc);
                     }
                 }
