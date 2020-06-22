@@ -1,17 +1,17 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.pdxfinder.dataloaders.*;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.InitMappingDatabase;
-import org.pdxfinder.services.constants.DataProvider;
-import org.pdxfinder.services.constants.DataProviderGroup;
-import org.pdxfinder.dataloaders.*;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SetDataVisibility;
 import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.constants.DataProvider;
+import org.pdxfinder.services.constants.DataProviderGroup;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
@@ -40,7 +40,6 @@ public class FinderLoader {
     private LoadHCI loadHCI;
     private LoadJAXData loadJAXData;
     private LoadMDAnderson loadMDAnderson;
-    private LoadPDMRData loadPDMRData;
     private LoadWISTAR loadWISTAR;
     private LoadWUSTL loadWUSTL;
     private Updog updog;
@@ -87,7 +86,6 @@ public class FinderLoader {
         this.loadHCI = loadHCI;
         this.loadJAXData = loadJAXData;
         this.loadMDAnderson = loadMDAnderson;
-        this.loadPDMRData = loadPDMRData;
         this.loadWISTAR = loadWISTAR;
         this.loadWUSTL = loadWUSTL;
         this.updog = updog;
@@ -192,9 +190,6 @@ public class FinderLoader {
                     break;
                 case PDXNet_MDAnderson:
                     loadMDAnderson.run();
-                    break;
-                case PDMR:
-                    loadPDMRData.run();
                     break;
                 case PDXNet_Wistar_MDAnderson_Penn:
                     loadWISTAR.run();

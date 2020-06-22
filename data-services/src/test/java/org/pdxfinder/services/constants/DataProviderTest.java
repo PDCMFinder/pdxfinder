@@ -60,8 +60,6 @@ public class DataProviderTest extends BaseTest {
                     break;
                 case NKI:
                     break;
-                case PDMR_XDOG:
-                    break;
                 case JAX_XDOG:
                     break;
                 case SJCRH:

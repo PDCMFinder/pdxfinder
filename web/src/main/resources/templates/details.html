@@ -789,20 +789,13 @@
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <a th:if="${dataRow.platformUsedUrl != null or dataRow.platformUsedLabel == '' }" target="_blank"
+                                                        <a th:if="${dataRow.platformUsedUrl != null or dataRow.platformUsedLabel == ''}" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
                                                            th:text="${#strings.replace(dataRow.platformUsedLabel,'_',' ')}"
                                                            th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
                                                             ...
                                                         </a>
-                                                        <!-- TODO: Remove this quickFix in April -->
-                                                        <a th:if="${dataRow.platformUsedLabel == 'OncoKB Gene Panel'}" target="_blank"
-                                                           style="color: #06369d; text-decoration: none;"
-                                                           th:text="${dataRow.platformUsedLabel}"
-                                                           th:onclick="'window.open(\''+${'https://pdmr.cancer.gov/content/docs/MCCRD_SOP0053_Generating_oncoKB_Report.pdf'}+'\')'">
-                                                            ...
-                                                        </a>
-                                                        <span th:if="${dataRow.platformUsedUrl == null && dataRow.platformUsedLabel != 'OncoKB Gene Panel'}" th:text="${dataRow.platformUsedLabel}"></span>
+                                                        <span th:if="${dataRow.platformUsedUrl == null}" th:text="${dataRow.platformUsedLabel}"></span>
                                                     </td>
                                                     <td>
                                                         <a th:text="${dataRow.rawDataLabel}"
@@ -998,7 +991,7 @@
 
     // We define the function
     function drawTable(tableId, apiURL) {
-        var l = jQuery("#tableId tr").length;;
+        var l = jQuery("#tableId tr").length;
         var dataTable = $('#' + tableId).DataTable({
             iDisplayLength: 10,
             serverSide: true,
