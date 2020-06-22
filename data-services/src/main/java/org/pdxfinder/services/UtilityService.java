@@ -55,7 +55,7 @@ public class UtilityService {
     public String serializeToCsvWithIncludeNonEmpty(List<?> pojoList) throws IOException {
 
         CsvMapper csvMapper = new CsvMapper();
-        List<Map<String, String>> dataList = mapper.convertValue(pojoList, new TypeReference<List<Map<String, String>>>(){});
+        List<Map<String, Object>> dataList = mapper.convertValue(pojoList, new TypeReference<List<Map<String, Object>>>(){});
         List<List<String>> csvData = new ArrayList<>();
         List<String> csvHead = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class UtilityService {
         dataList.forEach( row ->{
             List<String> rowData = new ArrayList<>();
             row.forEach((key,value)->{
-                rowData.add(value);
+                rowData.add(String.valueOf(value));
                 if (counter.get() == 0){
                     csvHead.add(key);
                 }
