@@ -1,8 +1,12 @@
 package org.pdxfinder.services.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pdxfinder.services.dto.pdxgun.Reference;
 
 import java.util.List;
+import java.util.Map;
 
 
 @JsonPropertyOrder({
@@ -24,9 +28,23 @@ public class MolecularDataTableDTO {
         return molecularDataRows;
     }
 
+    public List<Map<String, Object>> getMolecularDataCsv() {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String, Object>> dataList = mapper.convertValue(molecularDataRows, new TypeReference<List<Map<String, Object>>>(){});
+        dataList.forEach(dataMap -> dataMap.forEach((key, value)->{
+            boolean notString = !(value instanceof String);
+            if (notString){
+                dataMap.put(key, mapper.convertValue(value, Reference.class).getLabel());
+            }
+        }));
+        return dataList;
+    }
+
+
     public void setMolecularDataRows(List<MolecularDataRowDTO> molecularDataRows) {
         this.molecularDataRows = molecularDataRows;
     }
+
 
     public boolean getVisible() {
         return visible;
