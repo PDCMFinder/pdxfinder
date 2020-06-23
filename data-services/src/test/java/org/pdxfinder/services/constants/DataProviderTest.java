@@ -68,6 +68,8 @@ public class DataProviderTest extends BaseTest {
                     break;
                 case VHIO_PC:
                     break;
+                case LIH:
+                    break;
                 default:
                     message = String.format("%s %s", ASSERTION_ERROR, option);
                     expected = false;
