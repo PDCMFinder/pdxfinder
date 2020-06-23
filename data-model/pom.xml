@@ -14,15 +14,4 @@
     <artifactId>data-model</artifactId>
     <packaging>jar</packaging>
 
-    <dependencies>
-
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-ogm-embedded-driver</artifactId>
-            <scope>test</scope>
-            <version>2.1.1</version>
-        </dependency>
-
-    </dependencies>
-
 </project>

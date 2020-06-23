@@ -2,8 +2,6 @@ package org.pdxfinder;
 
 import org.apache.commons.io.FileUtils;
 import org.neo4j.ogm.session.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -31,20 +29,9 @@ import java.io.IOException;
 @EnableTransactionManagement
 public class DatasourceConfig {
 
-  private Logger log = LoggerFactory.getLogger(DatasourceConfig.class);
-
-  /*************************************************************************************************************
-   *     NEO4J GRAPH DATABASE CONFIGURATION           *
-   **************************************************/
-
-  @Value("${spring.data.neo4j.uri}")
-  private String embeddedDataDir;
-
-  @Value("${db-cache-dir}")
-  private String cacheDataDir;
-
-  @Value("${db-refresh}")
-  private boolean embeddedDbRefresh;
+  @Value("${spring.data.neo4j.uri}") private String embeddedDataDir;
+  @Value("${db-cache-dir}") private String cacheDataDir;
+  @Value("${db-refresh}") private boolean embeddedDbRefresh;
 
   @Primary
   @Bean
@@ -55,7 +42,7 @@ public class DatasourceConfig {
         .uri(embeddedDataDir)
         .autoIndex("assert")
         .build();
-    SessionFactory sessionFactory =  new SessionFactory("org.pdxfinder.graph");
+    SessionFactory sessionFactory =  new SessionFactory(config, "org.pdxfinder.graph");
     return sessionFactory;
   }
 
@@ -125,8 +112,6 @@ public class DatasourceConfig {
       }
     }
   }
-
-
 
 }
 
