@@ -54,9 +54,7 @@ public class PublicationServiceTest extends BaseTest {
     public void init() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
         mapper = new ObjectMapper();
-
         expectedResults = Arrays.asList("17606733","29463559","27374081");
-
     }
 
     @Test

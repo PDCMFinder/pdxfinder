@@ -187,46 +187,6 @@
                         <!-- Summary first row -->
                         <div class="row large-12 medium-12 expanded">
 
-                            <!--<div class="columns medium-12 small-12 margin-top-30 card-3">
-                                <div class="responsive-table top-space-20">
-                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
-                                        <thead>
-                                        <tr>
-                                            <th colspan="2"> Patient</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        <tr>
-                                            <th class="text-left medium-4">Sex</th>
-                                            <td th:text="${data.patientSex}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Age at Time of Collection</th>
-                                            <td th:text="${data.ageAtTimeOfCollection}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left medium-4">Race / Ethnicity</th>
-                                            <td>
-                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
-                                                <span th:text="${data.ethnicity}"></span>
-
-
-                                            </td>
-                                        </tr>
-                                        <tr th:if="${not #lists.isEmpty(data.relatedModels)}">
-                                            <th class="text-left">Related models</th>
-                                            <td><span th:each="relMod:${data.relatedModels}"><a th:text="${relMod}"
-                                                                                                th:href="@{'/pdx/'+${data.dataSource}+'/'+${relMod}}"></a> </span>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                            </div> -->
-
-
                             <div class="columns medium-12 small-12 margin-top-30 card-3">
                                <div class="responsive-table top-space-20">
                                    <table class="datatable-pdx table-borderedPdx pdx-table head-left">
@@ -838,10 +798,7 @@
 
 
                             <div class="columns medium-12 small-12 card-3" style="padding: 15px;">
-
-
                                 <div class="columns medium-6 small-12" id="download-data" style="float: right; margin-top:-65px; margin-right:-30px;">
-
                                     <div class="columns medium-5 small-12 text-right" style="padding: 0px;">
                                         <label class="dropdown">
                                             <a class="button outline secondary">
@@ -850,9 +807,9 @@
                                             <input type="checkbox" class="dd-input" id="test">
 
                                             <ul class="dd-menu">
-                                                <li th:each="dataType,iter : ${data.dataTypes}">
-                                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/'+${#strings.replace(dataType,' ','-')}+'/export'}"
-                                                       th:text="${#strings.capitalizeWords(dataType)}"> Download ... </a>
+                                                <li th:each="dataRow,iter : ${data.molecularDataRows}">
+                                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/'+${#strings.replace(dataRow.molcharType,' ','-')}+'/'+${dataRow.molcharId}+'/export'}"
+                                                       th:text="${#strings.capitalizeWords(dataRow.molcharType)}"> Download ... </a>
                                                 </li>
 
                                                 <li class="divider"></li>
