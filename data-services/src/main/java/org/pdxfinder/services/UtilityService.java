@@ -79,33 +79,6 @@ public class UtilityService {
         return csvMapper.writer(schema).writeValueAsString(csvData);
     }
 
-    public synchronized String serializePojoToCsv(final Object object, final Class type, final boolean withHeaders) throws IOException {
-        CsvMapper csvMapper = new CsvMapper();
-        CsvSchema csvSchema;
-        if (withHeaders) {
-            csvSchema = csvMapper.schemaFor(type).withHeader();
-        } else {
-            csvSchema = csvMapper.schemaFor(type).withoutHeader();
-        }
-        return csvMapper.writer(csvSchema).writeValueAsString(object);
-    }
-
-    public synchronized List<Object> deserializeCsvToPojo(final String csv, final Class type, final boolean hasHeaders) throws IOException {
-        CsvMapper csvMapper = new CsvMapper();
-        CsvSchema csvSchema;
-        if (hasHeaders) {
-            csvSchema = csvMapper.schemaFor(type).withHeader();
-        } else {
-            csvSchema = csvMapper.schemaFor(type).withoutHeader();
-        }
-        MappingIterator<Object> mappingIterator = csvMapper.readerFor(type).with(csvSchema).readValues(csv);
-        List<Object> objects = new ArrayList<>();
-        while (mappingIterator.hasNext()) {
-            objects.add(mappingIterator.next());
-        }
-        return objects;
-    }
-
     /*************************************************************************************************************
      *                                           DATA SERIALIZER METHODS SECTION                                 *
      ************************************************************************************************************/
