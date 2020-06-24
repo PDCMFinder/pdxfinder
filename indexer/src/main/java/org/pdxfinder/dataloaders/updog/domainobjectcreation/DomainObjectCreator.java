@@ -728,15 +728,11 @@ public class DomainObjectCreator {
 
     private List<ExternalUrl> getExternalUrls(String email, String formUrl, String databaseUrl) {
         List<ExternalUrl> externalUrls = new ArrayList<>();
-        Optional.ofNullable(email).ifPresent(
-                s -> externalUrls.add(
-                        dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, s)));
-        Optional.ofNullable(formUrl).ifPresent(
-                s -> externalUrls.add(
-                        dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, s)));
-        Optional.ofNullable(databaseUrl).ifPresent(
-                s -> externalUrls.add(
-                        dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, s)));
+
+        if(StringUtils.isNotBlank(email)) externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, email));
+        if(StringUtils.isNotBlank(formUrl)) externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.CONTACT, formUrl));
+        if(StringUtils.isNotBlank(databaseUrl)) externalUrls.add(dataImportService.getExternalUrl(ExternalUrl.Type.SOURCE, databaseUrl));
+
         return externalUrls;
     }
 

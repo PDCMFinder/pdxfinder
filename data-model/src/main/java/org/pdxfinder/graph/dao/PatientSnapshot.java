@@ -85,9 +85,10 @@ public class PatientSnapshot {
         Integer ageInteger;
 
         try {
-            ageInteger = Integer.parseInt(age);
+            String ageClean = age.replaceAll("[a-zA-Z _-]", "");
+            ageInteger = Integer.parseInt(ageClean);
             if (ageInteger <= 23) {
-                return "0-23months";
+                return "0-23 months";
             } else {
                 return getAgeBin(ageInteger / 24);
             }

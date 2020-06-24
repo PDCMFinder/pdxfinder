@@ -26,7 +26,8 @@ public enum DataProvider {
     JAX_XDOG("JAX-XDOG"),
     SJCRH("SJCRH"),
     UMCG("UMCG"),
-    VHIO_PC("VHIO-PC");
+    VHIO_PC("VHIO-PC"),
+    LIH("LIH");
 
     private String name;
     DataProvider(String name) {

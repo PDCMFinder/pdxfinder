@@ -1,6 +1,7 @@
 package org.pdxfinder.services;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.*;
@@ -588,10 +589,16 @@ public class DetailsService {
 
                 if (components.size() > 0) {
                     for (TreatmentComponent tc : components) {
-                        if (!dose.equals("")) {
-                            dose += " / ";
-                        }
-                        dose += tc.getDose();
+
+                        String doseString = tc.getDose();
+
+                        if(StringUtils.isBlank(doseString)) doseString = "NA";
+
+                            if (!dose.equals("")) {
+                                dose += " / ";
+                            }
+                            dose += doseString;
+
                     }
                 }
                 dto.setDose(dose);
