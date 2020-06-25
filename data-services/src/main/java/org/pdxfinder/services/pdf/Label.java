@@ -3,9 +3,6 @@ package org.pdxfinder.services.pdf;
 import java.util.Arrays;
 import java.util.List;
 
-/*
- * Created by abayomi on 31/10/2018.
- */
 public enum Label {
 
     PDX_MODEL("PDX MODEL"),

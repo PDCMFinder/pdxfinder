@@ -1,8 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.HelpFormatter;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -12,60 +9,33 @@ import org.pdxfinder.services.dto.NodeSuggestionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.*;
 
-/**
- * Load data from HCI PDXNet.
- */
-@Component
-@Order(value = -20)
+
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "hci")
-public class LoadHCI extends LoaderBase implements CommandLineRunner {
-
+public class LoadHCI extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadHCI.class);
 
-    private HelpFormatter formatter;
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
-
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
 
     public LoadHCI(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() throws Exception {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadHCI", "Load HCI PDX data");
-        parser.accepts("loadALL", "Load all, including HCI PDX data");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadHCI") || options.has("loadALL")) {
-
-            initMethod();
-
-            globalLoadingOrder();
-
-        }
+        initMethod();
+        globalLoadingOrder();
     }
-
 
 
     @Override
@@ -224,33 +194,29 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                                     reportManager.addMessage(nsdto.getLogEntity());
                                 }
 
+                                MolecularCharacterization mc;
 
                                 if (molCharMap.containsKey(modelId + "---" + sampleId)) {
 
-                                    MolecularCharacterization mc = molCharMap.get(modelId + "---" + sampleId);
-
-
-                                    MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setCytogeneticsResult(result);
-                                    ma.setMarker(marker);
-                                    mc.addMarkerAssociation(ma);
+                                    mc = molCharMap.get(modelId + "---" + sampleId);
                                 }
                                 else {
 
-                                    MolecularCharacterization mc = new MolecularCharacterization();
+                                    mc = new MolecularCharacterization();
                                     mc.setType("cytogenetics");
                                     mc.setPlatform(pl);
-
                                     MarkerAssociation ma = new MarkerAssociation();
-                                    ma.setCytogeneticsResult(result);
-                                    ma.setMarker(marker);
                                     mc.addMarkerAssociation(ma);
+
 
                                     molCharMap.put(modelId + "---" + sampleId, mc);
                                 }
 
-
-
+                                MolecularData molecularData = new MolecularData();
+                                molecularData.setMarker(marker.getHgncSymbol());
+                                molecularData.setCytogeneticsResult(result);
+                                mc.getFirstMarkerAssociation().addMolecularData(molecularData);
+                                mc.addMarker(molecularData.getMarker());
                             }
 
 
@@ -284,6 +250,7 @@ public class LoadHCI extends LoaderBase implements CommandLineRunner {
                 }
 
                 sample.addMolecularCharacterization(mc);
+                mc.getFirstMarkerAssociation().encodeMolecularData();
                 dataImportService.saveSample(sample);
 
             }

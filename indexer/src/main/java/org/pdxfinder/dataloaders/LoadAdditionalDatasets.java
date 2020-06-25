@@ -1,12 +1,5 @@
 package org.pdxfinder.dataloaders;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.neo4j.ogm.session.Session;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
@@ -18,37 +11,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/*
- * Created by csaba on 14/05/2019.
- */
-@Component
+@Service
 @Order(value = 15)
-public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationContextAware{
+public class LoadAdditionalDatasets implements ApplicationContextAware{
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     Logger log = LoggerFactory.getLogger(LoadAdditionalDatasets.class);
 
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
-    static ApplicationContext context;
-    ReportManager reportManager;
-
+    private static ApplicationContext context;
+    private ReportManager reportManager;
 
     @Autowired
     private DataImportService dataImportService;
@@ -56,31 +39,16 @@ public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationCon
     @Autowired
     private UtilityService utilityService;
 
-    private Session session;
 
+    public void run() {
 
+        reportManager = (ReportManager) context.getBean("ReportManager");
 
-
-    @Override
-    public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadAdditionalDatasets", "Loading additional datasets");
-        parser.accepts("loadALL", "Load all, loading additional datasets");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadAdditionalDatasets") || options.has("loadALL")) {
-
-            reportManager = (ReportManager) context.getBean("ReportManager");
-
-            loadAdditionalDatasetForCRL();
-
-        }
+        loadAdditionalDatasetForCRL();
     }
 
 
-    private void loadAdditionalDatasetForCRL() throws Exception{
+    private void loadAdditionalDatasetForCRL() {
 
         log.info("Loading additional datasets for CRL.");
 
@@ -263,10 +231,10 @@ public class LoadAdditionalDatasets implements CommandLineRunner, ApplicationCon
                 if(molChar != null){
                 //STEP4: link molchar to the markers with a fake MA
                     int maCounter = 0;
+                    MarkerAssociation ma = new MarkerAssociation();
                     for(Marker m: markerSet){
 
-                        MarkerAssociation ma = new MarkerAssociation();
-                        ma.setMarker(m);
+
                         molChar.addMarkerAssociation(ma);
                         maCounter++;
                         if(maCounter !=0 && maCounter%500==0){

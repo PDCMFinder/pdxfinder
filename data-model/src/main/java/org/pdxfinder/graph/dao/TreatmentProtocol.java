@@ -1,9 +1,10 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +25,8 @@ public class TreatmentProtocol {
      * @param passages                  The list of passages at which this treatment was applied
      */
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     @Relationship(type = "TREATMENT_COMPONENT")
@@ -38,9 +40,11 @@ public class TreatmentProtocol {
 
     private String armSize;
     private String responseCalculationMethod;
-    private String passages;
+    private String passageRange;
 
     private String treatmentDate;
+
+    private String clinicalTrialId;
 
     public TreatmentProtocol() {
         components = new ArrayList<>();
@@ -79,12 +83,12 @@ public class TreatmentProtocol {
         this.responseCalculationMethod = responseCalculationMethod;
     }
 
-    public String getPassages() {
-        return passages;
+    public String getPassageRange() {
+        return passageRange;
     }
 
-    public void setPassages(String passages) {
-        this.passages = passages;
+    public void setPassageRange(String passageRange) {
+        this.passageRange = passageRange;
     }
 
     public CurrentTreatment getCurrentTreatment() {
@@ -101,6 +105,14 @@ public class TreatmentProtocol {
 
     public void setTreatmentDate(String treatmentDate) {
         this.treatmentDate = treatmentDate;
+    }
+
+    public String getClinicalTrialId() {
+        return clinicalTrialId;
+    }
+
+    public void setClinicalTrialId(String clinicalTrialId) {
+        this.clinicalTrialId = clinicalTrialId;
     }
 
     public String getTreatmentString(boolean includeControlDrugs){
@@ -156,6 +168,7 @@ public class TreatmentProtocol {
         for(TreatmentComponent comp:components){
 
             String dur = comp.getDuration();
+            if(StringUtils.isBlank(dur)) dur = "NA";
 
             if(includeControlDrugs){
                 if(!durString.isEmpty()){
@@ -189,6 +202,8 @@ public class TreatmentProtocol {
 
             String dose = comp.getDose();
 
+            if(StringUtils.isBlank(dose)) dose = "NA";
+
             if(includeControlDrugs){
                 if(!doseString.isEmpty()){
                     doseString+=" / ";
@@ -198,7 +213,7 @@ public class TreatmentProtocol {
             //include only Drugs but no Controls
             else{
 
-                if(comp.getType().equals("Drug")){
+                if(!comp.getType().equals("Control")){
 
                     if(!doseString.isEmpty()){
                         doseString+=" / ";

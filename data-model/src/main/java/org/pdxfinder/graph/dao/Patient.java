@@ -1,28 +1,31 @@
-
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-/**
- * Entity class for storing the Patient from whom the Xenograft was derived
- */
+import java.util.StringJoiner;
+
 @NodeEntity
 public class Patient {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
-
 
     private String externalId;
     private String sex;
     private String race;
     private String ethnicity;
+    private String ethnicityAssessment;
     private String dataSource;
     private String cancerRelevantHistory;
     private String firstDiagnosis;
@@ -34,21 +37,15 @@ public class Patient {
     @Relationship(type = "COLLECTION_EVENT")
     private Set<PatientSnapshot> snapshots;
 
-    /**
-     * Empty constructor required as of Neo4j API 2.0.5
-     */
-    private Patient() {
-
+    public Patient() {
+        // Empty constructor required as of Neo4j API 2.0.5
     }
 
-    /**
-     * The constructor initializes the Patient's Entity Object
-     * @param externalId The external ID property of the Patient node
-     * @param sex  This is the patient's gender
-     * @param race The Patient's physical characteristics such as skin, hair, or eye color
-     * @param ethnicity The Patients origin either by birth e.g German or Spanish ancestry
-     * @param group The source of the Patient's data (Provider)
-     */
+    public Patient(String externalId, Group providerGroup) {
+        this.externalId = externalId;
+        this.groups = Collections.singletonList(providerGroup);
+    }
+
     public Patient(String externalId, String sex, String race, String ethnicity, Group group) {
         this.externalId = externalId;
         this.sex = sex;
@@ -59,106 +56,52 @@ public class Patient {
         this.groups.add(group);
     }
 
-
-    public void hasSnapshot(PatientSnapshot snapshot) {
-        if (snapshots == null) {
-            snapshots = new HashSet<>();
-        }
-        snapshots.add(snapshot);
-    }
-
-    /**
-     * Retrieves the external ID property of the patient node
-     * @return String This returns the external ID
-     */
     public String getExternalId() {
         return externalId;
     }
 
-    /**
-     *  Assigns value to the external ID of the Patient node
-     * @param externalId Must not be empty and must be alphanumeric
-     */
     public void setExternalId(String externalId) {
         this.externalId = externalId;
     }
 
-    /**
-     *  Retrieves the patients sex attribute from the patient object
-     * @return String This returns the sex
-     */
     public String getSex() {
         return sex;
     }
 
-    /**
-     * Assigns values to the patients sex
-     * @param sex Cannot be empty, must either be M or F
-     */
     public void setSex(String sex) {
         this.sex = sex;
     }
 
-    /**
-     * Retrieves the race from the patient node
-     * @return String This returns race (patients physical characteristics)
-     */
+    @Deprecated
     public String getRace() {
         return race;
     }
 
-    /**
-     * Assigns value to the race attribute of the patients node
-     * @param race Patient's physical characteristics such as skin, hair, ...
-     */
+    @Deprecated
     public void setRace(String race) {
         this.race = race;
     }
 
-    /**
-     * Retrieves the ethnicity attribute from the patient node
-     * @return String This returns the ethnicity (patients origin)
-     */
     public String getEthnicity() {
         return ethnicity;
     }
 
-    /**
-     * Assigns value to the ethnicity attribute of the patients node
-     * @param ethnicity This is the patients origin by birth
-     */
     public void setEthnicity(String ethnicity) {
         this.ethnicity = ethnicity;
     }
 
-    /**
-     * Retrieves a set of Patients snapshots from the patient snapshot node
-     * @return Set This returns the patient snapshots
-     */
     public Set<PatientSnapshot> getSnapshots() {
         return snapshots;
     }
 
-    /**
-     * Assigns value to the PatientSnapshot Object
-     * @param snapshots This is a set made up of Patients record, age, and samples attached to the patient
-     */
     public void setSnapshots(Set<PatientSnapshot> snapshots) {
         this.snapshots = snapshots;
     }
 
-    /**
-     * Retrieves the abbreviation of the external data source from the ExternalDataSource node
-     * @return String This returns the source of the Patient's data abbreviated
-     */
     public String getDataSource() {
         return dataSource;
     }
 
-    /**
-     * Assigns value to the source of the patients data
-     * @param dataSource This is the abbreviated version of the source of patient's data
-     */
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
     }
@@ -173,8 +116,10 @@ public class Patient {
 
     public Group getProviderGroup(){
 
+        if(groups == null) return null;
+
         for(Group g : groups){
-            if(g != null && g.getType().equals("Provider")) return g;
+            if(g.getType().equals("Provider")) return g;
         }
 
         return null;
@@ -241,29 +186,99 @@ public class Patient {
 
         if(snapshots == null) return null;
 
-        PatientSnapshot latestPS = null;
+        PatientSnapshot latestPSByAge = getLastSnapshotByAge();
+        PatientSnapshot latestPSByDate = getLastSnapshotByDate();
+
+        if(latestPSByAge != null ) {
+
+            return latestPSByAge;
+        }
+        else return latestPSByDate;
+
+    }
+
+
+    private PatientSnapshot getLastSnapshotByAge(){
+
+        PatientSnapshot latestPSByAge = null;
+
         for(PatientSnapshot ps: snapshots){
 
-            if(latestPS == null){
-                latestPS = ps;
+            if(latestPSByAge == null){
+                latestPSByAge = ps;
             }
             else{
-                //compare age at collection
-                if(latestPS.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0 ){
+                if(latestPSByAge.getAgeAtCollection() != null && ps.getAgeAtCollection() != null && latestPSByAge.getAgeAtCollection().compareTo(ps.getAgeAtCollection()) < 0){
 
-                    latestPS = ps;
-                }
-                //compare date collection
-                else if(latestPS.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
-
-                    latestPS = ps;
+                    latestPSByAge = ps;
                 }
             }
-
         }
 
-        return latestPS;
+        return latestPSByAge;
+    }
+
+    private PatientSnapshot getLastSnapshotByDate(){
+
+        PatientSnapshot latestPSByDate = null;
+
+        for(PatientSnapshot ps: snapshots){
+
+            if(latestPSByDate == null){
+                latestPSByDate = ps;
+            }
+            else{
+                if(latestPSByDate.getDateAtCollection() != null && ps.getDateAtCollection() != null && latestPSByDate.getDateAtCollection().compareTo(ps.getDateAtCollection()) < 0){
+
+                    latestPSByDate = ps;
+                }
+            }
+        }
+
+        return latestPSByDate;
+    }
+
+
+
+    public void addSnapshot(PatientSnapshot ps){
+
+        if(snapshots == null) snapshots = new HashSet<>();
+        snapshots.add(ps);
+    }
+
+    public String getEthnicityAssessment() {
+        return ethnicityAssessment;
+    }
+
+    public void setEthnicityAssessment(String ethnicityAssessment) {
+        this.ethnicityAssessment = ethnicityAssessment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Patient patient = (Patient) o;
+
+        return new EqualsBuilder()
+            .append(getExternalId(), patient.getExternalId())
+            .append(getGroups(), patient.getGroups())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getExternalId())
+            .append(getGroups())
+            .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s]", externalId);
     }
 
 }
-

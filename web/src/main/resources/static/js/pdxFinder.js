@@ -1,9 +1,4 @@
 /**
- * Created by csaba on 12/05/2017.
- */
-
-
-/**
  * Checks the filters and collects the parameters that are selected, t
  * hen constructs the url and redirects the user to that url
  */
@@ -38,8 +33,7 @@ function redirectPage(webFacetSections) {
             url = url + res[0] + "=" + res[1];
             no_parameters = false;
 
-        }
-        else if (jQuery(this).is("input:text")) {
+        } else if (jQuery(this).is("input:text")) {
             return;
         }
     });
@@ -48,43 +42,39 @@ function redirectPage(webFacetSections) {
     var twoParamUnlinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamUnlinkedFilter');
     twoParamUnlinkedFilters.forEach(function (filterComponent) {
 
-            options2List = filterComponent.options2;
-            componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
-            componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
-            urlKey = filterComponent.urlParam;
+        options2List = filterComponent.options2;
+        componentId1 = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+        componentId2 = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
+        urlKey = filterComponent.urlParam;
 
-            for (var i = 0; i < 19; i++) {
+        for (var i = 0; i < 19; i++) {
 
-                var component1Choice = jQuery("#" + componentId1 + i);
-                var component2Choices = jQuery("#" + componentId2 + i);
+            var component1Choice = jQuery("#" + componentId1 + i);
+            var component2Choices = jQuery("#" + componentId2 + i);
 
-                if (component1Choice.val() != null && component1Choice.val() != "NULL") {
+            if (component1Choice.val() != null && component1Choice.val() != "NULL") {
 
-                    for (var j = 0; j < component2Choices.val().length; j++) {
+                for (var j = 0; j < component2Choices.val().length; j++) {
 
-                        if (!no_parameters) {
-                            url = url + "&";
-                        }
+                    if (!no_parameters) {
+                        url = url + "&";
+                    }
 
-                        if (options2List.length == component2Choices.val().length) {
+                    if (options2List.length == component2Choices.val().length) {
 
-                            url += urlKey + "=" + component1Choice.val() + "___ALL";
-                            no_parameters = false;
-                            break;
-                        } else {
-                            url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j].replace(/^\s+|\s+$/g, '');
-                            no_parameters = false;
+                        url += urlKey + "=" + component1Choice.val() + "___ALL";
+                        no_parameters = false;
+                        break;
+                    } else {
+                        url += urlKey + "=" + component1Choice.val() + "___" + component2Choices.val()[j].replace(/^\s+|\s+$/g, '');
+                        no_parameters = false;
 
-                        }
                     }
                 }
-
             }
+
+        }
     });
-
-
-
-
 
 
     var twoParamLinkedFilters = getFiltersFromWebFacetSection(webFacetSections, 'TwoParamLinkedFilter');
@@ -127,10 +117,6 @@ function redirectPage(webFacetSections) {
     });
 
 
-
-
-
-
     var oneParamTextFilters = getFiltersFromWebFacetSection(webFacetSections, 'OneParamTextFilter');
     oneParamTextFilters.forEach(function (filterComponent) {
 
@@ -147,7 +133,7 @@ function redirectPage(webFacetSections) {
 
 
                 if (!no_parameters) {
-                        url = url + "&";
+                    url = url + "&";
                 }
 
 
@@ -158,8 +144,6 @@ function redirectPage(webFacetSections) {
 
         }
     });
-
-
 
 
     // Add all diagnosis filters to the URL
@@ -187,14 +171,6 @@ function redirectPage(webFacetSections) {
 }
 
 
-
-
-
-
-
-
-
-
 /****************************************************************
  *         MULTI PARAM  FILTER SECTION STARTS                   *
  ****************************************************************/
@@ -205,49 +181,46 @@ function intializeFilters(webFacetSection, index) {
     var filterComponents = webFacetSection.filterComponents;
 
     // Retrieve All the FilterComponents and their contents
-    filterComponents.forEach(function(filterComponent){
+    filterComponents.forEach(function (filterComponent) {
 
-        if (filterComponent.type === 'TwoParamLinkedFilter' || filterComponent.type === 'TwoParamUnlinkedFilter'){
+        if (filterComponent.type === 'TwoParamLinkedFilter' || filterComponent.type === 'TwoParamUnlinkedFilter') {
 
             dataList = filterComponent.options1;
-            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
-            componentTwoId = filterComponent.urlParam+"_"+(filterComponent.param2Name).toLowerCase();
-            filterButton = componentOneId+'_button';
+            componentOneId = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+            componentTwoId = filterComponent.urlParam + "_" + (filterComponent.param2Name).toLowerCase();
+            filterButton = componentOneId + '_button';
 
-            initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId,filterComponent.param2Name);
+            initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId, filterComponent.param2Name);
 
             //Add event listener to each TwoParamUnlinkedFilter filter class
-            jQuery('#'+filterButton).click(function () {
+            jQuery('#' + filterButton).click(function () {
                 redirectPage(webFacetSections);
             });
-        }
-        else if(filterComponent.type === "OneParamTextFilter"){
+        } else if (filterComponent.type === "OneParamTextFilter") {
 
             dataList = filterComponent.options1;
-            componentOneId = filterComponent.urlParam+"_"+(filterComponent.param1Name).toLowerCase();
-            filterButton = componentOneId+'_button';
+            componentOneId = filterComponent.urlParam + "_" + (filterComponent.param1Name).toLowerCase();
+            filterButton = componentOneId + '_button';
 
             initializeOneParamTextFilterComponent(dataList, componentOneId);
 
 
             //Add event listener to each OneParamTextFilter filter class
-            jQuery('#'+filterButton).click(function () {
+            jQuery('#' + filterButton).click(function () {
                 redirectPage(webFacetSections);
             });
         }
-
 
 
     });
 }
 
 
-
 function initializeTwoParamFilterComponents(dataList, componentOneId, componentTwoId, placeHolderText) {
 
     dataList = dataList.sort();
 
-    placeHolderText = placeHolderText.charAt(0).toUpperCase() + placeHolderText.substr(1).toLowerCase()+"s";
+    placeHolderText = placeHolderText.charAt(0).toUpperCase() + placeHolderText.substr(1).toLowerCase() + "s";
 
     for (var i = 0; i <= 19; i++) {
 
@@ -286,7 +259,7 @@ function getFiltersFromWebFacetSection(webFacetSections, desiredFilterType) {
         var filterComponents = webFacetSection.filterComponents;
 
         // Retrieve All the FilterComponents and their contents
-        filterComponents.forEach(function(filterComponent) {
+        filterComponents.forEach(function (filterComponent) {
 
             if (filterComponent.type === desiredFilterType) {
                 filterComponentsArray.push(filterComponent);
@@ -308,11 +281,11 @@ function getOptions2FromWebFacetSection(filterType, filterUrlParam) {
         var filterComponents = webFacetSection.filterComponents;
 
         // Retrieve the specific optionList and their contents
-        filterComponents.forEach(function(filterComponent) {
+        filterComponents.forEach(function (filterComponent) {
 
             if (filterComponent.type === filterType) {
 
-                if (filterComponent.urlParam === filterUrlParam){
+                if (filterComponent.urlParam === filterUrlParam) {
 
                     options2List = filterComponent.options2;
                 }
@@ -320,23 +293,23 @@ function getOptions2FromWebFacetSection(filterType, filterUrlParam) {
 
         });
     }
+
     return options2List;
 }
 
 
-
-function selectAllOptionsInMyComponent2(myContent, filterType, myComponent2Id,  options2List) {
+function selectAllOptionsInMyComponent2(myContent, filterType, myComponent2Id, options2List) {
 
     var newOptions = "";
 
-    if (filterType === 'TwoParamLinkedFilter'){
+    if (filterType === 'TwoParamLinkedFilter') {
 
         filterUrlParam = myComponent2Id.split('_')[0];
         options2Lista = getOptions2FromWebFacetSection(filterType, filterUrlParam);
 
         options2List = options2Lista[myContent.value];
 
-    }else{
+    } else {
 
         // Remove the opening and closing square brackets
         options2List = options2List.substr(1).slice(0, -1);
@@ -430,8 +403,8 @@ function linkGeneCivicdb(el, symbol) {
 function linkVariantCivicdb(el, symbol) {
     $.ajax({
         dataType: "json",
-        url: "https://civicdb.org/api/variants/typeahead_results?limit=1&query="+symbol,
-        success: function(data){
+        url: "https://civicdb.org/api/variants/typeahead_results?limit=1&query=" + symbol,
+        success: function (data) {
             civicDBVariantCache[symbol] = data;
             if (data.result.length > 0) {
                 var gene_id = data.result[0].gene_id;
@@ -440,14 +413,14 @@ function linkVariantCivicdb(el, symbol) {
                 $(el).html('<a target="_blank" href="' + civic_url + '">' + symbol + ' <i class="icon icon-generic" data-icon="x"> </i></a>');
             }
         },
-        error: function() {
-            civicDBVariantCache[symbol] = {'result':[]};
+        error: function () {
+            civicDBVariantCache[symbol] = {'result': []};
         }
     });
 }
 
 // Function to interrogate civicDB to create the gene and variant links
-function linkCivicdb(){
+function linkCivicdb() {
     console.log("Re-establishing civic DB links")
     var geneIndex = $('#molcharDataTable th:contains("HGNC Symbol")').index() + 1;
     var variantIndex = $('#molcharDataTable th:contains("Amino Acid Change")').index() + 1;
@@ -455,21 +428,21 @@ function linkCivicdb(){
     console.log("genes:" + genes)
     var variants = $('#molcharDataTable tr td:nth-child(' + variantIndex + ')');
     console.log("variants:" + variants)
-    genes.each(function() {
+    genes.each(function () {
         var symbol = $(this).html();
         linkGeneCivicdb(this, symbol);
     });
-    variants.each(function() {
+    variants.each(function () {
         var symbol = $(this).html();
-        symbol = symbol.replace(/\s+/g,'');
-        if(!(symbol === '')) {
+        symbol = symbol.replace(/\s+/g, '');
+        if (!(symbol === '')) {
             linkVariantCivicdb(this, symbol);
         }
     });
 }
 
 
-function getMolecularDataTable(clickedLink, clickedData){
+function getMolecularDataTable(clickedLink, clickedData) {
 
 
     console.log(clickedLink);
@@ -477,69 +450,90 @@ function getMolecularDataTable(clickedLink, clickedData){
     var titlecomp = clickedData.split("|");
     var id = idcomp[1];
 
-    var url = "/data/getmoleculardata/"+id;
+    var url = "/data/getmoleculardata/" + id;
 
-    var $targetDiv = jQuery('#variationTableData');
-    $targetDiv.empty();
+    var targetDiv = jQuery('#variationTableData');
+    targetDiv.empty();
 
     $('#preLoader').show();
 
     fetch(url)
         .then(response => response.json())
-        .then(json => displayMolecularDataTable(json, titlecomp))
+        .then(jsonData => displayMolecularDataTable(jsonData, titlecomp))
         .catch(error => console.log(error))
 
 }
 
+/*
+<br>
+      <span class="small">
+        <a target="_blank" href="https://civicdb.org/events/genes/24/summary#gene"
+        style="text-decoration:none; color:#06369d; text-transform: lowercase;"> civic
+          <i class="icon icon-generic" data-icon="x"> </i>
+          </a>
+    </span>&nbsp;
+    <span class="small">
+        <a target="_blank" href="https://civicdb.org/events/genes/24/summary#gene"
+        style="text-decoration:none; color:#06369d; text-transform: lowercase;"> cosmic
+          <i class="icon icon-generic" data-icon="x"> </i>
+          </a>
+    </span>&nbsp;
+    <span class="small">
+        <a target="_blank" href="https://civicdb.org/events/genes/24/summary#gene"
+        style="text-decoration:none; color:#06369d; text-transform: lowercase;"> cravat
+          <i class="icon icon-generic" data-icon="x"> </i>
+          </a>
+    </span>
+ */
 
+function displayMolecularDataTable(tableData, clickedData) {
 
-function displayMolecularDataTable(tableData, clickedData){
+    let fullData = tableData.molecularDataRows;
+    var dataVisibility = tableData.visible;
 
-    console.log("Headers length:"+tableData["tableHeaders"].length);
+    var targetDiv = jQuery('#variationTableData');
+    var table = jQuery('<table id="molcharDataTable" class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs"/>');
+    var thead = jQuery('<thead/>');
+    var theadRow = jQuery('<tr>');
+    var tbody = jQuery('<tbody />');
 
-    var $targetDiv = jQuery('#variationTableData');
+    if (dataVisibility === true) {
 
-    var $table = jQuery('<table id="molcharDataTable" class="datatable-pdx pdx-table table-borderedPdx head-left" data-tabs id="example-tabs"/>');
-    var $thead = jQuery('<thead/>');
-    var $theadRow = jQuery('<tr>');
-    var $tbody = jQuery('<tbody />');
+        let oneData = fullData[0];
+        let tableHeaders = Object.keys(oneData);
 
-    //add headers to table
-    for(var i=0; i<tableData["tableHeaders"].length;i++){
+        //add headers to table
+        for (var i = 0; i < tableHeaders.length; i++) {
+            var $th = jQuery(`<th> ${tableHeaders[i]} </th>`);
+            theadRow.append($th);
+        }
 
-        var $th = jQuery('<th>'+tableData["tableHeaders"][i]+'</th>');
-        $theadRow.append($th);
-    }
-
-    
-    //add datarows to table
-    var rowCount = tableData["tableRows"].length;
-    var tableHeaderDataSize = tableData["tableHeaders"].length;
-    var dataVisibility = tableData["visible"];
-
-    for(var j=0; j<rowCount; j++){
-
-        if (tableHeaderDataSize == 1){
-            $tr = jQuery('<tr class="tabs-title" style="float:none; font-weight: bold; font-size: 37px; color: #06369d;">/');
-        }else {
+        //add datarows to table
+        var rowCount = fullData.length;
+        var tableHeaderDataSize = tableHeaders.length;
+        for (var j = 0; j < rowCount; j++) {
             $tr = jQuery('<tr class="tabs-title" style="float:none; text-transform: capitalize;">/');
-        }
 
-        for(var k=0; k<tableData["tableRows"][j].length; k++){
-            console.log("Rows "+tableData["tableRows"][j].length);
-            $tr.append("<td>"+tableData["tableRows"][j][k]+"</td>");
+            tableHeaders.forEach((tableHeader, count) => {
+                let tableData = fullData[j][tableHeader];
+                if (typeof tableData === 'object') {
+                    tableData = this.referenceDatabase(tableData);
+                }
+                $tr.append(`<td> ${tableData} </td>`);
+            });
+            tbody.append($tr);
         }
-        
-        $tbody.append($tr);
+        thead.append(theadRow);
+        table.append(thead);
+        table.append(tbody);
+        targetDiv.append(table);
+        customizeDatatable('molcharDataTable', clickedData[4]);
+    } else {
+
+        let report = `<b style="margin-top: 15px; font-size: 13px; color: #06369d;"> ${tableData.reports[0]} </b> `
+        targetDiv.append(report);
+        $('#download-data').hide();
     }
-    $thead.append($theadRow);
-    $table.append($thead);
-    $table.append($tbody);
-    $targetDiv.append($table);
-
-
-    customizeDatatable('molcharDataTable', clickedData[4]);
-
 
     $("#omicDataCount").html(rowCount);
     $("#clickedSampleId").html(clickedData[0]);
@@ -547,87 +541,59 @@ function displayMolecularDataTable(tableData, clickedData){
     $("#clickedTumorType").html(clickedData[2]);
     $("#clickedPassage").html(clickedData[3]);
     $("#clickedTech").html(clickedData[4]);
-
     $('#hrTitle').attr('data-content', clickedData[4]);
-
     $('#preLoader').hide();
-
-    if (dataVisibility == false) {
-        $('#download-data').hide();
-    }
-
-
 }
 
 
 
+function referenceDatabase(dataObject) {
 
-function customizeDatatable(dTable, presentData){
+    let result = '';
+    let label = dataObject.label;
+    let referenceDBs = dataObject.referenceDbs;
 
-    $('#'+dTable).DataTable(
+    if (referenceDBs){
+        let databases = Object.keys(referenceDBs);
+        databases.forEach((database) => {
+            result += `<span class="small">
+                        <a target="_blank" href="${referenceDBs[database]}" 
+                            style="text-decoration:none; color:#06369d; text-transform: uppercase;"> 
+                                ${database} <i class="icon icon-generic small" data-icon="x"> </i> 
+                          </a>
+                    </span>&nbsp;`;
+        });
+    }
+    return `${label} <br> ${result}`;
+}
+
+
+function customizeDatatable(dTable, presentData) {
+
+    $('#' + dTable).DataTable(
         {
-            drawCallback : linkCivicdb(),
-            info:     false,
+            //drawCallback: linkCivicdb(),
+            info: false,
             dom: '<"top"i>rt<"bottom"flp><"clear">',
             language: {
-                lengthMenu: ' <select style="margin-top: 20px;">'+
-                    '<option value="10">10 Data Entries </option>'+
-                    '<option value="20">20 Data Entries </option>'+
-                    '<option value="30">30 Data Entries </option>'+
-                    '<option value="40">40 Data Entries </option>'+
-                    '<option value="50">50 Data Entries </option>'+
-                    '<option value="-1">Show All Entries </option>'+
+                lengthMenu: ' <select style="margin-top: 20px;">' +
+                    '<option value="10">10 Data Entries </option>' +
+                    '<option value="20">20 Data Entries </option>' +
+                    '<option value="30">30 Data Entries </option>' +
+                    '<option value="40">40 Data Entries </option>' +
+                    '<option value="50">50 Data Entries </option>' +
+                    '<option value="-1">Show All Entries </option>' +
                     '</select>'
             }
         }
     );
 
     $(".dataTables_filter").hide();
-    $("#customSearch").html('<input style="height: 41px; border-left: 0px;" type="text" id="omicSearch" placeholder="Search'+presentData+' data">');
+    $("#customSearch").html('<input style="height: 41px; border-left: 0px;" type="text" id="omicSearch" placeholder="Search' + presentData + ' data">');
 
     oTable = $('#molcharDataTable').DataTable();
-    $('#omicSearch').keyup(function(){
+    $('#omicSearch').keyup(function () {
         oTable.search($(this).val()).draw();
     })
 
 }
-
-
-
-
-
-
-function downloadAll() {
-
-    var urls = [
-        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export',
-        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export',
-        'http://localhost:8080/data/pdx/PDMR/245127-232-R/mutation/export'
-    ];
-
-    console.log("Welcome");
-
-    var link = document.createElement('a');
-
-    link.setAttribute('download', null);
-    link.style.display = 'none';
-
-    document.body.appendChild(link);
-
-    for (var i = 0; i < urls.length; i++) {
-
-        alert("Click Ok to download "+urls[i]);
-        link.setAttribute('href', urls[i]);
-        link.click();
-
-    }
-
-    document.body.removeChild(link);
-}
-
-
-
-
-
-
-

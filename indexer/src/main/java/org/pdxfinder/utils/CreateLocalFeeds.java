@@ -50,7 +50,7 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
     private final static Logger log = LoggerFactory.getLogger(CreateLocalFeeds.class);
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     //JAX
@@ -108,12 +108,12 @@ public class CreateLocalFeeds implements CommandLineRunner {
 
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
-        parser.accepts("createLocalFeeds", "Creating local feeds");
+        parser.accepts("localFeeds", "Creating local feeds");
 
         OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has("createLocalFeeds")) {
+        if (options.has("localFeeds")) {
             log.info("Creating local feeds");
 
             createJAXFeeds();

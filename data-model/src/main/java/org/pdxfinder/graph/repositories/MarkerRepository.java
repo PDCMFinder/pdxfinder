@@ -28,8 +28,15 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
     @Query("MATCH (t:Marker) WHERE t.ensembleId = {id} RETURN t")
     Marker findByEnsemblId(@Param("id") String id);
 
+    @Query("MATCH (t:Marker) WHERE t.ncbiGeneId = {id} return t")
+    Marker findByNcbiGeneId(@Param("id") String id);
+
     @Query("MATCH (m:Marker) RETURN m")
     Collection<Marker> findAllMarkers();
+
+    @Query("MATCH (m:Marker) RETURN count(m)")
+    Integer countAllMarkers();
+
 
     @Query("MATCH (m:Marker) " +
             "RETURN m")
@@ -58,9 +65,16 @@ public interface MarkerRepository extends PagingAndSortingRepository<Marker, Lon
     @Query("MATCH (m:Marker) WHERE NOT (m)--() DELETE m")
     void deleteMarkersWithoutRelationships();
 
-    @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation)-[mr:MARKER]-(m:Marker) " +
+    @Query("MATCH (mc:MolecularCharacterization)-[awr:ASSOCIATED_WITH]-(ma:MarkerAssociation) " +
             "WHERE ID(mc) = {id} " +
             "RETURN DISTINCT m")
     Set<Marker> findDistinctByMolCharId(@Param("id") Long id);
+
+    @Query("MATCH (m:Marker) return count(m)")
+    int getMarkerCount();
+
+    @Query("MATCH (m:Marker) return m SKIP {skip} LIMIT {limit}")
+    Collection<Marker> getAllMarkersSkipLimit(@Param("skip") int skip, @Param("limit") int limit);
+
 
 }

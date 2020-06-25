@@ -47,9 +47,18 @@ public class TwoParamUnlinkedSearch {
         for(String paramString : params){
 
             String[] paramArr = paramString.split("___");
+            String key1, key2;
 
-            String key1 = paramArr[0];
-            String key2 = paramArr[1];
+            if(paramArr.length == 1){
+                key1 = "";
+                key2 = paramArr[0];
+            }
+            else{
+                key1 = paramArr[0];
+                key2 = paramArr[1];
+            }
+
+
 
             //cases:
             //1. key1 not empty, key2 ALL
@@ -61,12 +70,10 @@ public class TwoParamUnlinkedSearch {
             if(!key1.toLowerCase().isEmpty() && key2.toLowerCase().equals("all") ){
 
                 if(data.containsKey(key1)){
-
                     for(Map.Entry<String, Set<Long>> arr: data.get(key1).entrySet()){
 
                         String datakey2 = arr.getKey();
                         Set<Long> foundModelIDs = arr.getValue();
-
                         modelsToKeep.addAll(foundModelIDs);
                         updateModelForQuery(foundModelIDs, models, key1+":"+datakey2, setter);
                     }

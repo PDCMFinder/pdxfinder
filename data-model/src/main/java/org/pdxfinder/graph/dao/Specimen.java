@@ -1,8 +1,12 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.util.StringJoiner;
 
 /**
  * Created by jmason on 06/06/2017.
@@ -10,8 +14,9 @@ import org.neo4j.ogm.annotation.Relationship;
 @NodeEntity
 public class Specimen {
 
-    @GraphId
-    Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
     private String externalId;
 
@@ -104,4 +109,32 @@ public class Specimen {
     public void setHostStrain(HostStrain hostStrain) {
         this.hostStrain = hostStrain;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Specimen specimen = (Specimen) o;
+
+        return new EqualsBuilder()
+            .append(getPassage(), specimen.getPassage())
+            .append(getHostStrain(), specimen.getHostStrain())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getPassage())
+            .append(getHostStrain())
+            .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s - %s]", getPassage(), getHostStrain().getSymbol());
+    }
+
 }

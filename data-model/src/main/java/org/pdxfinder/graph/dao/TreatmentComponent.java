@@ -17,7 +17,9 @@ public class TreatmentComponent {
     private String dose;
 
     private String type;
+    //on mouse this is the treatment length
     private String duration;
+    //on mouse this is the treatment schedule
     private String frequency;
 
     @Relationship(type = "TREATMENT")

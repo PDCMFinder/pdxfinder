@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.pdxfinder.services;
 
-//import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
@@ -24,22 +18,15 @@ import org.springframework.util.Assert;
 
 import org.springframework.cache.annotation.Cacheable;
 
-import javax.management.RuntimeErrorException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * The hope was to put a lot of reused repository actions into one place ie find
- * or create a node or create a node with that requires a number of 'child'
- * nodes that are terms
- *
- * @author sbn
- */
+import static org.pdxfinder.services.reporting.MarkerLogEntity.logNoSingleValidSymbol;
+import static org.pdxfinder.services.reporting.MarkerLogEntity.logUpdateFromPreviousSymbol;
+
 @Component
 public class DataImportService {
-
-    //public static Option loadAll = new Option("LoadAll", false, "Load all PDX Finder data");
 
     private TumorTypeRepository tumorTypeRepository;
     private HostStrainRepository hostStrainRepository;
@@ -71,10 +58,11 @@ public class DataImportService {
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
 
-    private HashMap<String, Marker> markersBySymbol;
-    private HashMap<String, Marker> markersByPrevSymbol;
-    private HashMap<String, Marker> markersBySynonym;
-    private HashMap<String, NodeSuggestionDTO> notFoundMarkerSymbols;
+    private HashMap<String, Marker> markersBySymbol = null;
+    private HashMap<String, List<Marker>> markersByPrevSymbol = null;
+    private HashMap<String, List<Marker>> markersBySynonym = null;
+
+    private boolean markersInitialized = false;
 
     public DataImportService(TumorTypeRepository tumorTypeRepository,
                              HostStrainRepository hostStrainRepository,
@@ -150,8 +138,6 @@ public class DataImportService {
         this.markersBySymbol = new HashMap<>();
         this.markersByPrevSymbol = new HashMap<>();
         this.markersBySynonym = new HashMap<>();
-        this.notFoundMarkerSymbols = new HashMap<>();
-
 
     }
 
@@ -160,7 +146,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(name, type);
 
         if(g == null){
-            log.info("Group not found. Creating", name);
+            log.info("Group not found. Creating {}", name);
 
             g = new Group(name, abbrev, type);
             groupRepository.save(g);
@@ -175,9 +161,9 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(name, "Provider");
 
         if(g == null){
-            log.info("Provider group not found. Creating", name);
+            log.info("Provider group not found. Creating {}", name);
 
-            g = new Group(name, abbrev, description, providerType, contact, url);
+            g = Group.createProviderGroup(name, abbrev, description, providerType, contact, url);
             groupRepository.save(g);
 
         }
@@ -190,7 +176,7 @@ public class DataImportService {
 
 
         if(g == null){
-            log.info("Publication group not found. Creating", publicationId);
+            log.info("Publication group not found. Creating {}", publicationId);
 
             g = new Group();
             g.setType("Publication");
@@ -207,7 +193,7 @@ public class DataImportService {
         Group g = groupRepository.findByNameAndType(groupName, "Project");
 
         if(g == null){
-            log.info("Project group not found. Creating", groupName);
+            log.info("Project group not found. Creating {}", groupName);
 
             g = new Group();
             g.setType("Project");
@@ -226,8 +212,7 @@ public class DataImportService {
         if(g == null){
             log.info("Access group not found. Creating " + accessibility + " " + accessModalities);
 
-            g = new Group(accessibility, accessModalities);
-            g.setType("Accessibility");
+            g = Group.createAccessibilityGroup(accessibility, accessModalities);
             groupRepository.save(g);
 
         }
@@ -293,8 +278,7 @@ public class DataImportService {
 
         ModelCreation modelCreation = modelCreationRepository.findBySourcePdxIdAndDataSource(modelId, dataSource);
 
-        if(modelCreation == null) return false;
-        return true;
+        return modelCreation != null;
     }
 
     public Collection<ModelCreation> findAllModelsPlatforms(){
@@ -374,7 +358,6 @@ public class DataImportService {
 
         if(patient == null){
 
-            log.info("Patient not found. Creating: " + patientId );
             patient = new Patient(patientId,sex,race,ethnicity,dataSource);
             patientRepository.save(patient);
         }
@@ -388,9 +371,9 @@ public class DataImportService {
     }
 
 
-    public void savePatient(Patient patient){
+    public Patient savePatient(Patient patient){
 
-        patientRepository.save(patient);
+        return patientRepository.save(patient);
     }
 
 
@@ -431,11 +414,10 @@ public class DataImportService {
         PatientSnapshot patientSnapshot = null;
 
         Set<PatientSnapshot> pSnaps = patientSnapshotRepository.findByPatient(patient.getExternalId());
-        loop:
         for (PatientSnapshot ps : pSnaps) {
             if (ps.getAgeAtCollection().equals(age)) {
                 patientSnapshot = ps;
-                break loop;
+                break;
             }
         }
         if (patientSnapshot == null) {
@@ -467,7 +449,7 @@ public class DataImportService {
         }
         //create new snapshot and save it with the patient
         ps = new PatientSnapshot(patient, ageAtCollection, collectionDate, collectionEvent, ellapsedTime);
-        patient.hasSnapshot(ps);
+        patient.addSnapshot(ps);
         ps.setPatient(patient);
         patientRepository.save(patient);
         patientSnapshotRepository.save(ps);
@@ -478,9 +460,7 @@ public class DataImportService {
 
     public PatientSnapshot getPatientSnapshot(String patientId, String age, String dataSource){
 
-        PatientSnapshot ps = patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
-
-        return ps;
+        return patientSnapshotRepository.findByPatientIdAndDataSourceAndAge(patientId, dataSource, age);
 
     }
 
@@ -589,7 +569,7 @@ public class DataImportService {
     public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, String passage, String sampleId){
 
         Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
-        Sample sample = null;
+        Sample sample;
 
         if(specimen.getSample() == null){
             sample = new Sample();
@@ -621,6 +601,19 @@ public class DataImportService {
     public List<MolecularCharacterization> findAllMolcharByDataSource(String dataSource){
 
         return molecularCharacterizationRepository.findAllByDataSource(dataSource);
+    }
+
+    public int findMolcharNumberByDataSource(String ds){
+        return molecularCharacterizationRepository.findNumberByDataSource(ds);
+    }
+    
+    public List<MolecularCharacterization> findMolcharByDataSourceSkipLimit(String ds, int skip, int limit){
+        return molecularCharacterizationRepository.findByDataSourceSkipLimit(ds, skip, limit);
+    }
+    
+    public Set<MolecularCharacterization> getMolcharsById(Set<Long> ids){
+
+        return molecularCharacterizationRepository.findByIds(ids);
     }
 
     public Sample getHumanSample(String sampleId, String dataSource){
@@ -710,7 +703,6 @@ public class DataImportService {
     public Tissue getTissue(String t) {
         Tissue tissue = tissueRepository.findByName(t);
         if (tissue == null) {
-            log.info("Tissue '{}' not found. Creating.", t);
             tissue = new Tissue(t);
             tissueRepository.save(tissue);
         }
@@ -799,8 +791,8 @@ public class DataImportService {
         patientSnapshotRepository.save(ps);
     }
 
-    public void saveMolecularCharacterization(MolecularCharacterization mc) {
-        molecularCharacterizationRepository.save(mc);
+    public MolecularCharacterization saveMolecularCharacterization(MolecularCharacterization mc) {
+        return molecularCharacterizationRepository.save(mc);
     }
 
     public void saveQualityAssurance(QualityAssurance qa) {
@@ -873,22 +865,15 @@ public class DataImportService {
     }
 
     public OntologyTerm getOntologyTerm(String url){
-
-        OntologyTerm ot = ontologyTermRepository.findByUrl(url);
-        return ot;
+        return ontologyTermRepository.findByUrl(url);
     }
 
     public OntologyTerm findOntologyTermByLabel(String label){
-
-        OntologyTerm ot = ontologyTermRepository.findByLabel(label);
-        return ot;
+        return ontologyTermRepository.findByLabel(label);
     }
 
     public OntologyTerm findOntologyTermByLabelAndType(String label, String type){
-
-
         return ontologyTermRepository.findByLabelAndType(label, type);
-
     }
 
     public OntologyTerm findOntologyTermByUrl(String url){
@@ -945,6 +930,22 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumberByType(type);
     }
 
+    public int countAllOntologyTerms(){
+        return ontologyTermRepository.getOntologyTermNumber();
+    }
+
+    public int countAllOntologyTermsByType(String type){
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
+
+    public boolean ontologyCacheIsEmpty() {
+        return countAllOntologyTerms() == 0;
+    }
+
+    public boolean ontologyCacheIsEmptyByType(String type){
+        return countAllOntologyTermsByType(type) == 0;
+    }
+
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
 
         return ontologyTermRepository.save(ot);
@@ -955,12 +956,24 @@ public class DataImportService {
         ontologyTermRepository.deleteTermsWithZeroMappings();
     }
 
-    public void saveMarker(Marker marker) {
-        markerRepository.save(marker);
+    public Marker saveMarker(Marker marker) {
+        return markerRepository.save(marker);
+    }
+
+    public void saveAllMarkers(Collection<Marker> markers) {
+        markerRepository.save(markers);
     }
 
     public Collection<Marker> getAllMarkers() {
         return markerRepository.findAllMarkers();
+    }
+
+    public Integer countAllMarkers() {
+        return markerRepository.countAllMarkers();
+    }
+
+    public boolean markerCacheIsEmpty() {
+        return countAllMarkers() == 0;
     }
 
     public Collection<Marker> getAllHumanMarkers() {
@@ -1020,12 +1033,14 @@ public class DataImportService {
         if (p == null) {
             System.out.println("Platform is null");
         }
+        assert p != null;
         if (p.getGroup() == null) {
             System.out.println("P.EDS is null");
         }
         if (m == null) {
             System.out.println("Marker is null");
         }
+        assert m != null;
         PlatformAssociation pa = platformAssociationRepository.findByPlatformAndMarker(p.getName(), p.getGroup().getName(), m.getHgncSymbol());
         if (pa == null) {
             pa = new PlatformAssociation();
@@ -1056,21 +1071,14 @@ public class DataImportService {
 
         TreatmentSummary ts = treatmentSummaryRepository.findModelTreatmentByDataSourceAndModelId(dataSource, modelId);
 
-        if(ts != null && ts.getTreatmentProtocols() != null){
-            return true;
-        }
-        return false;
+        return ts != null && ts.getTreatmentProtocols() != null;
     }
 
     public boolean isTreatmentSummaryAvailableOnPatient(String dataSource, String modelId){
 
         TreatmentSummary ts = treatmentSummaryRepository.findPatientTreatmentByDataSourceAndModelId(dataSource, modelId);
 
-        if(ts != null && ts.getTreatmentProtocols() != null){
-            return true;
-        }
-
-        return false;
+        return ts != null && ts.getTreatmentProtocols() != null;
     }
 
     public int findPatientTreatmentNumber(String dataSource){
@@ -1168,7 +1176,7 @@ public class DataImportService {
         return treatmentSummaryRepository.findPlatformUrlByDataSource(dataSource);
     }
 
-    public CurrentTreatment getCurrentTreatment(String name){
+    private CurrentTreatment getCurrentTreatment(String name){
 
         CurrentTreatment ct = currentTreatmentRepository.findByName(name);
 
@@ -1235,10 +1243,10 @@ public class DataImportService {
 
                 //use the same dosing for all drugs
 
-                for(int i=0;i<drugArray.length;i++){
+                for (String s : drugArray) {
 
                     Treatment treatment = new Treatment();
-                    treatment.setName(drugArray[i].trim());
+                    treatment.setName(s.trim());
 
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setDose(doseArray[0].trim());
@@ -1282,10 +1290,10 @@ public class DataImportService {
 
                 String[] drugArray = drugString.split("\\+");
 
-                for(int i=0;i<drugArray.length;i++){
+                for (String s : drugArray) {
 
                     Treatment treatment = new Treatment();
-                    treatment.setName(drugArray[i].trim());
+                    treatment.setName(s.trim());
                     TreatmentComponent tc = new TreatmentComponent();
                     tc.setDose(doseString.trim());
                     tc.setTreatment(treatment);
@@ -1448,7 +1456,7 @@ public class DataImportService {
                     // NOTE:  IRCC uses passage 0 to mean Patient Tumor, so we need to harmonize according to the other
                     // sources.  Subtract 1 from every passage.
                     for (String p : passages) {
-                        Integer intPassage = Integer.parseInt(p);
+                        int intPassage = Integer.parseInt(p);
                         passageInts.add(intPassage - 1);
                     }
 
@@ -1480,123 +1488,123 @@ public class DataImportService {
         return markerRepository.findBySynonym(symbol);
     }
 
+    private void initializeMarkers(){
+
+        int markerCount = markerRepository.getMarkerCount();
+        log.info("Initializing {} markers.",markerCount);
+        int counter = 0;
+        int batchSize = 400;
+        while(counter < markerCount){
+
+            Collection<Marker> markerCollection = markerRepository.getAllMarkersSkipLimit(counter, batchSize);
+
+            for(Marker marker: markerCollection){
+                addMarkerToMap(marker);
+            }
+
+            counter += batchSize;
+            Float percent = ((float)counter / markerCount) * 100;
+            System.out.print(String.format("%s markers initialized (%.0f%%)...\r", counter, percent));
+        }
+
+        markersInitialized = true;
+    }
+
+    private void addMarkerToMap(Marker marker){
+
+        markersBySymbol.put(marker.getHgncSymbol(), marker);
+
+        if(marker.getAliasSymbols() != null){
+            for(String synonym : marker.getAliasSymbols()){
+
+                addMarkerToMapList(synonym, marker, markersBySynonym);
+            }
+        }
+
+        if(marker.getPrevSymbols() != null){
+            for(String prevSymbol : marker.getPrevSymbols()){
+
+                addMarkerToMapList(prevSymbol, marker, markersByPrevSymbol);
+            }
+        }
+
+    }
+
+    private void addMarkerToMapList(String key, Marker marker, Map<String, List<Marker>> mapList){
+
+        if(mapList == null) mapList = new HashMap<>();
+
+        if(mapList.containsKey(key)){
+            mapList.get(key).add(marker);
+        }
+        else{
+            List<Marker> markerList = new ArrayList<>();
+            markerList.add(marker);
+            mapList.put(key, markerList);
+        }
+
+    }
+
     public NodeSuggestionDTO getSuggestedMarker(String reporter, String dataSource, String modelId, String symbol,
                                                 String characterizationType, String platform){
 
-        //not found key to avoid looking up not found symbols multiple times
-        //key: datasource + modelId + symbol
-        if(notFoundMarkerSymbols.containsKey(dataSource+modelId+symbol)) return notFoundMarkerSymbols.get(dataSource+modelId+symbol);
+        if(!markersInitialized) initializeMarkers();
 
-        NodeSuggestionDTO nsdto = new NodeSuggestionDTO();
-        LogEntity le;
-        Marker m;
-        List<Marker> markerSuggestionList = null;
-        boolean ready = false;
+        NodeSuggestionDTO nodeSuggestionDTO = new NodeSuggestionDTO();
+        LogEntity logEntity = new LogEntity(reporter, dataSource, modelId);
+        Marker marker = null;
 
-        //check if marker is cached
-        if(markersBySymbol.containsKey(symbol)){
-            m = markersBySymbol.get(symbol);
-            nsdto.setNode(m);
-            ready = true;
+        if (markersBySymbol.containsKey(symbol)) {
+            marker = markersBySymbol.get(symbol);
+            nodeSuggestionDTO.setNode(marker);
         }
         else if(markersByPrevSymbol.containsKey(symbol)){
 
-            m = markersByPrevSymbol.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
-            nsdto.setLogEntity(le);
-            ready = true;
+            List<Marker> markerList = markersByPrevSymbol.get(symbol);
+            if (markerList.size() == 1) {
+                marker = markerList.get(0);
+                logEntity = logUpdateFromPreviousSymbol(reporter,dataSource, modelId, characterizationType, platform,
+                    symbol, marker.getHgncSymbol(),"Previous symbol");
+                nodeSuggestionDTO.setNode(marker);
+            }
+            else {
+                logEntity = logNoSingleValidSymbol(reporter,dataSource, modelId, characterizationType, platform,
+                    symbol, symbol,"");
+                String prevMarkers = markerList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
+                logEntity.setMessage("Previous symbol for multiple approved markers: {} "+prevMarkers);
+
+            }
+
         }
         else if(markersBySynonym.containsKey(symbol)){
 
-            m = markersBySynonym.get(symbol);
-            le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
-            nsdto.setLogEntity(le);
-            ready = true;
-        }
+            List<Marker> markerList = markersBySynonym.get(symbol);
 
-        if(ready) return nsdto;
-
-        m = getMarkerBySymbol(symbol);
-
-        if(m != null){
-
-            //good, pass the marker
-            //no message
-            nsdto.setNode(m);
-            markersBySymbol.put(symbol, m);
-        }
-        else{
-
-            markerSuggestionList = getMarkerByPrevSymbol(symbol);
-
-            if(markerSuggestionList != null && markerSuggestionList.size() > 0){
-
-                if(markerSuggestionList.size() == 1){
-                    //symbol found in prev symbols
-                    m = markerSuggestionList.get(0);
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Previous symbol");
-                    nsdto.setNode(m);
-                    nsdto.setLogEntity(le);
-                    markersByPrevSymbol.put(symbol, m);
-                }
-                else{
-
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                    String prevMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
-
-                    le.setMessage("Previous symbol for multiple approved markers: "+prevMarkers);
-                    le.setType("ERROR");
-                    nsdto.setNode(null);
-                    nsdto.setLogEntity(le);
-                }
-
-                return nsdto;
-
+            if(markerList.size() == 1) {
+                marker = markerList.get(0);
+                logEntity = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
+                        marker.getHgncSymbol(),"Synonym");
+                nodeSuggestionDTO.setNode(marker);
             }
             else{
-
-                markerSuggestionList = getMarkerBySynonym(symbol);
-
-                if(markerSuggestionList != null && markerSuggestionList.size() > 0){
-
-                    if(markerSuggestionList.size() == 1){
-
-                        //symbol found in synonym
-                        m = markerSuggestionList.get(0);
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, m.getHgncSymbol(),"Synonym");
-
-                        nsdto.setNode(m);
-                        nsdto.setLogEntity(le);
-                        markersBySynonym.put(symbol, m);
-                    }
-                    else{
-                        le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                        String synonymMarkers = markerSuggestionList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
-                        le.setMessage("Synonym for multiple markers: "+synonymMarkers);
-                        le.setType("ERROR");
-                        nsdto.setNode(null);
-                        nsdto.setLogEntity(le);
-                    }
-
-                    return nsdto;
-                }
-                else{
-
-                    //error, didn't find the symbol anywhere
-                    le = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol, "","");
-                    le.setMessage(symbol +" is an unrecognised symbol");
-                    le.setType("ERROR");
-                    nsdto.setLogEntity(le);
-                    notFoundMarkerSymbols.put(dataSource+modelId+symbol, nsdto);
-                }
+                logEntity = new MarkerLogEntity(reporter,dataSource, modelId, characterizationType, platform, symbol,
+                        symbol,"");
+                String synMarkers = markerList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
+                logEntity.setMessage("Synonym for multiple approved markers: {} "+synMarkers);
             }
+        }
+        else{
+            logEntity.setMessage("Unknown symbol: {} "+symbol);
 
         }
 
+        nodeSuggestionDTO.setLogEntity(logEntity);
 
-
-        return nsdto;
+        return nodeSuggestionDTO;
     }
 
 
+    public Marker getMarkerbyNcbiGeneId(String ncbiGene) {
+        return markerRepository.findByNcbiGeneId(ncbiGene);
+    }
 }

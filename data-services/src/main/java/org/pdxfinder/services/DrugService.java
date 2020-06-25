@@ -1,5 +1,9 @@
 package org.pdxfinder.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.TreatmentProtocol;
 import org.pdxfinder.graph.dao.TreatmentSummary;
@@ -19,16 +23,19 @@ public class DrugService {
     private TreatmentProtocolRepository treatmentProtocolRepository;
     private ResponseRepository responseRepository;
     private ModelCreationRepository modelCreationRepository;
+    private DataProjectionRepository dataProjectionRepository;
 
     public DrugService(TreatmentSummaryRepository treatmentSummaryRepository,
                        TreatmentProtocolRepository treatmentProtocolRepository,
                        ResponseRepository responseRepository,
-                       ModelCreationRepository modelCreationRepository) {
+                       ModelCreationRepository modelCreationRepository,
+                       DataProjectionRepository dataProjectionRepository) {
 
         this.treatmentSummaryRepository = treatmentSummaryRepository;
         this.treatmentProtocolRepository = treatmentProtocolRepository;
         this.responseRepository = responseRepository;
         this.modelCreationRepository = modelCreationRepository;
+        this.dataProjectionRepository = dataProjectionRepository;
     }
 
 
@@ -121,5 +128,36 @@ public class DrugService {
         return res;
 
     }
+
+
+    public List<CountDTO> getModelCountByDrugs(){
+
+        DataProjection dp = dataProjectionRepository.findByLabel("drug dosing counter");
+
+        List<CountDTO> result = new ArrayList<>();
+        Map<String, Set<Long>> data = new HashMap<>();
+        String responses = "{}";
+
+        if(dp != null) responses = dp.getValue();
+
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            data = mapper.readValue(responses, new TypeReference<Map<String, Set<Long>>>(){});
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        for(Map.Entry<String, Set<Long>> entry : data.entrySet()){
+            CountDTO c = new CountDTO(entry.getKey(), entry.getValue().size());
+            result.add(c);
+        }
+
+        Collections.sort(result, (CountDTO c1, CountDTO c2) -> c2.getValue()-c1.getValue());
+
+        return result;
+    }
+
 
 }

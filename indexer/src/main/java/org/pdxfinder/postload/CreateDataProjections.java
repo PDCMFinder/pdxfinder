@@ -1,9 +1,6 @@
 package org.pdxfinder.postload;
 
 import com.google.gson.Gson;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.neo4j.ogm.json.JSONArray;
 import org.neo4j.ogm.json.JSONObject;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
@@ -21,11 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,9 +34,9 @@ import java.util.stream.Collectors;
 /*
  * Created by csaba on 09/03/2018.
  */
-@Component
+@Service
 @Order(value = 90)
-public class CreateDataProjections implements CommandLineRunner, ApplicationContextAware{
+public class CreateDataProjections implements ApplicationContextAware{
 
     private final static Logger log = LoggerFactory.getLogger(CreateDataProjections.class);
     private DataImportService dataImportService;
@@ -50,8 +47,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     @Value("${user.home}")
     String homeDir;
 
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
 
     protected ReportManager reportManager;
@@ -73,18 +69,25 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     //"platform"=>"markercombos"=>"set of model ids"
     private Map<String, Map<String, Set<Long>>> immunoHistoChemistryDP = new HashMap<>();
 
+    //marker=>status=>set of model ids
+    private Map<String, Map<String, Set<Long>>> cytogeneticsDP = new HashMap<>();
+
     //"cnamarker"=>set of model ids
     private Map<String, Set<Long>> copyNumberAlterationDP = new HashMap<>();
 
+    //"platform"=>"marker"=>"set of model ids"
+    private Map<String, Map<String, Set<Long>>> expressionDP = new HashMap<>();
+
     private Map<String, List<DataAvailableDTO>> dataAvailableDP = new HashMap<>();
 
+    private TreeMap<String, Set<Long>> frequentlyMutatedMarkers = new TreeMap<>();
     private List<MutatedMarkerData> frequentlyMutatedMarkersDP = new ArrayList<>();
+
+    //name of drugs to model
+    private Map<String, Set<Long>> drugDosingDP = new HashMap<>();
 
     //"treatment name"=>"set of model ids"
     private Map<String, Set<Long>> patientTreatmentDP = new HashMap<>();
-
-
-    private Map<String, Set<Long>> transcriptomicsDP = new HashMap<>();
 
     protected static ApplicationContext context;
 
@@ -96,46 +99,34 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         this.utilityService = utilityService;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void run() {
 
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("createDataProjections", "Creating data projections");
-        parser.accepts("loadALL", "Load all, then create projections");
-        parser.accepts("loadSlim", "Load slim, then create projections");
-        parser.accepts("loadEssentials", "Load essentials then create projections");
-
-        OptionSet options = parser.parse(args);
         long startTime = System.currentTimeMillis();
 
-        if (options.has("createDataProjections") || options.has("loadALL")  || options.has("loadSlim") || options.has("loadEssentials")) {
 
-            log.info("Creating data projections");
+        log.info("Creating data projections");
 
-            reportManager = (ReportManager) context.getBean("ReportManager");
+        reportManager = (ReportManager) context.getBean("ReportManager");
 
-            createMutationDataProjection();
+        createMutationDataProjection();
 
-            createModelForQueryDataProjection();
+        createModelForQueryDataProjection();
 
-            createModelDrugResponseDataProjection();
+        createModelDrugResponseDataProjection();
 
-            createPatientTreatmentDataProjection();
+        createPatientTreatmentDataProjection();
 
-            createImmunoHistoChemistryDataProjection();
+        createImmunoHistoChemistryDataProjection();
 
-            createCNADataProjection();
+        createCNADataProjection();
 
-            createTranscriptomicsDataProjection();
+        createExpressionDataProjection();
 
-            createDataAvailableDataProjection();
+        createDataAvailableDataProjection();
 
-            createFrequentlyMutatedGenesDataProjection();
+        createFrequentlyMutatedGenesDataProjection();
 
-            saveDataProjections();
-
-        }
+        saveDataProjections();
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
@@ -162,6 +153,10 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
             ModelCreation model = dataImportService.findModelByMolChar(mc);
 
+            if(model == null){
+                log.error("Molchar {} with type {} is not linked to a sample! ",mc.getId(), mc.getType());
+                continue;
+            }
             Long modelId = model.getId();
 
             String platformName = "Not Specified";
@@ -177,12 +172,22 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                 for(MarkerAssociation ma: mas){
 
-                    Marker m = ma.getMarker();
+                    List<MolecularData> molecularData;
+                    try{
 
-                    if(m != null){
+                        molecularData = ma.decodeMolecularData();
+                    }
+                    catch (Exception e){
+                        log.error("No molecular data");
+                        molecularData = new ArrayList<>();
+                    }
 
-                        String variantName = ma.getAminoAcidChange();
-                        String markerName = m.getHgncSymbol();
+
+
+                    for(MolecularData md: molecularData){
+
+                        String variantName = md.getAminoAcidChange();
+                        String markerName = md.getMarker();
 
                         if(variantName != null && !variantName.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
@@ -192,10 +197,13 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
                             addToMutatedMarkerVariantDP(markerName, variantName);
 
                             addToThreeParamDP(mutatedPlatformMarkerVariantModelDP, platformName, markerName, variantName, modelId);
-
+                            addToFrequentlyMutatedMarkers(markerName, modelId);
                         }
 
+
                     }
+
+
                     count++;
                     if(count%10000 == 0) {log.info("Processed "+count+" MA objects");}
                     //if (count > 40000) break;
@@ -220,6 +228,12 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         for(MolecularCharacterization mc:ihcMolchars){
 
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
+
+            if(model == null){
+                log.error("Molchar {} with type {} is not linked to a sample! ",mc.getId(), mc.getType());
+                continue;
+            }
+
             Long modelId = model.getId();
 
             //the findModelWithSampleByMolchar should return exactly one sample object
@@ -249,23 +263,33 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
             Set<MarkerAssociation> mas = dataImportService.findMarkerAssocsByMolChar(mc);
 
-            Set<String> markerSet = new HashSet<>();
-
             if(mas != null){
 
                 for(MarkerAssociation ma: mas){
 
-                    Marker m = ma.getMarker();
+                    List<MolecularData> molecularData;
+                    try{
 
-                    if(m != null){
+                        molecularData = ma.decodeMolecularData();
+                    }
+                    catch (Exception e){
+                        log.error("No molecular data");
+                        molecularData = new ArrayList<>();
+                    }
 
-                        String ihcResult = ma.getCytogeneticsResult();
-                        String markerName = m.getHgncSymbol();
+
+                    for(MolecularData md:molecularData){
+
+                        String ihcResult = md.getCytogeneticsResult();
+                        String markerName = md.getMarker();
                         //log.info(ihcResult + markerName);
                         if(ihcResult != null && !ihcResult.isEmpty()  && markerName != null && !markerName.isEmpty()){
 
                             //this was needed to avoid issues with variants where the value was a single space " "
                             if(ihcResult.length()<3) ihcResult = "Not applicable";
+
+                            addToTwoParamDP(cytogeneticsDP, markerName, ihcResult.toLowerCase(), modelId);
+
                             if(ihcResult.toLowerCase().contains("pos")) ihcResult = "pos";
                             if(ihcResult.toLowerCase().contains("neg")) ihcResult = "neg";
 
@@ -350,69 +374,61 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         for(MolecularCharacterization mc:cnaMolchars) {
 
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
+            if(model == null){
+                log.error("Molchar {} with type {} is not linked to a sample! ",mc.getId(), mc.getType());
+                continue;
+            }
             Long modelId = model.getId();
 
-            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
-            for(Marker m : mas){
+            Set<String> mas = mc.getMarkers();
+            if(mas != null){
+                for(String m : mas){
 
 
-                if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
+                    if(copyNumberAlterationDP.containsKey(m)){
 
-                    copyNumberAlterationDP.get(m.getHgncSymbol()).add(modelId);
+                        copyNumberAlterationDP.get(m).add(modelId);
+                    }
+                    else{
+
+                        Set<Long> newSet = new HashSet<>();
+                        newSet.add(modelId);
+                        copyNumberAlterationDP.put(m, newSet);
+                    }
                 }
-                else{
 
-                    Set<Long> newSet = new HashSet<>();
-                    newSet.add(modelId);
-                    copyNumberAlterationDP.put(m.getHgncSymbol(), newSet);
-                }
             }
+
 
         }
 
         count++;
-
-
-        try {
-            addCharlesRiverCNA();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
-    private void createTranscriptomicsDataProjection(){
+    private void createExpressionDataProjection(){
 
 
-        Collection<MolecularCharacterization> transMolchars = dataImportService.findMolCharsByType("transcriptomics");
-        log.info("Looking at "+transMolchars.size()+" Transcriptomics MolChar objects. This may take a while folks...");
+        Collection<MolecularCharacterization> expressionMolchars = dataImportService.findMolCharsByType("expression");
+        log.info("Looking at "+expressionMolchars.size()+" Expression MolChar objects. This may take a while folks...");
 
-        int count = 0;
-
-        for(MolecularCharacterization mc:transMolchars) {
+        for(MolecularCharacterization mc:expressionMolchars) {
 
             ModelCreation model = dataImportService.findModelWithSampleByMolChar(mc);
+            if(model == null){
+                log.error("Molchar {} with type {} is not linked to a sample! ",mc.getId(), mc.getType());
+                continue;
+            }
             Long modelId = model.getId();
+            String platform = mc.getPlatform().getName();
+            Set<String> mas = mc.getMarkers();
 
-            Set<Marker> mas = dataImportService.findAllDistinctMarkersByMolCharId(mc.getId());
-            for(Marker m : mas){
-
-                if(transcriptomicsDP.containsKey(m.getHgncSymbol())){
-
-                    transcriptomicsDP.get(m.getHgncSymbol()).add(modelId);
-                }
-                else{
-
-                    Set<Long> newSet = new HashSet<>();
-                    newSet.add(modelId);
-                    transcriptomicsDP.put(m.getHgncSymbol(), newSet);
+            if(mas != null){
+                for(String m : mas){
+                    addToTwoParamDP(expressionDP, platform, m, modelId);
                 }
             }
-
         }
-
-        count++;
-
 
     }
 
@@ -458,11 +474,21 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             List<DataAvailableDTO> dataAvailableDTOList = new ArrayList<>();
 
             for(Map.Entry<String, Set<String>> platform :platformMap.entrySet()){
-
-                String[] platformArr = platform.getKey().split("___");
-
-                DataAvailableDTO dto = new DataAvailableDTO(platformArr[0], platformArr[1], Integer.toString(platform.getValue().size()), platformArr[2]);
-                dataAvailableDTOList.add(dto);
+                try {
+                    String[] platformArr = platform.getKey().split("___");
+                    String dataType = platformArr[0];
+                    String platformName = platformArr[1];
+                    String platformUrl = "";
+                    if(platformArr.length > 2){
+                        platformUrl = platformArr[2];
+                    }
+                    String numOfModels = Integer.toString(platform.getValue().size());
+                    DataAvailableDTO dto = new DataAvailableDTO(dataType, platformName, numOfModels, platformUrl);
+                    dataAvailableDTOList.add(dto);
+                }
+                catch(Exception e){
+                    log.error(platform.getKey());
+                }
             }
 
             int drugDosingStudies = dataImportService.findDrugDosingStudyNumberByDataSource(group.getAbbreviation());
@@ -869,7 +895,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
                                     cytogeneticsPlatformsByModel.get(mc.getId()).add(platformName);
                                 }
-                                else if (molc.getType().toLowerCase().equals("transcriptomics")) {
+                                else if (molc.getType().toLowerCase().equals("expression")) {
 
                                     if (!transcriptomicsPlatformsByModel.containsKey(mc.getId())) {
 
@@ -968,7 +994,7 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             }
 
             if(transcriptomicsPlatformsByModel.containsKey(mc.getId())){
-                dataAvailable.add("Transcriptomics");
+                dataAvailable.add("Expression");
             }
 
 
@@ -1321,9 +1347,17 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
     private void createFrequentlyMutatedGenesDataProjection(){
 
         log.info("Creating Frequently Mutated Genes DP");
-        frequentlyMutatedMarkersDP = dataImportService.getFrequentlyMutatedGenes();
 
+        for(Map.Entry<String, Set<Long>> entry : frequentlyMutatedMarkers.entrySet() ){
 
+            MutatedMarkerData mmd = new MutatedMarkerData();
+            mmd.setGene_name(entry.getKey());
+            mmd.setNumber_of_models(entry.getValue().size());
+
+            frequentlyMutatedMarkersDP.add(mmd);
+        }
+
+        frequentlyMutatedMarkersDP.sort(Comparator.comparing(MutatedMarkerData::getNumber_of_models).reversed());
     }
 
 
@@ -1335,6 +1369,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             //TODO: Remove regex after drug harmonization is done
             String drug = drugName.replaceAll("[^a-zA-Z0-9 _-]","");
             String response = responseVal.replaceAll("[^a-zA-Z0-9 _-]","");
+
+            addToDrugDosingDp(drug, modelId);
 
             if(modelDrugResponseDP.containsKey(drug)){
 
@@ -1367,7 +1403,25 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
     }
 
+    private void addToFrequentlyMutatedMarkers(String marker, Long modelId){
 
+        if(frequentlyMutatedMarkers.containsKey(marker)){
+            frequentlyMutatedMarkers.get(marker).add(modelId);
+        }
+        else{
+            Set<Long> set = new HashSet<>();
+            set.add(modelId);
+            frequentlyMutatedMarkers.put(marker, set);
+        }
+    }
+
+    private void addToDrugDosingDp(String drug, Long modelId){
+
+        if(!drugDosingDP.containsKey(drug)){
+            drugDosingDP.put(drug, new HashSet<>());
+        }
+        drugDosingDP.get(drug).add(modelId);
+    }
 
     private void saveDataProjections(){
 
@@ -1397,11 +1451,18 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             drugDP.setLabel("ModelDrugData");
         }
 
-        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("cytogenetics");
+        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("breast cancer markers");
 
         if(ihcDP == null){
             ihcDP = new DataProjection();
-            ihcDP.setLabel("cytogenetics");
+            ihcDP.setLabel("breast cancer markers");
+        }
+
+        DataProjection cytoDP = dataImportService.findDataProjectionByLabel("cytogenetics");
+
+        if(cytoDP == null){
+            cytoDP = new DataProjection();
+            cytoDP.setLabel("cytogenetics");
         }
 
         DataProjection cnaDP = dataImportService.findDataProjectionByLabel("copy number alteration");
@@ -1413,12 +1474,12 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
 
-        DataProjection transDP = dataImportService.findDataProjectionByLabel("transcriptomics");
+        DataProjection expDP = dataImportService.findDataProjectionByLabel("expression");
 
 
-        if(transDP == null){
-            transDP = new DataProjection();
-            transDP.setLabel("transcriptomics");
+        if(expDP == null){
+            expDP = new DataProjection();
+            expDP.setLabel("expression");
         }
 
 
@@ -1443,14 +1504,19 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
             ptDP.setLabel("patient treatment");
         }
 
+        DataProjection ddDP = dataImportService.findDataProjectionByLabel("drug dosing counter");
 
+        if(ddDP == null){
+            ddDP = new DataProjection();
+            ddDP.setLabel("drug dosing counter");
+        }
 
-        JSONObject j1 ,j2, j3, j4, j5, j6, j7;
+        JSONObject json;
 
 
         try{
-            j1 = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
-            pmvmDP.setValue(j1.toString());
+            json = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
+            pmvmDP.setValue(json.toString());
         }
         catch(Exception e){
 
@@ -1459,16 +1525,16 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
-            j2 = new JSONObject(mutatedMarkerVariantDP.toString());
-            mvDP.setValue(j2.toString());
+            json = new JSONObject(mutatedMarkerVariantDP.toString());
+            mvDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
             log.error(mutatedMarkerVariantDP.toString());
         }
         try{
-            j3 = new JSONObject(modelDrugResponseDP.toString());
-            drugDP.setValue(j3.toString());
+            json = new JSONObject(modelDrugResponseDP.toString());
+            drugDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
@@ -1476,8 +1542,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
-            j4 = new JSONObject(immunoHistoChemistryDP.toString());
-            ihcDP.setValue(j4.toString());
+            json = new JSONObject(immunoHistoChemistryDP.toString());
+            ihcDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
@@ -1485,8 +1551,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
-            j5 = new JSONObject(copyNumberAlterationDP.toString());
-            cnaDP.setValue(j5.toString());
+            json = new JSONObject(copyNumberAlterationDP.toString());
+            cnaDP.setValue(json.toString());
         }
         catch(Exception e){
             e.printStackTrace();
@@ -1494,8 +1560,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
-            j6 = new JSONObject(dataAvailableDP.toString());
-            daDP.setValue(j6.toString());
+            json = new JSONObject(dataAvailableDP.toString());
+            daDP.setValue(json.toString());
         }
         catch(Exception e){
 
@@ -1504,8 +1570,8 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         }
 
         try{
-            j7 = new JSONObject(patientTreatmentDP.toString());
-            ptDP.setValue(j7.toString());
+            json = new JSONObject(patientTreatmentDP.toString());
+            ptDP.setValue(json.toString());
             System.out.println();
         }
         catch(Exception e){
@@ -1515,13 +1581,42 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
 
 
         try{
-            //ja1 = new JSONArray(frequentlyMutatedMarkersDP.toString());
             fmgDP.setValue(frequentlyMutatedMarkersDP.toString());
         }
         catch(Exception e){
 
             e.printStackTrace();
             log.error(frequentlyMutatedMarkersDP.toString());
+        }
+
+        try{
+            json = new JSONObject(cytogeneticsDP.toString());
+            cytoDP.setValue(json.toString());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(cytogeneticsDP.toString());
+        }
+
+        try{
+            json = new JSONObject(expressionDP.toString());
+            expDP.setValue(json.toString());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(expressionDP.toString());
+        }
+
+        try{
+            json = new JSONObject(drugDosingDP.toString());
+            ddDP.setValue(json.toString());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            log.error(drugDosingDP.toString());
         }
 
 
@@ -1533,6 +1628,9 @@ public class CreateDataProjections implements CommandLineRunner, ApplicationCont
         dataImportService.saveDataProjection(daDP);
         dataImportService.saveDataProjection(fmgDP);
         dataImportService.saveDataProjection(ptDP);
+        dataImportService.saveDataProjection(cytoDP);
+        dataImportService.saveDataProjection(expDP);
+        dataImportService.saveDataProjection(ddDP);
 
     }
 
