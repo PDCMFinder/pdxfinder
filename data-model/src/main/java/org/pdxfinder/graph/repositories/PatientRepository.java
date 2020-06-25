@@ -19,6 +19,21 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
     Patient findByExternalIdAndGroup(@Param("externalId") String externalId, @Param("g") Group g);
 
 
+    @Query("MATCH (ps:PatientSnapshot)-[patRel:COLLECTION_EVENT]-(p:Patient)--(g:Group) WHERE id(g) = {g} RETURN p, patRel, ps ORDER BY p.externalId")
+    List<Patient> findByGroup(@Param("g") Group g);
+
+
+    @Query("MATCH (g:Group)--(p:Patient)-[patRel:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sf:SAMPLED_FROM]-(s:Sample)-[ii:IMPLANTED_IN]-(mod:ModelCreation) " +
+            "WHERE id(g) = {g} " +
+            "WITH p, patRel, ps, sf, s, ii, mod " +
+            "MATCH (s)-[o:ORIGIN_TISSUE]-(t:Tissue) "+
+            "MATCH (s)-[ot:OF_TYPE]-(tt:TumorType) " +
+            "MATCH (s)-[ssr:SAMPLE_SITE]-(ss:Tissue) "+
+            "RETURN p, patRel, ps, sf, s, ii, mod, o, t, ot, tt, ssr, ss ORDER BY p.externalId")
+    List<Patient> findPatientTumorAtCollectionDataByDS(@Param("g") Group g);
+
+
+
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
             "MATCH (s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pt:PATIENT]-(p:Patient) " +
             "WHERE mod.sourcePdxId = {modelId} " +
@@ -57,11 +72,11 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
             "            RETURN pat,patRel,ps,sfrm,psamp,char,molch,mAss,m SKIP {skip} LIMIT {lim} ")
     Set<Patient> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                       @Param("modelId") String modelId,
-                                                       @Param("tech") String tech,
-                                                       @Param("search") String search,
-                                                       @Param("skip") int skip,
-                                                       @Param("lim") int lim);
+                                                      @Param("modelId") String modelId,
+                                                      @Param("tech") String tech,
+                                                      @Param("search") String search,
+                                                      @Param("skip") int skip,
+                                                      @Param("lim") int lim);
 
 
     @Query("MATCH(pat:Patient)-[patRel:PATIENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
@@ -76,9 +91,9 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
             "            RETURN count(*) ")
     Integer countByBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                      @Param("modelId") String modelId,
-                                                      @Param("tech") String tech,
-                                                      @Param("search") String search);
+                                            @Param("modelId") String modelId,
+                                            @Param("tech") String tech,
+                                            @Param("search") String search);
 
 
     @Query("MATCH (p:Patient)--(ps:PatientSnapshot)--(s:Sample)--(mod:ModelCreation) " +
@@ -127,7 +142,6 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "AND samp.sourceSampleId = {sourceSampleId} " +
             " RETURN mod.sourcePdxId ")
     String getModelIdByDataSourceAndPatientSampleId(@Param("dataSource") String dataSource,
-                                                                          @Param("sourceSampleId") String modelId);
+                                                    @Param("sourceSampleId") String modelId);
 
 }
-
