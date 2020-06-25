@@ -807,10 +807,12 @@
                                             <input type="checkbox" class="dd-input" id="test">
 
                                             <ul class="dd-menu">
-                                                <li th:each="dataRow,iter : ${data.molecularDataRows}">
-                                                    <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/'+${#strings.replace(dataRow.molcharType,' ','-')}+'/'+${dataRow.molcharId}+'/export'}"
-                                                       th:text="${#strings.capitalizeWords(dataRow.molcharType)}"> Download ... </a>
-                                                </li>
+                                                <th:block th:each="dataRow,iter : ${data.molecularDataRows}">
+                                                    <li th:if="${dataRow.isVisible == 'YES' and dataRow.dataAssociated == 'YES'}">
+                                                        <a th:href="@{'/pdx/'+${data.dataSource}+'/'+${data.modelId}+'/'+${#strings.replace(dataRow.molcharType,' ','-')}+'/'+${dataRow.molcharId}+'/export'}"
+                                                           th:text="${#strings.capitalizeWords(dataRow.molcharType)}"> Download ... </a>
+                                                    </li>
+                                                </th:block>
 
                                                 <li class="divider"></li>
                                                 <!--<li>
