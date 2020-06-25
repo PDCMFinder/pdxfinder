@@ -14,7 +14,7 @@ public class MolecularDataEntryDTO {
     private String platformUsedLabel;
     private String platformUsedUrl;
     private String rawDataLabel;
-    private String rawDataUrl;
+    private String rawDataLink;
 
     private String molcharId;
 
@@ -23,8 +23,7 @@ public class MolecularDataEntryDTO {
     private String isVisible;
 
     public MolecularDataEntryDTO(String sampleId, String sampleType, String engraftedTumorPassage, String dataAvailableLabel,
-                                 String dataAvailableUrl, String platformUsedLabel, String platformUsedUrl, String rawDataLabel,
-                                 String rawDataUrl) {
+                                 String dataAvailableUrl, String platformUsedLabel, String platformUsedUrl, String rawDataLabel) {
 
         this.sampleId = sampleId;
         this.sampleType = sampleType;
@@ -34,7 +33,6 @@ public class MolecularDataEntryDTO {
         this.platformUsedLabel = platformUsedLabel;
         this.platformUsedUrl = platformUsedUrl;
         this.rawDataLabel = rawDataLabel;
-        this.rawDataUrl = rawDataUrl;
     }
 
     public MolecularDataEntryDTO() {
@@ -104,14 +102,6 @@ public class MolecularDataEntryDTO {
         this.rawDataLabel = rawDataLabel;
     }
 
-    public String getRawDataUrl() {
-        return rawDataUrl;
-    }
-
-    public void setRawDataUrl(String rawDataUrl) {
-        this.rawDataUrl = rawDataUrl;
-    }
-
     public String getHistology() {
         return histology;
     }
@@ -151,4 +141,13 @@ public class MolecularDataEntryDTO {
     public void setIsVisible(String isVisible) {
         this.isVisible = isVisible;
     }
+
+    public String getRawDataLink() {
+        return rawDataLink;
+    }
+
+    public void setRawDataLink(String rawDataLink) {
+        this.rawDataLink = rawDataLink;
+    }
+
 }

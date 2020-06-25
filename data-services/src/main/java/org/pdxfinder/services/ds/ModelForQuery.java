@@ -42,6 +42,9 @@ public class ModelForQuery {
     private Set<String> allOntologyTermAncestors;
 
     private List<String> breastCancerMarkers;
+    private List<String> geneExpression;
+    private List<String> cytogenetics;
+
     private Set<String> queryMatch;
 
 
@@ -479,6 +482,36 @@ public class ModelForQuery {
 
         if(!this.cnaMarkers.contains(s)){
             this.cnaMarkers.add(s);
+        }
+    }
+
+    public List<String> getGeneExpression() {
+        return geneExpression;
+    }
+
+    public void setGeneExpression(List<String> geneExpression) {
+        this.geneExpression = geneExpression;
+    }
+
+    public List<String> getCytogenetics() {
+        return cytogenetics;
+    }
+
+    public void setCytogenetics(List<String> cytogenetics) {
+        this.cytogenetics = cytogenetics;
+    }
+
+    public void addGeneExpression(String s){
+        if(this.geneExpression == null) this.geneExpression = new ArrayList<>();
+        if(!this.geneExpression.contains(s)){
+            this.geneExpression.add(s);
+        }
+    }
+
+    public void addCytogenetics(String s){
+        if(this.cytogenetics == null) this.cytogenetics = new ArrayList<>();
+        if(!this.cytogenetics.contains(s)){
+            this.cytogenetics.add(s);
         }
     }
 }

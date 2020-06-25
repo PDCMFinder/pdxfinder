@@ -49,13 +49,16 @@ public class SearchController {
                   @RequestParam("project") Optional<List<String>> project,
                   @RequestParam("data_available") Optional<List<String>> data_available,
                   @RequestParam("breast_cancer_markers") Optional<List<String>> breast_cancer_markers,
-                  @RequestParam("copy_number_alteration") Optional<List<String>> copy_number_alteration
+                  @RequestParam("copy_number_alteration") Optional<List<String>> copy_number_alteration,
+                  @RequestParam("gene_expression") Optional<List<String>> gene_expression,
+                  @RequestParam("cytogenetics") Optional<List<String>> cytogenetics
     ) {
 
 
         ExportDTO eDTO = searchService.export(query, datasource,
                 diagnosis, patient_age, patient_treatment, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, copy_number_alteration);
+                sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, copy_number_alteration,
+                gene_expression, cytogenetics);
 
         Set<ModelForQueryExport> exportResults = eDTO.getResults().stream().map(ModelForQueryExport::new).collect(Collectors.toSet());
 
@@ -101,12 +104,15 @@ public class SearchController {
                    @RequestParam("data_available") Optional<List<String>> data_available,
                    @RequestParam("breast_cancer_markers") Optional<List<String>> breast_cancer_markers,
                    @RequestParam("copy_number_alteration") Optional<List<String>> copy_number_alteration,
+                   @RequestParam("gene_expression") Optional<List<String>> gene_expression,
+                   @RequestParam("cytogenetics") Optional<List<String>> cytogenetics,
                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                    @RequestParam(value = "size", defaultValue = "10") Integer size){
 
         model.addAttribute("websearch", searchService.webSearch(query, datasource,
                 diagnosis, patient_age, patient_treatment, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
-                sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, copy_number_alteration, page, size));
+                sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, copy_number_alteration, gene_expression,
+                cytogenetics, page, size));
 
         return "search";
     }

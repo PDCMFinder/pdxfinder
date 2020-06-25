@@ -61,7 +61,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
     }
 
 
-    public void initTemplates(String updogCurrDir) throws Exception {
+    public void initTemplates(String updogCurrDir) {
 
         log.info("******************************************************");
         log.info("* Initializing Sheet data                            *");
@@ -139,7 +139,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
             return Optional.of(workbook);
 
         } catch (IOException e) {
-            log.error("There was a problem accessing the file: {}", e);
+            log.error("There was a problem accessing the file: {}", file, e);
         }
         return Optional.empty();
     }
@@ -208,7 +208,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
      */
     private void createDataSourceGroup() {
 
-        //TODO: this data has to come from the spreadsheet, I am using constants for now
 
         log.info("******************************************************");
         log.info("* Creating DataSource                                *");
@@ -377,7 +376,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
                 mc.setSample(sample);
                 mc.addRelatedSample(sample);
 
-                patient.hasSnapshot(ps);
+                patient.addSnapshot(ps);
 
                 dataImportService.savePatient(patient);
                 dataImportService.savePatientSnapshot(ps);
@@ -775,14 +774,18 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
             String platformTag = "";
 
-            if(molCharType.equals("mutation")){
-                platformTag = "_mut";
-            }
-            else if(molCharType.equals("copy number alteration")){
-                platformTag = "_cna";
-            }
-            else if(molCharType.equals("transcriptomics")){
-                platformTag = "_trans";
+            switch(molCharType) {
+                case "mutation" :
+                    platformTag = "_mut";
+                    break;
+                case "copy number alteration" :
+                    platformTag = "_cna";
+                    break;
+                case "expression" :
+                    platformTag = "_expr";
+                    break;
+                default:
+                    break;
             }
 
 
@@ -992,8 +995,6 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
 
         platformURL = new HashMap<>();
-        //platformURL.put("CRL__CGH_array", "/platform/curie-lc-cna/");
-        //platformURL.put("CRL__Targeted_NGS", "/platform/curie-lc-mutation/");
 
         if (dataSourceAbbreviation.equals("CRL")) {
             omicDataFilesType = "ONE_FILE_PER_MODEL";
@@ -1041,8 +1042,8 @@ public class UniversalLoader extends UniversalLoaderOmic {
 
                 // Transcriptomics
                 if(transcriptomicData.exists()){
-                    log.info("Loading transcriptomics for "+modelId);
-                    loadOmicData(modelCreation, ds, "transcriptomics", providerDataRootDir);
+                    log.info("Loading expression for  {}",modelId);
+                    loadOmicData(modelCreation, ds, "expression", providerDataRootDir);
                 }
 
 
@@ -1233,6 +1234,7 @@ public class UniversalLoader extends UniversalLoaderOmic {
         //TODO: At some point deal with micro-satelite instability. Currently those rows are skipped. We don't want instability in our lives just yet.
 
         //first get all markers for the individual molchar objects
+        MarkerAssociation ma = new MarkerAssociation();
         for (List<String> dataRow : cytogeneticsSheetData) {
 
             String sampleId = dataRow.get(0);
@@ -1310,13 +1312,13 @@ public class UniversalLoader extends UniversalLoaderOmic {
                     toBeCreatedMolcharNodes.put(molcharKey, molecularCharacterization);
                 }
 
+                MolecularData md = new MolecularData();
+                md.setMarker(marker.getHgncSymbol());
 
-                MarkerAssociation ma = new MarkerAssociation();
-                ma.setMarker(marker);
 
                 if (technique.toLowerCase().equals("immunohistochemistry") || technique.toLowerCase().equals("fish")) {
 
-                    ma.setCytogeneticsResult(markerStatus);
+                    md.setCytogeneticsResult(markerStatus);
                 }
                 //what if it is not ihc?
 

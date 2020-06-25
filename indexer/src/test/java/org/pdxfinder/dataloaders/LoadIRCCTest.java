@@ -32,15 +32,13 @@ public class LoadIRCCTest extends BaseTest {
         badAccess = new Group();
         badAccess.setName("another group");
 
-        loader.providerDS = new Group(
+        loader.providerDS = Group.createProviderGroup(
             "Test IRCC Provider",
             "IRCC-CRC",
             "Test provider description",
             "Academia",
             "Joe Bloggs",
             "ircc.example.com");
-
-
     }
 
     @MockBean UtilityService utilityService;

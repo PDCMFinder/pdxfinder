@@ -33,7 +33,7 @@ public class PrintReport implements CommandLineRunner, ApplicationContextAware {
     ReportManager reportManager;
 
 
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderLogDir;
 
     private UtilityService utilityService;
