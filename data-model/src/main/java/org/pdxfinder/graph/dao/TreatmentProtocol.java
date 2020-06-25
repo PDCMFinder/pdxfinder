@@ -1,5 +1,6 @@
 package org.pdxfinder.graph.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import javax.persistence.GeneratedValue;
@@ -167,6 +168,7 @@ public class TreatmentProtocol {
         for(TreatmentComponent comp:components){
 
             String dur = comp.getDuration();
+            if(StringUtils.isBlank(dur)) dur = "NA";
 
             if(includeControlDrugs){
                 if(!durString.isEmpty()){
@@ -200,6 +202,8 @@ public class TreatmentProtocol {
 
             String dose = comp.getDose();
 
+            if(StringUtils.isBlank(dose)) dose = "NA";
+
             if(includeControlDrugs){
                 if(!doseString.isEmpty()){
                     doseString+=" / ";
@@ -209,7 +213,7 @@ public class TreatmentProtocol {
             //include only Drugs but no Controls
             else{
 
-                if(comp.getType().equals("Drug")){
+                if(!comp.getType().equals("Control")){
 
                     if(!doseString.isEmpty()){
                         doseString+=" / ";
