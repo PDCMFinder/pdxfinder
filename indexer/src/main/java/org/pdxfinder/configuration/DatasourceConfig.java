@@ -1,4 +1,4 @@
-package org.pdxfinder;
+package org.pdxfinder.configuration;
 
 import org.apache.commons.io.FileUtils;
 import org.neo4j.ogm.session.SessionFactory;
@@ -24,28 +24,39 @@ import java.io.File;
 import java.io.IOException;
 
 @Configuration
-@EnableNeo4jRepositories(basePackages = "org.pdxfinder.graph")
-@EnableJpaRepositories(basePackages = "org.pdxfinder.rdbms", transactionManagerRef = "h2TransactionManager")
+@EnableNeo4jRepositories(
+    basePackages = "org.pdxfinder.graph.repositories",
+    transactionManagerRef = "neo4jTransactionManager")
+@EnableJpaRepositories(
+    basePackages = "org.pdxfinder.rdbms.repositories",
+    transactionManagerRef = "h2TransactionManager")
 @EnableTransactionManagement
 public class DatasourceConfig {
 
-  @Value("${spring.data.neo4j.uri}") private String embeddedDataDir;
-  @Value("${db-cache-dir}") private String cacheDataDir;
-  @Value("${db-refresh}") private boolean embeddedDbRefresh;
+  @Value("${spring.data.neo4j.uri}")
+  private String embeddedDataDir;
 
-  @Primary
+  @Value("${db-cache-dir}")
+  private String cacheDataDir;
+
+  @Value("${db-refresh}")
+  private boolean embeddedDbRefresh;
+
+  @Value("${data-dir}")
+  private String dataDir;
+
   @Bean
   public SessionFactory sessionFactory() throws IOException {
-
     refreshEmbeddedDBFromCache();
-    org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration.Builder()
+    return new SessionFactory(neo4jConfiguration(), "org.pdxfinder.graph");
+  }
+
+  private org.neo4j.ogm.config.Configuration neo4jConfiguration() {
+    return new org.neo4j.ogm.config.Configuration.Builder()
         .uri(embeddedDataDir)
         .autoIndex("assert")
         .build();
-    SessionFactory sessionFactory =  new SessionFactory(config, "org.pdxfinder.graph");
-    return sessionFactory;
   }
-
 
   @Primary
   @Bean(name = "neo4jTransactionManager")
@@ -58,10 +69,21 @@ public class DatasourceConfig {
    *     RELATIONAL DATABASE CONFIGURATION           *
    **************************************************/
 
-  @Bean(name = "dataSource")
-  @ConfigurationProperties(prefix = "spring.datasource")
+  @Bean
+  @ConfigurationProperties("h2.datasource")
   public DataSource dataSource() {
-    return DataSourceBuilder.create().build();
+      String url = String.format(
+          "jdbc:h2:%s/h2-db/data;" +
+          "AUTO_SERVER=true;" +
+          "DB_CLOSE_ON_EXIT=FALSE",
+          dataDir
+      );
+      return DataSourceBuilder.create()
+          .driverClassName("org.h2.Driver")
+          .url(url)
+          .username("neo4j")
+          .password("neo5j")
+          .build();
   }
 
   @Bean
@@ -70,7 +92,7 @@ public class DatasourceConfig {
   }
 
   @Autowired
-  @Bean(name = "h2TransactionManager")
+  @Bean
   public JpaTransactionManager h2TransactionManager(
       LocalContainerEntityManagerFactoryBean entityManagerFactory
   ) throws Exception {
@@ -84,8 +106,10 @@ public class DatasourceConfig {
 
   @Autowired
   @Bean(name = "transactionManager")
-  public PlatformTransactionManager transactionManager(Neo4jTransactionManager neo4jTransactionManager,
-                                                       JpaTransactionManager h2TransactionManager) {
+  public PlatformTransactionManager transactionManager(
+      Neo4jTransactionManager neo4jTransactionManager,
+      JpaTransactionManager h2TransactionManager
+  ) {
     return new ChainedTransactionManager(
             h2TransactionManager,
             neo4jTransactionManager
