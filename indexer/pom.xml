@@ -39,15 +39,19 @@
             <version>4.8</version>
         </dependency>
         <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli-spring-boot-starter</artifactId>
+            <version>4.0.4</version>
+        </dependency>
+        <dependency>
             <groupId>org.pdxfinder</groupId>
             <artifactId>data-services</artifactId>
         </dependency>
 
-        <!-- For loading excel documents -->
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.15</version>
+            <groupId>tech.tablesaw</groupId>
+            <artifactId>tablesaw-core</artifactId>
+            <version>LATEST</version>
         </dependency>
 
     </dependencies>

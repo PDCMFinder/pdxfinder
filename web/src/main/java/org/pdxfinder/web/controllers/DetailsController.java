@@ -1,48 +1,37 @@
 package org.pdxfinder.web.controllers;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import org.apache.commons.collections4.ListUtils;
 import org.pdxfinder.services.DetailsService;
 import org.pdxfinder.services.PdfService;
+import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.dto.DetailsDTO;
 import org.pdxfinder.services.pdf.Label;
 import org.pdxfinder.services.pdf.PdfHelper;
 import org.pdxfinder.services.pdf.Report;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
-/*
- * Created by abayomi on 09/05/2018.
- */
+
 @Controller
 public class DetailsController {
 
 
     private DetailsService detailsService;
+    private UtilityService utilityService;
+    private PdfService pdfService;
 
-    @Autowired
-    PdfService pdfService;
-
-
-    @Autowired
-    public DetailsController(DetailsService detailsService) {
+    public DetailsController(DetailsService detailsService, UtilityService utilityService, PdfService pdfService) {
         this.detailsService = detailsService;
+        this.utilityService = utilityService;
+        this.pdfService = pdfService;
     }
 
-
-    @RequestMapping(value = "/pdx/{dataSrc}/{modelId:.+}")
+    @GetMapping("/pdx/{dataSrc}/{modelId:.+}")
     public String details(Model model,
                           @PathVariable String dataSrc,
                           @PathVariable String modelId,
@@ -54,41 +43,21 @@ public class DetailsController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/pdx/{dataSrc}/{modelId}/{dataType}/export")
+    @GetMapping("/pdx/{dataSrc}/{modelId}/{molcharType}/{molcharId}/export")
     @ResponseBody
     public String download(HttpServletResponse response,
                            @PathVariable String dataSrc,
                            @PathVariable String modelId,
-                           @PathVariable String dataType) {
+                           @PathVariable String molcharType,
+                           @PathVariable String molcharId) throws IOException {
 
-        List<List<String>> variationDataCSV = detailsService.getVariationDataByMolcharTypeCSV(dataSrc, modelId, dataType);
-
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema.Builder builder = CsvSchema.builder();
-
-        List<String> csvHead = detailsService.getCsvHead(dataType);
-
-        for (String head : csvHead){
-            builder.addColumn(head);
-        }
-        CsvSchema  schema = builder.build().withHeader();
-
-
-        String output = "CSV output";
-        try {
-            output = mapper.writer(schema).writeValueAsString(variationDataCSV);
-        } catch (JsonProcessingException e) {}
+        List<Map<String, Object>> molecularDataRowDTOS = detailsService.getMolecularDataTable(molcharId).getMolecularDataCsv();
+        String output = utilityService.serializeToCsvWithIncludeNonEmpty(molecularDataRowDTOS);
 
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=pdxfinder.org_"+dataType + dataSrc + "_" + modelId + ".csv");
-        try{
-            response.getOutputStream().flush();
-        }catch (Exception e){
-
-        }
+        response.setHeader("Content-Disposition", String.format("attachment; filename=pdxfinder.org_%s_%s_%s.csv",dataSrc, modelId, molcharType));
+        response.getOutputStream().flush();
         return output;
-
-
     }
 
 
@@ -117,7 +86,6 @@ public class DetailsController {
 
         return "pdf-generator";
     }
-
 
 }
 

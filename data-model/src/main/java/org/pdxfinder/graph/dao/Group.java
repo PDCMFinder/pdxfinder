@@ -1,17 +1,16 @@
 package org.pdxfinder.graph.dao;
 
-/*
- * Created by csaba on 26/06/2018.
- */
-
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
-
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @NodeEntity
 public class Group {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name; //The name of the group, ie: The Jackson Laboratory
@@ -31,8 +30,7 @@ public class Group {
 
     private String url; // a url to their website
 
-    public Group() {
-    }
+    public Group() { }
 
     public Group(String name, String abbrev, String type) {
         this.name = name;
@@ -40,24 +38,35 @@ public class Group {
         this.abbreviation = abbrev;
     }
 
-
-    //Special constructor for Provider Groups
-    public Group(String name, String abbrev, String description, String providerType, String contact, String url){
-
-        this.name = name;
-        this.abbreviation = abbrev;
-        this.description = description;
-        this.providerType = providerType;
-        this.contact = contact;
-        this.url = url;
-        this.type = "Provider";
+    public static Group createAccessibilityGroup(
+        String accessibility,
+        String accessModalities
+    ) {
+        Group ag = new Group();
+        ag.setName("Has access information");
+        ag.setType("Accessibility");
+        ag.setAccessibility(accessibility);
+        ag.setAccessModalities(accessModalities);
+        return ag;
     }
 
-    //Special constructor for Accessibility groups
-    public Group(String accessibility, String accessModalities) {
-        this.type = "Accessibility";
-        this.accessibility = accessibility;
-        this.accessModalities = accessModalities;
+    public static Group createProviderGroup(
+        String name,
+        String abbreviation,
+        String description,
+        String providerType,
+        String contact,
+        String url
+    ) {
+        Group pg = new Group();
+        pg.setName(name);
+        pg.setType("Provider");
+        pg.setProviderType(providerType);
+        pg.setAbbreviation(abbreviation);
+        pg.setDescription(description);
+        pg.setContact(contact);
+        pg.setUrl(url);
+        return pg;
     }
 
     public String getName() {
@@ -155,4 +164,36 @@ public class Group {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        return new EqualsBuilder()
+            .append(getName(), group.getName())
+            .append(getType(), group.getType())
+            .append(getAccessibility(), group.getAccessibility())
+            .append(getAccessModalities(), group.getAccessModalities())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getName())
+            .append(getType())
+            .append(getAccessibility())
+            .append(getAccessModalities())
+            .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s: %s]", this.type, this.name);
+    }
+
 }

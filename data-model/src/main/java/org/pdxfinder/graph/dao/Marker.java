@@ -1,9 +1,11 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
-
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,23 +15,24 @@ import java.util.Set;
 @NodeEntity
 public class Marker {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     Long id;
 
     @Index
-    String hgncSymbol;              // This is the approved Symbol in HGNC - KRAS
-    String hgncName;                // This is the approved name in HGNC KRAS proto-oncogene, GTPase
-    String hgncId;                  // This is the hugo unique ID - e.g HGNC:6407
-    String ucscGeneId;
+    private String hgncSymbol;
+    private String hgncName;
+    private String hgncId;
+    private String ucscGeneId;
 
-    String ensemblGeneId;
-    String ncbiGeneId;
-    String uniprotId;               // e.g For human KRAS : P01116
-
+    private String ensemblGeneId;
+    private String ncbiGeneId;
+    private String uniprotId;
+    
     @Index
-    Set<String> prevSymbols;
+    private Set<String> prevSymbols;
     @Index
-    Set<String> aliasSymbols;       // This was formerly called synonymns
+    private Set<String> aliasSymbols;
 
 
 
@@ -39,7 +42,24 @@ public class Marker {
     public Marker(String hgncSymbol, String hgncName) {
         this.hgncSymbol = hgncSymbol;
         this.hgncName = hgncName;
+        this.prevSymbols = new HashSet<>();
+        this.aliasSymbols = new HashSet<>();
 
+    }
+
+    public static Marker createMarker(String symbol, String ensemblId, String hgncId, String ncbiId, String[] synonyms, String[] prevSymbols) {
+        Marker m = new Marker();
+        m.setHgncSymbol(symbol);
+        m.setEnsemblGeneId(ensemblId);
+        m.setHgncId(hgncId);
+        m.setNcbiGeneId(ncbiId);
+        for (String s : synonyms) {
+            m.addAliasSymbols(s);
+        }
+        for (String s : prevSymbols) {
+            m.addPrevSymbol(s);
+        }
+        return m;
     }
 
     public String getHgncSymbol() {
@@ -48,6 +68,10 @@ public class Marker {
 
     public void setHgncSymbol(String hgncSymbol) {
         this.hgncSymbol = hgncSymbol;
+    }
+
+    public boolean hasHgncSymbol() {
+        return StringUtils.isNotEmpty(this.hgncSymbol);
     }
 
     public String getHgncName() {

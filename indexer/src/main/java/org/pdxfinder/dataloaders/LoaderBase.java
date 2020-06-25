@@ -203,7 +203,7 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
      *     SKELETON OF LOADING ALGORITHM STANDARDIZED IN A TEMPLATE METHOD        *
      *******************************************************************************/
 
-    public final void globalLoadingOrder() throws Exception {
+    public final void globalLoadingOrder() {
 
         step00StartReportManager();
         step02GetMetaDataJSON();
@@ -216,20 +216,27 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
 
         for (int i = 0; i < jsonArray.length(); i++) {
             dto = new LoaderDTO();
-            this.jsonData = jsonArray.getJSONObject(i);
+            try {
+                this.jsonData = jsonArray.getJSONObject(i);
+                step08GetMetaData();
+                step09LoadPatientData();
+                step10LoadExternalURLs();
 
-            step08GetMetaData();
-            step09LoadPatientData();
-            step10LoadExternalURLs();
-            step11LoadBreastMarkers();
-            step12CreateModels();
-            step13LoadSpecimens();
-            step14LoadPatientTreatments();
-            step17LoadModelDosingStudies();
-            step16LoadVariationData();
+                step12CreateModels();
+                step13LoadSpecimens();
+                step14LoadPatientTreatments();
+                step17LoadModelDosingStudies();
+                step16LoadVariationData();
+                step11LoadBreastMarkers();
+            }
+            catch (Exception e){
+                log.error("Exception occurred in loaderbase", e);
+            }
+
         }
 
         step15LoadImmunoHistoChemistry();
+
     }
 
     public void loadExternalURLs(String dataSourceContact, String dataSourceURL){
@@ -300,10 +307,15 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 Specimen specimen = dataImportService.getSpecimen(dto.getModelCreation(), dto.getModelCreation().getSourcePdxId(), providerDS.getAbbreviation(), passage);
                 specimen.setHostStrain(bs);
 
-                if (ds.equals("wustl")){
+                if(specimen.getSample() == null){
                     Sample mouseSample = new Sample();
+                    mouseSample.setSourceSampleId(dto.getModelID());
                     specimen.setSample(mouseSample);
                     dto.getModelCreation().addRelatedSample(mouseSample);
+                }
+
+                if (ds.equals("wustl")){
+
 
                     if (dto.getImplantationSiteStr().contains(";")) {
                         String[] parts = dto.getImplantationSiteStr().split(";");
@@ -317,14 +329,8 @@ public abstract class LoaderBase extends UniversalLoaderOmic implements Applicat
                 EngraftmentType it = dataImportService.getImplantationType(dto.getImplantationtypeStr());
                 specimen.setEngraftmentType(it);
 
-                if (ds.equals("wustl")){
-                    dto.getModelCreation().addSpecimen(specimen);
-                }
 
-                if (ds.equals("mdAnderson")) {
-                    specimen.setSample(dto.getPatientSample());
-                    dataImportService.saveSpecimen(specimen);
-                }
+                dto.getModelCreation().addSpecimen(specimen);
 
             }
             dataImportService.saveSample(dto.getPatientSample());  // TODO: This was not be implemented for wustl

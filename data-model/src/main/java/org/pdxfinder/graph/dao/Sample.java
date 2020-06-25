@@ -1,25 +1,27 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.collections4.CollectionUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Sample represents a piece of tissue taken from a specimen (human or mouse)
- * <p>
  * A sample could be cancerous or not (tissue used to compare to cancer sampled from a health tissue)
  */
 @NodeEntity
 public class Sample {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String sourceSampleId;
     private String diagnosis;
+    private String diagnosisNotes;
     private Tissue originTissue;
     private Tissue sampleSite;
     private String extractionMethod;
@@ -32,6 +34,8 @@ public class Sample {
 
     public Boolean normalTissue;
     private String dataSource;
+
+    private String rawDataUrl;
 
     @Relationship(type="MAPPED_TO")
     private SampleToOntologyRelationship sampleToOntologyRelationShip;
@@ -51,6 +55,11 @@ public class Sample {
     
     public Sample() {
         // Empty constructor required as of Neo4j API 2.0.5
+    }
+
+    // Minimal Constructor
+    public Sample(String sourceSampleId) {
+        this.sourceSampleId = sourceSampleId;
     }
 
     public Sample(String sourceSampleId, TumorType type, String diagnosis, Tissue originTissue, Tissue sampleSite, String extractionMethod,
@@ -147,6 +156,10 @@ public class Sample {
         this.molecularCharacterizations = molecularCharacterizations;
     }
 
+    public boolean hasMolecularCharacterizations() {
+        return CollectionUtils.isNotEmpty(this.molecularCharacterizations);
+    }
+
     public void addMolecularCharacterization(MolecularCharacterization mc){
 
         if(this.molecularCharacterizations == null){
@@ -180,16 +193,10 @@ public class Sample {
         return this.histology;
     }
 
-    /**
-     * @return the extractionMethod
-     */
     public String getExtractionMethod() {
         return extractionMethod;
     }
 
-    /**
-     * @param extractionMethod the extractionMethod to set
-     */
     public void setExtractionMethod(String extractionMethod) {
         this.extractionMethod = extractionMethod;
     }
@@ -240,5 +247,41 @@ public class Sample {
 
     public void setGradeClassification(String gradeClassification) {
         this.gradeClassification = gradeClassification;
+    }
+
+    public MolecularCharacterization getMolecularCharacterization(String type, String platformName){
+
+        if(molecularCharacterizations == null) return null;
+
+        platformName = platformName.replaceAll("[^A-Za-z0-9 _-]", "");
+        for(MolecularCharacterization mc : molecularCharacterizations){
+
+            if(mc.getType().equals(type)){
+
+                if(mc.getPlatform() != null && mc.getPlatform().getName().replaceAll("[^A-Za-z0-9 _-]", "").equalsIgnoreCase(platformName)) {
+
+                    return mc;
+                }
+
+            }
+        }
+
+        return null;
+    }
+
+    public String getDiagnosisNotes() {
+        return diagnosisNotes;
+    }
+
+    public void setDiagnosisNotes(String diagnosisNotes) {
+        this.diagnosisNotes = diagnosisNotes;
+    }
+
+    public String getRawDataUrl() {
+        return rawDataUrl;
+    }
+
+    public void setRawDataUrl(String rawDataUrl) {
+        this.rawDataUrl = rawDataUrl;
     }
 }

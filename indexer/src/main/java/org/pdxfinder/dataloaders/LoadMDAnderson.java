@@ -15,22 +15,14 @@ import org.pdxfinder.services.dto.LoaderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-
-/**
- * Load data from University of Texas MD Anderson PDXNet.
- */
-@Component
-@Order(value = -17)
+@Service
 @PropertySource("classpath:loader.properties")
 @ConfigurationProperties(prefix = "mda")
-public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
+public class LoadMDAnderson extends LoaderBase {
 
     private final static Logger log = LoggerFactory.getLogger(LoadMDAnderson.class);
 
@@ -38,45 +30,19 @@ public class LoadMDAnderson extends LoaderBase implements CommandLineRunner {
     private Group mdaDS;
     private Group projectGroup;
 
-    private Options options;
-    private CommandLineParser parser;
-    private CommandLine cmd;
-    private HelpFormatter formatter;
-
     private Session session;
 
-
-    @Value("${pdxfinder.root.dir}")
+    @Value("${data-dir}")
     private String finderRootDir;
-
-    //   @Value("${mdapdx.url}")
-    //   private String urlStr;
-    @PostConstruct
-    public void init() {
-        formatter = new HelpFormatter();
-    }
 
     public LoadMDAnderson(UtilityService utilityService, DataImportService dataImportService) {
         super(utilityService, dataImportService);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-
-        OptionParser parser = new OptionParser();
-        parser.allowsUnrecognizedOptions();
-        parser.accepts("loadMDA", "Load MDAnderson PDX data");
-
-        parser.accepts("loadALL", "Load all, including MDA PDX data");
-        OptionSet options = parser.parse(args);
-
-        if (options.has("loadMDA") || options.has("loadALL")) {
+    public void run() throws Exception {
 
             initMethod();
-
             mdAndersonAlgorithm();
-        }
-
     }
 
 

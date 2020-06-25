@@ -72,7 +72,7 @@ public class MolcharAPITest implements CommandLineRunner{
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
 
-                int size = dto.getTableRows().size();
+                int size = dto.getMolecularDataRows().size();
 
                 if(size == 0){
                     log.error("MC id: "+id.toString()+": Size: "+size+ " Time:"+totalTime);

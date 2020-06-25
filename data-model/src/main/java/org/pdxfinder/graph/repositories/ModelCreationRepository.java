@@ -2,6 +2,7 @@ package org.pdxfinder.graph.repositories;
 
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.dao.TreatmentSummary;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -28,13 +29,38 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "OPTIONAL MATCH (model)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
             "OPTIONAL MATCH (model)-[qar:QUALITY_ASSURED_BY]-(qa:QualityAssurance) "+
             "OPTIONAL MATCH (model)-[url:EXTERNAL_URL]-(ext_url:ExternalUrl) "+
-            "WITH model, spr, sp, hsr, hs, qar, qa, url, ext_url " +
+            "OPTIONAL MATCH (model)-[grp:GROUP]-(group:Group) "+
+            "WITH model, spr, sp, hsr, hs, qar, qa, url, ext_url, grp, group " +
             "OPTIONAL MATCH (sp)-[itr:ENGRAFTMENT_TYPE]-(it:EngraftmentType) "+
             "OPTIONAL MATCH (sp)-[isr:ENGRAFTMENT_SITE]-(is:EngraftmentSite) "+
             "OPTIONAL MATCH (sp)-[ism:ENGRAFTMENT_MATERIAL]-(im:EngraftmentMaterial) "+
 
-            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url, ism, im")
+            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url, grp, group, ism, im")
     ModelCreation findByDataSourceAndSourcePdxId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
+
+    @Query("MATCH (model:ModelCreation) WHERE model.dataSource = {ds} " +
+            "WITH model ORDER by model.sourcePdxId" +
+            "OPTIONAL MATCH (model)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "OPTIONAL MATCH (model)-[qar:QUALITY_ASSURED_BY]-(qa:QualityAssurance) "+
+            "OPTIONAL MATCH (model)-[url:EXTERNAL_URL]-(ext_url:ExternalUrl) "+
+            "OPTIONAL MATCH (model)-[gr:GROUP]-(g:Group) "+
+            "WITH model, spr, sp, hsr, hs, qar, qa, url, ext_url, gr, g " +
+            "OPTIONAL MATCH (sp)-[itr:ENGRAFTMENT_TYPE]-(it:EngraftmentType) "+
+            "OPTIONAL MATCH (sp)-[isr:ENGRAFTMENT_SITE]-(is:EngraftmentSite) "+
+            "OPTIONAL MATCH (sp)-[ism:ENGRAFTMENT_MATERIAL]-(im:EngraftmentMaterial) "+
+
+            "RETURN model, spr, sp, hsr, hs, itr, isr, it, is, qar, qa, url, ext_url, ism, im, gr, g ")
+    List<ModelCreation> findModelsWithSpecimensAndQAByDS(@Param("ds") String ds);
+
+
+    @Query("MATCH (model:ModelCreation) WHERE model.dataSource = {ds} " +
+            "WITH model " +
+
+            "OPTIONAL MATCH (model)-[url:EXTERNAL_URL]-(ext_url:ExternalUrl) "+
+            "OPTIONAL MATCH (model)-[gr:GROUP]-(g:Group) "+
+
+            "RETURN model, url, ext_url, gr, g ORDER by model.sourcePdxId")
+    List<ModelCreation> findModelsWithSharingAndContactByDS(@Param("ds") String ds);
 
     @Query("MATCH (model:ModelCreation) WHERE model.sourcePdxId = {modelId} AND model.dataSource = {dataSource} RETURN model ")
     ModelCreation findBySourcePdxIdAndDataSource(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
@@ -47,9 +73,9 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     int getModelCountByDataSource(@Param("datasource") String dataSource);
 
     @Query("MATCH (s:Sample)-[i:IMPLANTED_IN]-(mod:ModelCreation) " +
-            "WHERE s.sourceSampleId = {sampleId} " +
+            "WHERE id(s) = {sample} " +
             "RETURN mod")
-    ModelCreation findBySampleId(@Param("sampleId") String sampleId);
+    ModelCreation findBySample(@Param("sample") Sample sample);
 
 
     //disable filtering on markers
@@ -169,6 +195,32 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "RETURN mod, msr, s, cbr, mc, pur, pl")
     Collection<ModelCreation> getModelsWithMolCharBySource(@Param("dataSource") String dataSource);
+
+    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) " +
+            "WITH mod ORDER BY mod.sourcePdxId " +
+            "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization) " +
+            "OPTIONAL MATCH (mod)-[spr:SPECIMENS]-(sp:Specimen)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "WITH mod, iir, psamp, spr, sp, cbr2, mc2, hsr, hs " +
+            "OPTIONAL MATCH (sp)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization) " +
+            "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
+            "RETURN mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, hs, hsr")
+    List<ModelCreation> findModelPlatformSampleByDS(@Param("dataSource") String dataSource);
+
+
+    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) and mod.sourcePdxId = {modelId} " +
+            "WITH mod " +
+            "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation) " +
+            "WHERE mc.type = {type}  "+
+            "WITH mod, iir, psamp, cbr, mc, assoc, mAss " +
+            "OPTIONAL MATCH (mod)-[spr:SPECIMENS]-(sp:Specimen)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization)-[assoc2:ASSOCIATED_WITH]->(mAss2:MarkerAssociation) " +
+            "WHERE mc2.type = {type} "+
+            "WITH mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, assoc, mAss, assoc2, mAss2 " +
+            "OPTIONAL MATCH (sp)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
+            "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
+            "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
+            "RETURN mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
+    ModelCreation findModelWithMolecularDataByDSAndIdAndMolcharType(@Param("dataSource") String dataSource, @Param("modelId") String modelId, @Param("type") String type);
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
             "WITH mod SKIP {from} LIMIT {to}" +

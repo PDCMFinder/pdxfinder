@@ -86,7 +86,7 @@ public class DataImportServiceTests extends BaseTest {
 
         Patient patientWithSnapshots = new Patient(EXTERNAL_ID, SEX, RACE, ETHNICITY, GROUP);
 
-        patientWithSnapshots.hasSnapshot(SNAPSHOT);
+        patientWithSnapshots.addSnapshot(SNAPSHOT);
         SNAPSHOT.setPatient(patientWithSnapshots);
 
         actualSnapshot = dataImportService.getPatientSnapshot(patientWithSnapshots, AGE_AT_COLLECTION,

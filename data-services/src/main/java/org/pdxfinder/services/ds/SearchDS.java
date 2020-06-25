@@ -87,6 +87,11 @@ public class SearchDS {
     private TwoParamLinkedSearch breastCancerMarkersSearch;
 
 
+    private TwoParamUnlinkedSearch cytogeneticsSearch;
+
+
+    private TwoParamUnlinkedSearch expressionSearch;
+
     public SearchDS(DataProjectionRepository dataProjectionRepository) {
         Assert.notNull(dataProjectionRepository, "Data projection repository cannot be null");
 
@@ -173,7 +178,8 @@ public class SearchDS {
 
         //age filter def
         List<FacetOption> ageOptions = new ArrayList<>();
-        ageOptions.add(new FacetOption("0-9", "0-9"));
+        ageOptions.add(new FacetOption("0-23 months", "0-23months"));
+        ageOptions.add(new FacetOption("2-9", "2-9"));
         ageOptions.add(new FacetOption("10-19", "10-19"));
         ageOptions.add(new FacetOption("20-29", "20-29"));
         ageOptions.add(new FacetOption("30-39", "30-39"));
@@ -232,7 +238,7 @@ public class SearchDS {
         datasetAvailableOptions.add(new FacetOption("Copy Number Alteration", "Copy_Number_Alteration"));
         datasetAvailableOptions.add(new FacetOption("Dosing Studies", "Dosing_Studies"));
         datasetAvailableOptions.add(new FacetOption("Patient Treatment", "Patient_Treatment"));
-        datasetAvailableOptions.add(new FacetOption("Transcriptomics", "Transcriptomics"));
+        datasetAvailableOptions.add(new FacetOption("Expression", "Expression"));
 
         OneParamCheckboxFilter datasetAvailable = new OneParamCheckboxFilter("DATASET AVAILABLE", "data_available", false, FilterType.OneParamCheckboxFilter.get(),
                 datasetAvailableOptions, new ArrayList<>());
@@ -284,6 +290,10 @@ public class SearchDS {
         molecularDataSection.addComponent(copyNumberAlteration);
 
 
+        OneParamTextFilter expression = new OneParamTextFilter("GENE EXPRESSION", "gene_expression", false,
+                FilterType.OneParamTextFilter.get(), "GENE", getExpressionOptions(), new ArrayList<>());
+        molecularDataSection.addComponent(expression);
+
         //Breast cancer markers
         //labelIDs should be alphabetically ordered(ER, HER, PR) as per dataprojection requirement
         List<FacetOption> breastCancerMarkerOptions = new ArrayList<>();
@@ -309,6 +319,16 @@ public class SearchDS {
         molecularDataSection.addComponent(breastCancerMarkers);
         facetOptionMap.put("breast_cancer_markers",breastCancerMarkerOptions);
 
+        List<String> cytogeneticsStatusList = new ArrayList<>();
+        cytogeneticsStatusList.add("positive");
+        cytogeneticsStatusList.add("negative");
+        List<String> cytogeneticsMarkerList = new ArrayList<>(getCytogeneticsDP().keySet());
+
+        TwoParamUnlinkedFilter cytogenetics = new TwoParamUnlinkedFilter("CYTOGENETICS", "cytogenetics", false,
+                FilterType.TwoParamUnlinkedFilter.get(), "Gene", "Result", cytogeneticsMarkerList,
+                cytogeneticsStatusList , new HashMap() );
+
+        molecularDataSection.addComponent(cytogenetics);
 
         //treatment status filter
         List<FacetOption> patientTreatmentStatusOptions = new ArrayList<>();
@@ -378,6 +398,12 @@ public class SearchDS {
         copyNumberAlterationSearch = new OneParamTextSearch("copyNumberAlteration", "copy_number_alteration", getCopyNumberAlterationDP());
 
         patientTreatmentSearch = new OneParamTextSearch("patientTreatment", "patient_treatment", getPatientTreatmentsFromDP());
+
+        expressionSearch = new TwoParamUnlinkedSearch();
+        expressionSearch.setData(getExpressionDP());
+
+        cytogeneticsSearch = new TwoParamUnlinkedSearch();
+        cytogeneticsSearch.setData(getCytogeneticsDP());
 
         INITIALIZED = true;
     }
@@ -552,6 +578,11 @@ public class SearchDS {
         //reset patient treatments
         result.forEach(x -> x.setPatientTreatments(new ArrayList<>()));
 
+        result.forEach(x -> x.setGeneExpression(new ArrayList<>()));
+
+        result.forEach(x -> x.setCytogenetics(new ArrayList<>()));
+
+
         // If no filters have been specified, return the complete set
         if (filters == null) {
             return result;
@@ -653,6 +684,15 @@ public class SearchDS {
                 case patient_treatment:
                     result = patientTreatmentSearch.search(filters.get(SearchFacetName.patient_treatment), result, ModelForQuery::addPatientTreatment, ComparisonOperator.OR);
                     break;
+
+                case gene_expression:
+                    result = expressionSearch.search(filters.get(SearchFacetName.gene_expression), result, ModelForQuery::addGeneExpression);
+                    break;
+
+                case cytogenetics:
+                    result = cytogeneticsSearch.search(filters.get(SearchFacetName.cytogenetics), result, ModelForQuery::addCytogenetics);
+                    break;
+
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -729,7 +769,10 @@ public class SearchDS {
 
                 mfq.setSampleOriginTissue(j.getString("sampleOriginTissue"));
                 mfq.setSampleSampleSite(j.getString("sampleSampleSite"));
-                mfq.setSampleExtractionMethod(j.getString("sampleExtractionMethod"));
+                if(j.has("sampleExtractionMethod")){
+                    mfq.setSampleExtractionMethod(j.getString("sampleExtractionMethod"));
+                }
+
                 //mfq.setSampleClassification(j.getString("sampleClassification"));
                 mfq.setSampleTumorType(j.getString("sampleTumorType"));
                 mfq.setDiagnosis(j.getString("diagnosis"));
@@ -917,13 +960,55 @@ public class SearchDS {
         return modelDrugResponses;
     }
 
+    private Map<String, Map<String, Set<Long>>> getExpressionDP(){
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("expression");
+        String responses = "{}";
+
+        if(dataProjection != null){
+            responses = dataProjection.getValue();
+        }
+
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>(){});
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
+    private Map<String, Map<String, Set<Long>>> getCytogeneticsDP() {
+
+        Map<String, Map<String, Set<Long>>> data = new HashMap<>();
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
+        String responses = "{}";
+
+        if (dataProjection != null) {
+            responses = dataProjection.getValue();
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            data = mapper.readValue(responses, new TypeReference<Map<String, Map<String, Set<Long>>>>() {
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return data;
+    }
+
     private Map<String, Map<String, Set<Long>>> getBreastCancerMarkersFromDP(){
 
         log.info("Initializing breast cancer markers ");
 
         Map<String, Map<String, Set<Long>>> data = new HashMap<>();
 
-        DataProjection dataProjection = dataProjectionRepository.findByLabel("cytogenetics");
+        DataProjection dataProjection = dataProjectionRepository.findByLabel("breast cancer markers");
         String responses = "{}";
 
         if(dataProjection != null){
@@ -1001,6 +1086,19 @@ public class SearchDS {
         }
 
         return data;
+    }
+
+    private List<String> getExpressionOptions(){
+
+        Map<String, Map<String, Set<Long>>> data = getExpressionDP();
+        Set<String> optionsSet = new HashSet<>();
+        for(Map.Entry<String, Map<String, Set<Long>>> entry : data.entrySet()){
+
+            optionsSet.addAll(entry.getValue().keySet());
+        }
+
+        List<String> options = new ArrayList<>(optionsSet);
+        return options;
     }
 
     private List<String> getPatientTreatmentOptions(){

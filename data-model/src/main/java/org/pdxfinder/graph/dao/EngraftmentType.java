@@ -1,7 +1,10 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * Represents the type of implantation. e.g. Orthotopic, Heterotopic
@@ -9,7 +12,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class EngraftmentType {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;
@@ -28,5 +32,25 @@ public class EngraftmentType {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EngraftmentType that = (EngraftmentType) o;
+
+        return new EqualsBuilder()
+            .append(getName(), that.getName())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getName())
+            .toHashCode();
     }
 }
