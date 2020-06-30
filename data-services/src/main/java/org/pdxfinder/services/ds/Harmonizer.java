@@ -1,6 +1,6 @@
 package org.pdxfinder.services.ds;
 
-import org.json.*;
+import com.github.openjson.*;
 import org.pdxfinder.services.DataImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 

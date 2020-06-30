@@ -1,6 +1,6 @@
 package org.pdxfinder.dataloaders;
 
-import org.json.*;
+import com.github.openjson.*;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;

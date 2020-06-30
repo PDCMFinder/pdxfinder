@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.json.*;
+import com.github.openjson.*;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.repositories.SpecimenRepository;

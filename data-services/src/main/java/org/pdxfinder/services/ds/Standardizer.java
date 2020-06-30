@@ -1,6 +1,6 @@
 package org.pdxfinder.services.ds;
 
-import org.json.JSONObject;
+import com.github.openjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

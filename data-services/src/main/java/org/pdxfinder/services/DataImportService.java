@@ -1,8 +1,8 @@
 package org.pdxfinder.services;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.graph.queryresults.TreatmentMappingData;

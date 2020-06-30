@@ -84,9 +84,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20190722</version>
+            <groupId>com.github.openjson</groupId>
+            <artifactId>openjson</artifactId>
+            <version>1.0.11</version>
         </dependency>
 
         <dependency>

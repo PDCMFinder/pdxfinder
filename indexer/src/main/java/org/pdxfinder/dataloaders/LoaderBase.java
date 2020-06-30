@@ -1,7 +1,7 @@
 package org.pdxfinder.dataloaders;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;

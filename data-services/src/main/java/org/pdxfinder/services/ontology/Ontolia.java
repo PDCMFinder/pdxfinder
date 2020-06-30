@@ -1,6 +1,6 @@
 package org.pdxfinder.services.ontology;
 
-import org.json.*;
+import com.github.openjson.*;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;

@@ -2,7 +2,7 @@ package org.pdxfinder.utils;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.json.*;
+import com.github.openjson.*;
 import org.pdxfinder.services.TransformerService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
