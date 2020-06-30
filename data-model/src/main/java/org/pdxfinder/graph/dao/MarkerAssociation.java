@@ -24,7 +24,7 @@ public class MarkerAssociation {
     private String molecularDataString;
     private int dataPoints = 0;
 
-    private List<MolecularData> molecularDataList = new ArrayList<>();
+    private List<MolecularData> molecularDataList;
 
     public MarkerAssociation() {
         molecularDataList = new ArrayList<>();
