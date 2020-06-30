@@ -1,6 +1,5 @@
 package org.pdxfinder.postload;
 
-import com.google.gson.Gson;
 import com.github.openjson.*;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
@@ -1168,11 +1167,8 @@ public class CreateDataProjections implements ApplicationContextAware{
             mfqDP.setLabel("ModelForQuery");
         }
 
-        //log.info("MFQ value toString:"+modelForQueryDP.toString());
-        Gson gson = new Gson();
-        String jsonMfqDP = gson.toJson(this.modelForQueryDP);
+        String jsonMfqDP = JSONObject.wrap(modelForQueryDP).toString();
         mfqDP.setValue(jsonMfqDP);
-        //log.info("MFQ value:"+jsonMfqDP);
         dataImportService.saveDataProjection(mfqDP);
 
 

@@ -2,7 +2,6 @@ package org.pdxfinder.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import com.github.openjson.*;
 import org.pdxfinder.services.mapping.MappingContainer;
@@ -114,10 +113,7 @@ public class MappingService {
         Map<String, List<MappingEntity>> mappings = new HashMap<>();
         mappings.put("mappings", maprules);
 
-        Gson gson = new Gson();
-        String json = gson.toJson(mappings);
-
-
+        String json = JSONObject.wrap(mappings).toString();
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
 

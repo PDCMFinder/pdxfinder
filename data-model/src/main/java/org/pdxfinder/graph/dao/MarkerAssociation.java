@@ -1,7 +1,7 @@
 package org.pdxfinder.graph.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
+import com.github.openjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -39,7 +39,7 @@ public class MarkerAssociation {
     }
 
     public void encodeMolecularData(){
-        molecularDataString = new Gson().toJson(molecularDataList);
+        molecularDataString = JSONObject.wrap(molecularDataList).toString();
         dataPoints = molecularDataList.size();
         molecularDataList = Collections.emptyList();
     }
