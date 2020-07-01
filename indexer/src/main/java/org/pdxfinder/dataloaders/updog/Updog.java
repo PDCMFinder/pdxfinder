@@ -1,20 +1,13 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.OmicValidationRuleset;
-import org.pdxfinder.dataloaders.updog.tablevalidation.PdxValidationRuleset;
-import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.*;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.nio.file.*;
 import java.util.*;
 
 @Component
@@ -57,20 +50,15 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        reportAnyErrors(validationErrors);
+        Validator.reportAnyErrors(validationErrors);
+
+        log.error("There were {} errors found. Check {} for details.",
+            validationErrors.size(),
+            "log/validation_errors.html");
 
         if (!validateOnly) {
             domainObjectCreator.loadDomainObjects(combinedTableSet, updogProviderDirectory);
         }
-    }
-
-    private void reportAnyErrors(List<ValidationError> validationErrors) {
-        if (CollectionUtils.isNotEmpty(validationErrors))
-            for (ValidationError error : validationErrors) {
-                log.debug(error.message());
-            }
-        else
-            log.info("There were no validation errors raised, great!");
     }
 
     private Map<String, Table> readPdxTablesFromPath(Path updogProviderDirectory) {
