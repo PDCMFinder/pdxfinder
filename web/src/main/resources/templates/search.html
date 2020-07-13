@@ -143,13 +143,11 @@
                         <span th:remove="tag" th:utext="${websearch.textSearchDescription}">Viewing results</span>
                     </span>
                 </div>
-
             </section>
 
 
             <!-- Search Result and Filter Section -->
             <section class="row expanded padding-right-large padding-left-large">
-
                 <div class="columns medium-3" style="position: relative;  ">
 
                     <div class="column large-12 cl_filter">
@@ -170,7 +168,6 @@
                             <ul class="accordion pdx-accordion-2" data-accordion data-multi-expand="true"
                                 data-allow-all-closed="true">
 
-
                                 <li class="accordion-item filterComponent" data-accordion-item
                                     th:classappend="${filterComponent.isActive} ? is-active : not-active"
                                     th:each="filterComponent:${section.filterComponents}"
@@ -179,7 +176,6 @@
                                     <a href="#" class="accordion-title" th:text="${filterComponent.name}"></a>
 
                                     <div class="accordion-content" data-tab-content>
-
                                         <!-- Check what kind of component is it, not all components have options-->
 
                                         <!-- OneParamCheckboxFilter -->
@@ -203,9 +199,7 @@
                                                     th:include="fragments/filter-components :: oneParamTextFilter(filterComponent=${filterComponent})">
                                                 ...
                                             </th:block>
-
                                         </div>
-
 
                                         <div class="light-grey-bg-box"
                                              th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamUnlinkedFilter)}">
@@ -215,13 +209,10 @@
                                                     th:include="fragments/filter-components :: twoParamUnlinkedFilter(filterComponent=${filterComponent})">
                                                 ...
                                             </th:block>
-
                                         </div>
-
 
                                         <div class="light-grey-bg-box"
                                              th:if="${filterComponent instanceof T(org.pdxfinder.services.search.TwoParamLinkedFilter)}">
-
                                             <!-- TwoParamUnlinkedFilter-->
                                             <th:block
                                                     th:include="fragments/filter-components :: twoParamLinkedFilter(filterComponent=${filterComponent})">
@@ -235,7 +226,6 @@
 
                             </ul>
                             </div>
-
                         </li>
 
 

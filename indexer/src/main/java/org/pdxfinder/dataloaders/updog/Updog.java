@@ -1,22 +1,20 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.OmicValidationRuleset;
-import org.pdxfinder.dataloaders.updog.tablevalidation.PdxValidationRuleset;
-import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.*;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import javax.annotation.Nonnull;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class Updog {
@@ -28,10 +26,10 @@ public class Updog {
     private static final Logger log = LoggerFactory.getLogger(Updog.class);
 
     public Updog(
-        @Nonnull Reader reader,
-        @Nonnull TableSetCleaner tableSetCleaner,
-        @Nonnull Validator validator,
-        @Nonnull DomainObjectCreator domainObjectCreator
+        Reader reader,
+        TableSetCleaner tableSetCleaner,
+        Validator validator,
+        DomainObjectCreator domainObjectCreator
     ) {
         this.reader = reader;
         this.tableSetCleaner = tableSetCleaner;
@@ -50,41 +48,19 @@ public class Updog {
         pdxTableSet = readPdxTablesFromPath(updogProviderDirectory);
         pdxTableSet = tableSetCleaner.cleanPdxTables(pdxTableSet);
 
-        //omicsTableSet = readOmicsTablesFromPath(updogProviderDirectory);
-        //omicsTableSet = tableSetCleaner.cleanOmicsTables(omicsTableSet);
         omicsTableSet = new HashMap<>();
-
         treatmentTableSet = readTreatmentTablesFromPath(updogProviderDirectory);
         treatmentTableSet = tableSetCleaner.cleanTreatmentTables(treatmentTableSet);
 
         combinedTableSet.putAll(pdxTableSet);
-        //combinedTableSet.putAll(omicsTableSet);
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        reportAnyErrors(validationErrors);
+        new ErrorReporter(validationErrors).truncate(50).logErrors();
 
         if (!validateOnly) {
             domainObjectCreator.loadDomainObjects(combinedTableSet, updogProviderDirectory);
         }
-    }
-
-    private void reportAnyErrors(List<ValidationError> validationErrors) {
-        if (CollectionUtils.isNotEmpty(validationErrors))
-            for (ValidationError error : validationErrors) {
-                log.error(error.verboseMessage());
-            }
-        else
-            log.info("There were no validation errors raised, great!");
-    }
-
-    private boolean hasNoValidationErrors(List<ValidationError> errors) {
-        return CollectionUtils.isEmpty(errors);
-    }
-
-    private Map<String, Table> readOmicsTablesFromPath(Path updogProviderDirectory) {
-        PathMatcher allTsvFiles = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna,expression}/*.tsv");
-        return reader.readAllOmicsFilesIn(updogProviderDirectory, allTsvFiles);
     }
 
     private Map<String, Table> readPdxTablesFromPath(Path updogProviderDirectory) {

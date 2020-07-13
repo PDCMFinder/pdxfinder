@@ -7,14 +7,11 @@ import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class BrokenRelationErrorCreatorTest {
 
@@ -41,6 +38,22 @@ public class BrokenRelationErrorCreatorTest {
 
     private final TableSetSpecification SIMPLE_JOIN_SPECIFICATION = TableSetSpecification.create().setProvider(PROVIDER)
         .addRelations(RELATION);
+
+    @Test(expected = Test.None.class)
+    public void checkRelationsValid_givenNoRightTable_noExceptionThrown() {
+        Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
+        tableSetWithSimpleJoin.put(RIGHT_TABLE, null);
+        assertThat(brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(),
+            is(true));
+    }
+
+    @Test(expected = Test.None.class)
+    public void checkRelationsValid_givenNoLeftTable_noExceptionThrown() {
+        Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();
+        tableSetWithSimpleJoin.put(LEFT_TABLE, null);
+        assertThat(brokenRelationErrorCreator.generateErrors(tableSetWithSimpleJoin, SIMPLE_JOIN_SPECIFICATION).isEmpty(),
+            is(true));
+    }
 
     @Test public void checkRelationsValid_givenValidOneToManyJoin_emptyErrorList() {
         Map<String, Table> tableSetWithSimpleJoin = makeTableSetWithSimpleJoin();

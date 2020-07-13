@@ -1,13 +1,15 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.springframework.stereotype.Component;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -71,9 +73,9 @@ public class Reader {
 
     public List<Path> getOmicFilePaths(Path targetDirectory) {
         List<Path> paths = new ArrayList<>();
-        try {
+        try(Stream<Path> walk = Files.walk(targetDirectory)) {
             PathMatcher omicPatterns = FileSystems.getDefault().getPathMatcher("glob:**/{cyto,mut,cna,expression}/**.tsv");
-            return Files.walk(targetDirectory)
+            return walk
                 .filter(omicPatterns::matches)
                 .collect(Collectors.toList());
         } catch (IOException e) {

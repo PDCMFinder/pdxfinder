@@ -3,20 +3,11 @@ package org.pdxfinder.services.constants;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DataProviderTest extends BaseTest {
 
     private final static String ASSERTION_ERROR = "Unknown Data Provider Found: ";
-
-    @Test
-    public void given_DataProviderEnumListCount_EnsureListIntegrity() {
-
-        final int DATA_PROVIDER_COUNT = 21;
-
-        assertEquals(DATA_PROVIDER_COUNT, DataProvider.values().length);
-    }
 
     @Test
     public void given_DataProviders_When_EnumListIsChanged_Then_Error() {
@@ -68,6 +59,16 @@ public class DataProviderTest extends BaseTest {
                 case DFCI_CPDM:
                     break;
                 case NKI:
+                    break;
+                case JAX_XDOG:
+                    break;
+                case SJCRH:
+                    break;
+                case UMCG:
+                    break;
+                case VHIO_PC:
+                    break;
+                case LIH:
                     break;
                 default:
                     message = String.format("%s %s", ASSERTION_ERROR, option);

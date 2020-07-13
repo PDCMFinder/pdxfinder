@@ -2,6 +2,7 @@ package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.HashSet;
@@ -56,39 +57,79 @@ public class PatientSnapshot {
     public String getAgeBin() {
         String ageBin;
 
+        String age = this.ageAtCollection;
+        Integer ageInteger;
+
+        if(age.contains("mo")){
+            return getPediatricAgeBin(age);
+        }
+        else{
+
+            try {
+                ageInteger = Integer.parseInt(this.ageAtCollection);
+                return getAgeBin(ageInteger);
+            } catch (Exception e) {
+                // probably a parse exception
+                ageBin = this.ageAtCollection;
+            }
+
+        }
+
+        return ageBin;
+
+
+
+    }
+
+    private String getPediatricAgeBin(String age){
+
+        Integer ageInteger;
+
         try {
-            Integer ageInteger = Integer.parseInt(this.ageAtCollection);
-
-            if (ageInteger < 10) {
-                ageBin = "0-9";
-            } else if (ageInteger < 20) {
-                ageBin = "10-19";
-            } else if (ageInteger < 30) {
-                ageBin = "20-29";
-            } else if (ageInteger < 40) {
-                ageBin = "30-39";
-            } else if (ageInteger < 50) {
-                ageBin = "40-49";
-            } else if (ageInteger < 60) {
-                ageBin = "50-59";
-            } else if (ageInteger < 70) {
-                ageBin = "60-69";
-            } else if (ageInteger < 80) {
-                ageBin = "70-79";
-            } else if (ageInteger < 90) {
-                ageBin = "80-89";
+            String ageClean = age.replaceAll("[a-zA-Z _-]", "");
+            ageInteger = Integer.parseInt(ageClean);
+            if (ageInteger <= 23) {
+                return "0-23 months";
+            } else {
+                return getAgeBin(ageInteger / 24);
             }
-            else {
-                ageBin = "90+";
-            }
+        }
+        catch (Exception e){
+            return age;
+        }
+    }
 
-        } catch (Exception e) {
-            // probably a parse exception
-            ageBin = this.ageAtCollection;
+
+    private String getAgeBin(Integer ageInteger){
+        String ageBin;
+        if(ageInteger <2){
+            ageBin = "0-23 months";
+        } else if (ageInteger < 10) {
+            ageBin = "2-9";
+        } else if (ageInteger < 20) {
+            ageBin = "10-19";
+        } else if (ageInteger < 30) {
+            ageBin = "20-29";
+        } else if (ageInteger < 40) {
+            ageBin = "30-39";
+        } else if (ageInteger < 50) {
+            ageBin = "40-49";
+        } else if (ageInteger < 60) {
+            ageBin = "50-59";
+        } else if (ageInteger < 70) {
+            ageBin = "60-69";
+        } else if (ageInteger < 80) {
+            ageBin = "70-79";
+        } else if (ageInteger < 90) {
+            ageBin = "80-89";
+        }
+        else {
+            ageBin = "90+";
         }
 
         return ageBin;
     }
+
 
     public PatientSnapshot(Patient patient, String ageAtCollection, Set<Sample> samples) {
         this.patient = patient;

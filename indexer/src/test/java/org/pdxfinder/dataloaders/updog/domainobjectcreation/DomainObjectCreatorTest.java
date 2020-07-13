@@ -11,11 +11,8 @@ import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.dto.NodeSuggestionDTO;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
@@ -23,6 +20,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 public class DomainObjectCreatorTest extends BaseTest {
 
@@ -37,6 +38,13 @@ public class DomainObjectCreatorTest extends BaseTest {
     private Group accessibilityGroup;
     private Patient testPatient;
     private ModelCreation testModel;
+    private static final String key1 = "model";
+    private static final String key2 = "MOCK_MODEL";
+    private static final String passage = "0";
+    private static final String hostStrainSymbol = "Not Specified";
+    private static final String enaAccession = "ERP120397";
+    private static final String platformName = "Next Generation Sequencing";
+    private static final String mcType = "mutation";
 
     private static final String FIRST = "first";
 
@@ -223,13 +231,15 @@ public class DomainObjectCreatorTest extends BaseTest {
 
         pdxDataTables.put(samplePlatform, Table.create(samplePlatform).addColumns(
                 StringColumn.create("sample_id", Collections.singletonList("sample 1")),
-                StringColumn.create("sample_origin", Collections.singletonList("patient")),
-                StringColumn.create("passage", Collections.singletonList("")),
-                StringColumn.create("model_id", Collections.singletonList("model 1")),
+                StringColumn.create("sample_origin", Collections.singletonList("xenograft")),
+                StringColumn.create("passage", Collections.singletonList(passage)),
+                StringColumn.create("model_id", Collections.singletonList(key2)),
                 StringColumn.create("host_strain_name", Collections.singletonList("")),
-                StringColumn.create("host_strain_nomenclature", Collections.singletonList("")),
-                StringColumn.create("molecular_characterisation_type", Collections.singletonList("mutation")),
-                StringColumn.create("platform", Collections.singletonList("Next Generation Sequencing"))
+                StringColumn.create("host_strain_nomenclature", Collections.singletonList(hostStrainSymbol)),
+                StringColumn.create("molecular_characterisation_type", Collections.singletonList(mcType)),
+                StringColumn.create("raw_data_file", Collections.singletonList(enaAccession)),
+                StringColumn.create("platform", Collections.singletonList(platformName)),
+                StringColumn.create("internal_protocol_url", Collections.singletonList("www.pdxFinder.org"))
         ));
 
         pdxDataTables.put(mutation, Table.create(mutation).addColumns(
@@ -327,4 +337,74 @@ public class DomainObjectCreatorTest extends BaseTest {
         verify(modelCreationCreator).create(any(), any(), any());
     }
 
+    @Test public void createSamplePlatformData_givenBlankSampleAlreadyExists_overwriteSampleId(){
+        ModelCreation mockModel = new ModelCreation();
+        Sample mockSample = new Sample();
+        mockSample.setSourceSampleId("");
+        HostStrain mockHostStrain = new HostStrain(hostStrainSymbol);
+        Specimen mockSpecimen = new Specimen();
+
+        mockSpecimen.setPassage(passage);
+        mockSpecimen.setSample(mockSample);
+        mockSpecimen.setHostStrain(mockHostStrain);
+        mockModel.setSpecimens(Collections.singleton(mockSpecimen));
+        mockModel.addRelatedSample((mockSpecimen.getSample()));
+
+        domainObjectCreator.addDomainObject(key1, key2, mockModel);
+        domainObjectCreator.createSamplePlatformData(pdxDataTables);
+
+        Assert.assertNotNull(mockModel
+                .getSpecimenByPassageAndHostStrain(passage, hostStrainSymbol)
+                .getSample()
+                .getSourceSampleId());
+
+        Assert.assertNotEquals(mockModel
+                .getSpecimenByPassageAndHostStrain(passage, hostStrainSymbol)
+                .getSample()
+                .getSourceSampleId(), "");
+    }
+
+    @Test public void createSamplePlatformdata_givenEnaEgaAndGeoAccessions_buildLinktoResource(){
+        String egaAccession = "EGAN00001285956";
+        String geoAccession = "GSM1986620";
+        String rubbishAccession ="rubbish";
+
+        String expectedEna = String.format("https://www.ebi.ac.uk/ena/data/view/%s", enaAccession);
+        String expectedEga = String.format("https://www.ebi.ac.uk/ega/search/site/%s", egaAccession);
+        String expectedGeo = String.format("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=%s", geoAccession);
+        String expectedRubbish = "";
+
+        String actualEna = domainObjectCreator.formatAccessionToURL(enaAccession);
+        String actualEga = domainObjectCreator.formatAccessionToURL(egaAccession);
+        String actualGeo = domainObjectCreator.formatAccessionToURL(geoAccession);
+        String actualRubbish = domainObjectCreator.formatAccessionToURL(rubbishAccession);
+
+        Assert.assertEquals(actualEna.split(",")[0], enaAccession);
+        Assert.assertEquals(actualEga.split(",")[0], egaAccession);
+        Assert.assertEquals(actualGeo.split(",")[0], geoAccession);
+
+        Assert.assertEquals(actualEna.split(",")[1], expectedEna);
+        Assert.assertEquals(actualEga.split(",")[1], expectedEga);
+        Assert.assertEquals(actualGeo.split(",")[1], expectedGeo);
+        Assert.assertEquals(actualRubbish, "");
+    }
+
+
+    @Test public void getCellAsText_whenGivenDifferentColumnTypes_returnsString() {
+        Table table = Table.create(
+            "table",
+            StringColumn.create("StringColumn", "x"),
+            IntColumn.create("IntColumn", new int[]{1}),
+            DoubleColumn.create("DoubleColumn", 1.0));
+
+        Assert.assertEquals(
+            "x",
+            domainObjectCreator.getCellAsText(table.row(0), "StringColumn"));
+        Assert.assertEquals(
+            "1",
+            domainObjectCreator.getCellAsText(table.row(0), "IntColumn"));
+        Assert.assertEquals(
+            "1.0",
+            domainObjectCreator.getCellAsText(table.row(0), "DoubleColumn"));
+    }
 }

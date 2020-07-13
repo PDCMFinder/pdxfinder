@@ -1,7 +1,6 @@
 package org.pdxfinder.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
@@ -16,17 +15,13 @@ import org.pdxfinder.BaseTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -73,7 +68,6 @@ public class UtilityServiceTest extends BaseTest {
 
         // when
         JsonNode jsonNode = utilityService.jsonStringToNode(testJsonString);
-
 
         // Then
         String expectedString = testJsonObject.get(JSON_IRI_KEY).asText();
@@ -173,8 +167,6 @@ public class UtilityServiceTest extends BaseTest {
                 .toString();
     }
 
-
-
     @Test
     public void given_SourceAndDestination_When_MoveFileInvoked_Then_FileIsMoved() throws IOException {
 
@@ -190,16 +182,13 @@ public class UtilityServiceTest extends BaseTest {
         FileUtils.writeStringToFile(sourceFile, fileContent);
         String source = sourceFile.getPath();
 
-
         // build a destination String without creating the file
         File expectedDestination = temporaryFolder.newFolder(newFolderName)
                 .toPath()
                 .resolve(fileName)
                 .toFile();
 
-
         // when
-        // ... call moveFile method to move the file from source to destination, create destination directory and move file there
         utilityService.moveFile(source, expectedDestination.getPath());
 
         // Read the moved file content
@@ -209,9 +198,6 @@ public class UtilityServiceTest extends BaseTest {
         assertTrue(expectedDestination.exists());
         assertThat(expectedDestination).hasName(fileName).hasContent(actual).hasParent(resolvePath(newFolderName));
     }
-
-
-
 
     @Test
     public void given_FileDir_When_ListAllFilesInADirectoryInvoked_Then_FileIsMoved() throws IOException {
@@ -246,9 +232,6 @@ public class UtilityServiceTest extends BaseTest {
         assertEquals(expected, actual);
     }
 
-
-
-
     @Test
     public void given_CamelCaseString_When_CamelCaseToSentenceInvoked_Then_ReturnReadableSentence(){
 
@@ -263,7 +246,6 @@ public class UtilityServiceTest extends BaseTest {
         assertEquals(expected, actual);
     }
 
-
     @Test
     public void given_SentenceString_When_SentenceToCamelCaseInvoked_Then_ReturnCamelCase(){
 
@@ -277,7 +259,6 @@ public class UtilityServiceTest extends BaseTest {
         // Then
         assertEquals(expected, actual);
     }
-
 
     @Test
     public void given_DelimitedString_When_SplitTextInvoked_Then_ReturnExpected() throws IOException {
@@ -294,5 +275,4 @@ public class UtilityServiceTest extends BaseTest {
         // Then
         assertEquals(expected, actual);
     }
-
 }

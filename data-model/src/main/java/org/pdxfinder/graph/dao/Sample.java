@@ -3,6 +3,7 @@ package org.pdxfinder.graph.dao;
 import org.apache.commons.collections4.CollectionUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.HashSet;
@@ -253,11 +254,12 @@ public class Sample {
 
         if(molecularCharacterizations == null) return null;
 
+        platformName = platformName.replaceAll("[^A-Za-z0-9 _-]", "");
         for(MolecularCharacterization mc : molecularCharacterizations){
 
             if(mc.getType().equals(type)){
 
-                if(mc.getPlatform() != null && mc.getPlatform().getName().equals(platformName)) {
+                if(mc.getPlatform() != null && mc.getPlatform().getName().replaceAll("[^A-Za-z0-9 _-]", "").equalsIgnoreCase(platformName)) {
 
                     return mc;
                 }

@@ -1,17 +1,17 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.pdxfinder.dataloaders.*;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.InitMappingDatabase;
-import org.pdxfinder.services.constants.DataProvider;
-import org.pdxfinder.services.constants.DataProviderGroup;
-import org.pdxfinder.dataloaders.*;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SetDataVisibility;
 import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.constants.DataProvider;
+import org.pdxfinder.services.constants.DataProviderGroup;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
@@ -40,7 +40,6 @@ public class FinderLoader {
     private LoadHCI loadHCI;
     private LoadJAXData loadJAXData;
     private LoadMDAnderson loadMDAnderson;
-    private LoadPDMRData loadPDMRData;
     private LoadWISTAR loadWISTAR;
     private LoadWUSTL loadWUSTL;
     private Updog updog;
@@ -87,7 +86,6 @@ public class FinderLoader {
         this.loadHCI = loadHCI;
         this.loadJAXData = loadJAXData;
         this.loadMDAnderson = loadMDAnderson;
-        this.loadPDMRData = loadPDMRData;
         this.loadWISTAR = loadWISTAR;
         this.loadWUSTL = loadWUSTL;
         this.updog = updog;
@@ -114,27 +112,14 @@ public class FinderLoader {
         File dataDirectory,
         boolean validateOnlyRequested,
         boolean loadCacheRequested,
-        boolean keepDatabaseRequested,
         boolean postLoadRequested,
         boolean initializeMappingDb
     ) {
 
-        this.keepDatabaseIfRequested(keepDatabaseRequested);
-        this.loadCache(loadCacheRequested);
-        this.loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
-        this.postLoad(dataProviders, postLoadRequested);
-
-        this.initializeMappingDb(initializeMappingDb);
-    }
-
-    private void keepDatabaseIfRequested(boolean keepDatabaseRequested) {
-        if (keepDatabaseRequested) {
-            log.info("Using existing database: {}", databaseURI);
-        } else {
-            throw new UnsupportedOperationException(
-                "Removing the database on load is not yet supported, " +
-                    "please use `-k` or `--keep-db` for the time being.");
-        }
+        loadCache(loadCacheRequested);
+        loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
+        postLoad(dataProviders, postLoadRequested);
+        initializeMappingDb(initializeMappingDb);
     }
 
     private void loadCache(boolean loadCacheRequested) {
@@ -165,7 +150,7 @@ public class FinderLoader {
     }
 
     private void loadRegimens(boolean loadCacheRequested) {
-        if (dataImportService.ontologyCacheIsEmpty() || loadCacheRequested) {
+        if (dataImportService.ontologyCacheIsEmptyByType("treatment") || loadCacheRequested) {
             try {
                 loadNCITDrugs.loadRegimens();
             } catch (Exception e) {
@@ -205,9 +190,6 @@ public class FinderLoader {
                     break;
                 case PDXNet_MDAnderson:
                     loadMDAnderson.run();
-                    break;
-                case PDMR:
-                    loadPDMRData.run();
                     break;
                 case PDXNet_Wistar_MDAnderson_Penn:
                     loadWISTAR.run();

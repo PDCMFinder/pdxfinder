@@ -13,10 +13,9 @@ import org.pdxfinder.services.reporting.LogEntity;
 import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -645,6 +644,14 @@ public class DataImportService {
         return molecularCharacterizationRepository.findAllByDataSource(dataSource);
     }
 
+    public int findMolcharNumberByDataSource(String ds){
+        return molecularCharacterizationRepository.findNumberByDataSource(ds);
+    }
+    
+    public List<MolecularCharacterization> findMolcharByDataSourceSkipLimit(String ds, int skip, int limit){
+        return molecularCharacterizationRepository.findByDataSourceSkipLimit(ds, skip, limit);
+    }
+    
     public Set<MolecularCharacterization> getMolcharsById(Set<Long> ids){
 
         return molecularCharacterizationRepository.findByIds(ids);
@@ -968,8 +975,16 @@ public class DataImportService {
         return ontologyTermRepository.getOntologyTermNumber();
     }
 
+    public int countAllOntologyTermsByType(String type){
+        return ontologyTermRepository.getOntologyTermNumberByType(type);
+    }
+
     public boolean ontologyCacheIsEmpty() {
         return countAllOntologyTerms() == 0;
+    }
+
+    public boolean ontologyCacheIsEmptyByType(String type){
+        return countAllOntologyTermsByType(type) == 0;
     }
 
     public OntologyTerm saveOntologyTerm(OntologyTerm ot){
@@ -984,6 +999,10 @@ public class DataImportService {
 
     public Marker saveMarker(Marker marker) {
         return markerRepository.save(marker);
+    }
+
+    public void saveAllMarkers(Collection<Marker> markers) {
+        markerRepository.save(markers);
     }
 
     public Collection<Marker> getAllMarkers() {

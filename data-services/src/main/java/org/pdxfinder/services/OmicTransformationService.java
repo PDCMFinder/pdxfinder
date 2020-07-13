@@ -28,25 +28,37 @@ public class OmicTransformationService {
 
     public void convertListOfNcbiToHgnc(List<String> geneList){
         String fileOut = "ncbiToHugoAccesions";
-        BufferedWriter out;
+
+        FileWriter fstream = null;
         try {
-            FileWriter fstream = new FileWriter(fileOut, true);
-            out = new BufferedWriter(fstream);
-            BufferedWriter finalOut = out;
-            geneList.forEach(g ->
-                    {
-                        try {
-                            String conversionRow = String.format("%s\t%s\n", g, ncbiGeneIdToHgncSymbol(g));
-                            finalOut.write(conversionRow);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+            fstream = new FileWriter(fileOut, true);
+
+            try(BufferedWriter out = new BufferedWriter(fstream)) {
+                BufferedWriter finalOut = out;
+                geneList.forEach(g ->
+                        {
+                            try {
+                                String conversionRow = String.format("%s\t%s\n", g, ncbiGeneIdToHgncSymbol(g));
+                                finalOut.write(conversionRow);
+                            } catch (IOException e) {
+                                log.error("Exception in conversion ",e);
+                            }
                         }
-                    }
-            );
-            out.flush();
-            out.close();
+                );
+                out.flush();
+            }
+            catch(Exception e){
+                log.error("Bufferedwriter exception ", e);
+            }
         } catch(IOException e){
             log.error("Failure opening output file %n {}", e.toString());
+        }
+        finally{
+            try {
+                if (fstream != null) fstream.close();
+            } catch (IOException ex) {
+                log.error("Exception ", ex);
+            }
         }
     }
 
@@ -54,7 +66,7 @@ public class OmicTransformationService {
         String hgncSymbol = geneIdCache.get(ncbiGene);
         if (hgncSymbol == null) {
             Marker marker = dataImportService.getMarkerbyNcbiGeneId(ncbiGene);
-            if (isMarkerSymbolNullOrEmpty(marker)) {
+            if (marker.hasHgncSymbol()) {
                 hgncSymbol = marker.getHgncSymbol();
                 geneIdCache.put(ncbiGene, hgncSymbol);
             } else { log.warn("No marker found for NCBI gene Id {} Cannot generate Hgnc symbol", ncbiGene); }
@@ -62,7 +74,4 @@ public class OmicTransformationService {
         return hgncSymbol;
     }
 
-    private Boolean isMarkerSymbolNullOrEmpty(Marker marker){
-        return marker.getHgncSymbol() != null && !marker.getHgncSymbol().isEmpty();
-    }
 }

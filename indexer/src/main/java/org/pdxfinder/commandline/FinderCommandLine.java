@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ArgGroup;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,10 +70,6 @@ public class FinderCommandLine implements Callable<Integer> {
                 description = "Delete mapping database content, and reload from mapping file")
         private boolean initializeMappingDB;
 
-        @Option(names = {"-k", "--keep-db"},
-                description = "Skips clearing of the database before loading new data.")
-        private boolean keepDatabaseRequested;
-
         @Option(names = {"--validate-only"},
                 description = "Don't load the PDX data, only perform validation and report errors.")
         private boolean validateOnlyRequested;
@@ -127,7 +123,6 @@ public class FinderCommandLine implements Callable<Integer> {
                     dataDirectory,
                     validateOnlyRequested,
                     loadCacheRequested,
-                    keepDatabaseRequested,
                     postLoadRequested,
                     initializeMappingDB
             );
@@ -158,7 +153,6 @@ public class FinderCommandLine implements Callable<Integer> {
             return new StringJoiner("\n", Load.class.getSimpleName() + "[\n", "\n]")
                     .add("dataDirectory=" + dataDirectory)
                     .add("clearCacheRequested=" + loadCacheRequested)
-                    .add("keepDatabaseRequested=" + keepDatabaseRequested)
                     .add("datasetRequested=" + getListOfRequestedProviders())
                     .toString();
         }

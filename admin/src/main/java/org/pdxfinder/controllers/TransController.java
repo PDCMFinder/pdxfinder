@@ -4,17 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.rdbms.dao.MappingEntity;
-import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
-import org.pdxfinder.services.UtilityService;
-import org.pdxfinder.services.TransformerService;
 import org.pdxfinder.rdbms.dao.PdmrPdxInfo;
 import org.pdxfinder.rdbms.dao.PdxInfo;
+import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
+import org.pdxfinder.services.TransformerService;
+import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -94,7 +95,7 @@ public class TransController {
     }
 
 
-    @RequestMapping("/pdmr/genomics")
+    @RequestMapping(path = "/pdmr/genomics", method = RequestMethod.GET)
     public Object transformPdmrGenomicData() {
 
         List transformedData = transformerService.transformOncoKB();

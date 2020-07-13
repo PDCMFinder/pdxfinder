@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.pdxfinder.services.dto.pdxgun.Reference;
 
 
 @JsonPropertyOrder({
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "Seq. End Position",
         "Ref. Allele",
         "Alt Allele",
-        "Rs Id Variant",
+        "Variant Type",
         "Ensembl Transcript Id",
         "Ensembl Gene Id",
         "Ucsc Gene Id",
@@ -32,7 +33,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "RNAseq Count",
         "Z-Score",
         "Genome Assembly",
-        "Result"
+        "Result",
+        "Illumina HGEA Exp",
+        "Rs Id Variant"
 })
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MolecularDataRowDTO {
@@ -44,13 +47,14 @@ public class MolecularDataRowDTO {
     private String refAllele;
     private String altAllele;
     private String consequence;
-    private String hgncSymbol;
+    private Reference hgncSymbol;
     protected String rnaSeqCount;
     private String zscore;
-    private String aminoAcidChange;
+    private Reference aminoAcidChange;
     private String readDepth;
     private String alleleFrequency;
-    private String rsidVariants;
+    private String variantClass;
+    private String existingVariation;
     private String nucleotideChange;
     private String genomeAssembly;
     private String seqStartPosition;
@@ -70,6 +74,7 @@ public class MolecularDataRowDTO {
     private String cnaCopyNumberStatus;
     private String cnaGisticValue;
     private String cnaPicnicValue;
+    private String illuminaHGEAExp;
 
 
     public MolecularDataRowDTO() {
@@ -141,12 +146,12 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("HGNC Symbol")
-    public String getHgncSymbol() {
+    public Reference getHgncSymbol() {
         return hgncSymbol;
     }
 
     @JsonProperty("HGNC Symbol")
-    public MolecularDataRowDTO setHgncSymbol(String hgncSymbol) {
+    public MolecularDataRowDTO setHgncSymbol(Reference hgncSymbol) {
         this.hgncSymbol = hgncSymbol;
         return this;
     }
@@ -174,12 +179,12 @@ public class MolecularDataRowDTO {
     }
 
     @JsonProperty("Amino Acid Change")
-    public String getAminoAcidChange() {
+    public Reference getAminoAcidChange() {
         return aminoAcidChange;
     }
 
     @JsonProperty("Amino Acid Change")
-    public MolecularDataRowDTO setAminoAcidChange(String aminoAcidChange) {
+    public MolecularDataRowDTO setAminoAcidChange(Reference aminoAcidChange) {
         this.aminoAcidChange = aminoAcidChange;
         return this;
     }
@@ -206,14 +211,25 @@ public class MolecularDataRowDTO {
         return this;
     }
 
-    @JsonProperty("Rs Id Variant")
-    public String getRsidVariants() {
-        return rsidVariants;
+    @JsonProperty("Variant Type")
+    public String getVariantClass() {
+        return variantClass;
+    }
+
+    @JsonProperty("Variant Type")
+    public MolecularDataRowDTO setVariantClass(String variantClass) {
+        this.variantClass = variantClass;
+        return this;
     }
 
     @JsonProperty("Rs Id Variant")
-    public MolecularDataRowDTO setRsidVariants(String rsidVariants) {
-        this.rsidVariants = rsidVariants;
+    public String getExistingVariation() {
+        return existingVariation;
+    }
+
+    @JsonProperty("Rs Id Variant")
+    public MolecularDataRowDTO setExistingVariation(String existingVariation) {
+        this.existingVariation = existingVariation;
         return this;
     }
 
@@ -426,8 +442,20 @@ public class MolecularDataRowDTO {
         return this;
     }
 
+    @JsonProperty("Illumina HGEA Exp")
+    public String getIlluminaHGEAExp(){
+        return illuminaHGEAExp;
+    }
+
+    @JsonProperty("Illumina HGEA Exp")
+    public MolecularDataRowDTO setIlluminaHGEAExp(String value) {
+        this.illuminaHGEAExp = value;
+        return this;
+    }
+
     public MolecularDataRowDTO build() {
         return this;
     }
+
 }
 

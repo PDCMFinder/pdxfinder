@@ -298,6 +298,11 @@ h5{
     margin-top: 100px;
 }
 
+
+.top-space-n-20 {
+    margin-top: -20px;
+}
+
 .baseSpace2{
     margin-bottom: 20px;
 }
@@ -306,6 +311,9 @@ h5{
     min-width: 300px;
     font-size: 13px;
     float: right;
+}
+.bold{
+    font-weight: bold;
 }
 
 
@@ -1695,4 +1703,90 @@ th,td {
 }
 
 
-.omicSearch { padding-left: 10px;  padding-right: 10px; border: 1px solid #000; }
+.omicSearch {
+    padding-left: 10px;  padding-right: 10px; border: 1px solid #000;
+}
+
+
+
+
+@media (min-width: 2880px) {
+    .auto-suggest-field{
+        width: 660px;
+    }
+    .auto-suggest-field-2{
+        width: 330px;
+    }
+}
+
+@media (min-width: 2160px) and (max-width: 2879px) {
+    .auto-suggest-field{
+        width: 475px;
+    }
+    .auto-suggest-field-2{
+        width: 235px;
+    }
+}
+
+@media (min-width: 1824px) and (max-width: 2159px) {
+    .auto-suggest-field{
+        width: 390px;
+    }
+    .auto-suggest-field-2{
+        width: 195px;
+    }
+}
+
+@media (min-width: 1584px) and (max-width: 1823px) {
+    .auto-suggest-field{
+        width: 338px;
+    }
+    .auto-suggest-field-2{
+        width: 169px;
+    }
+}
+
+@media (min-width: 1440px) and (max-width: 1583px) {
+    .auto-suggest-field{
+        width: 300px;
+    }
+    .auto-suggest-field-2{
+        width: 150px;
+    }
+}
+
+@media (min-width: 1296px) and (max-width: 1439px) {
+    .auto-suggest-field{
+        width: 270px;
+    }
+    .auto-suggest-field-2{
+        width: 135px;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1295px) {
+    .auto-suggest-field{
+        width: 250px;
+    }
+    .auto-suggest-field-2{
+        width: 125px;
+    }
+}
+
+@media (min-width: 1104px) and (max-width: 1199px) {
+    .auto-suggest-field{
+        width: 200px;
+    }
+    .auto-suggest-field-2{
+        width: 100px;
+    }
+}
+
+@media (min-width: 480px) and (max-width: 1103px) {
+    .auto-suggest-field{
+        width: 200px;
+    }
+    .auto-suggest-field-2{
+        width: 100px;
+    }
+}

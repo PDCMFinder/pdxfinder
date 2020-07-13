@@ -1,12 +1,7 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.BrokenRelationErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.DuplicateValueErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.EmptyValueErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.MissingColumnErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.MissingTableErrorCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -37,16 +32,23 @@ public class Validator {
         checkRequiredTablesPresent(tableSet, tableSetSpecification);
         if (CollectionUtils.isNotEmpty(validationErrors)) {
             log.error(
-                "Not all required tables where present forNot all required tables where present for {}. Aborting further validation",
+                "Not all required tables where present for {}. Aborting further validation",
                 tableSetSpecification.getProvider());
             return validationErrors;
         }
+        performColumnValidations(tableSet, tableSetSpecification);
+
+        return validationErrors;
+    }
+
+    private void performColumnValidations(
+        Map<String, Table> tableSet,
+        TableSetSpecification tableSetSpecification
+    ) {
         checkRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueColumnsForDuplicates(tableSet, tableSetSpecification);
-        //checkRelationsValid(tableSet, tableSetSpecification);
-
-        return validationErrors;
+        checkRelationsValid(tableSet, tableSetSpecification);
     }
 
     private void checkRequiredTablesPresent(

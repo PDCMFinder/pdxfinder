@@ -1,5 +1,6 @@
 package org.pdxfinder.dataloaders.updog;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.tablesaw.api.StringColumn;
@@ -54,6 +55,18 @@ public final class TableUtilities {
 
     public static Table removeRowsMissingRequiredColumnValue(Table table, StringColumn requiredColumn) {
         return removeRowsMissingRequiredColumnValue(table, requiredColumn.name());
+    }
+
+    public static Table fromString(String tableName, String ... lines) {
+        Table table = Table.create();
+        String string = String.join("\n", lines);
+        try {
+            table = Table.read().csv(IOUtils.toInputStream(string));
+            table.setName(tableName);
+        } catch (Exception e) {
+            log.error("There was an error parsing string to Table", e);
+        }
+        return table;
     }
 
 }
