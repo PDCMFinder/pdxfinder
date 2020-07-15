@@ -1,7 +1,8 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.lang3.StringUtils;
-import org.pdxfinder.dataexport.ExportSheets;
+import org.pdxfinder.dataexport.ExportProviderSheets;
+import org.pdxfinder.dataexport.ExporterTemplates;
 import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.dataexport.UniversalDataExtractor;
 import org.pdxfinder.graph.dao.Group;
@@ -66,16 +67,15 @@ public class FinderExporter {
         });
     }
 
-    public void export(File rootDir, String dataSourceAbbrev, boolean unharmonized) throws IOException {
+    public void export(File rootDir, String dataSourceAbbrev, boolean isharmonized) throws IOException {
         Group ds = dataImportService.findProviderGroupByAbbrev(dataSourceAbbrev);
         if(ds == null) {
             log.error("Datasource {} not found. ",dataSourceAbbrev);
             return;
         }
-        ExportSheets xDogSheets = new ExportSheets();
-        xDogSheets.init(rootDir + "/template", ds);
-        universalDataExtractor.extract(xDogSheets, unharmonized);
-        universalDataExporter.export(rootDir + "/export", xDogSheets);
+        ExporterTemplates xDogSheets = new ExporterTemplates(rootDir + "/template", isharmonized);
+        ExportProviderSheets providerSheets = universalDataExtractor.extract(ds, isharmonized);
+        universalDataExporter.export(rootDir + "/export",providerSheets, xDogSheets);
     }
 
     public void setDefaultDirectory(String defaultDirectory) {

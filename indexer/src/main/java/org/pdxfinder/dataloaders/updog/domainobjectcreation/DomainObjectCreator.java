@@ -1,8 +1,8 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
 import org.apache.commons.lang3.StringUtils;
+import org.pdxfinder.TSV;
 import org.pdxfinder.dataloaders.updog.Reader;
-import org.pdxfinder.dataloaders.updog.TSV;
 import org.pdxfinder.dataloaders.updog.TableSetCleaner;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;

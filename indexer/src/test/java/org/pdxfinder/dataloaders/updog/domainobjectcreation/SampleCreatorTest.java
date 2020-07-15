@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.pdxfinder.dataloaders.updog.TSV;
+import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.dao.Tissue;
 import org.pdxfinder.graph.dao.TumorType;
@@ -15,8 +15,7 @@ import tech.tablesaw.api.Table;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class SampleCreatorTest {
 

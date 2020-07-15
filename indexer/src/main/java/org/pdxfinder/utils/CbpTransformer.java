@@ -1,7 +1,10 @@
 package org.pdxfinder.utils;
 
 
-import org.pdxfinder.dataexport.UniversalDataExtractor;
+import org.pdxfinder.TSV;
+import org.pdxfinder.dataexport.ExportProviderSheets;
+import org.pdxfinder.dataexport.ExporterTemplates;
+import org.pdxfinder.dataexport.UniversalDataExporter;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.services.UtilityService;
@@ -13,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,56 +28,48 @@ public class CbpTransformer {
 
     private UtilityService utilityService;
     private OmicTransformationService omicTransformationService;
-    private UniversalDataExtractor universalDataExporter;
+    private UniversalDataExporter universalDataExporter;
 
-    CbpTransformer(UtilityService utilityService, OmicTransformationService omicTransformationService, UniversalDataExtractor universalDataExtractor){
+    CbpTransformer(UtilityService utilityService, OmicTransformationService omicTransformationService,
+                   UniversalDataExporter universalDataExporter){
         this.utilityService = utilityService;
         this.omicTransformationService = omicTransformationService;
-        this.universalDataExporter = universalDataExtractor;
+        this.universalDataExporter = universalDataExporter;
     }
-
     private static String notSpecified = "Not Specified";
     private static String patientId = "patientId";
     private static String sampleId = "sampleId";
     private static String entrezGeneId = "EntrezGeneId";
-
     public enum cbioType {
         MUT,
         GISTIC
     }
 
     public void exportCBP(File exportDir,File templateDir, File pathToJson, cbioType dataType) throws IOException {
-
         if (doesFileNotExist(exportDir) || doesFileNotExist(templateDir) || doesFileNotExist(pathToJson)) {
             throw new IOException(String.format("A string argument passed to the exportCBP does not point to an existing file." +
                     "%s %n %s %n %s %n", exportDir, templateDir, pathToJson));
         }
             Group jsonGroup = createGroupWithJsonsFilename(pathToJson.getAbsolutePath());
-
             List<Map<String, Object>> listMapTable = utilityService.serializeJSONToMaps(pathToJson.getAbsolutePath());
-            cbpMapsToSheetsByDataType(listMapTable, dataType);
-
-            universalDataExporter.setDs(jsonGroup);
-            universalDataExporter.setTemplateDir(templateDir.getAbsolutePath());
-            universalDataExporter.export(exportDir.getAbsolutePath());
+            ExportProviderSheets exporterSheets = new ExportProviderSheets(jsonGroup);
+            cbpMapsToSheetsByDataType(listMapTable, dataType, exporterSheets);
+            ExporterTemplates templates = new ExporterTemplates(templateDir.getAbsolutePath());
+            universalDataExporter.export(exportDir.getAbsolutePath(), exporterSheets, templates);
     }
 
-    private void cbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, cbioType dataType){
-
-        List<List<String>> sheet;
+    private void cbpMapsToSheetsByDataType(List<Map<String, Object>> listMapTable, cbioType dataType,
+                                           ExportProviderSheets exporterProviderData){
         if(dataType.equals(cbioType.MUT)){
-            sheet = cbpMutJsonMapsToSheet(listMapTable);
-            universalDataExporter.setMutationSheetDataExport(sheet);
+            cbpMutJsonMapsToSheet(listMapTable, exporterProviderData.get(TSV.providerFileNames.mut.name()));
         }
-       else if(dataType.equals(cbioType.GISTIC)) {
-            sheet = cbpGisticsonMapsToSheet(listMapTable);
-            universalDataExporter.setCnaSheetDataExport(sheet);
+        else if(dataType.equals(cbioType.GISTIC)) {
+             cbpGisticsonMapsToSheet(listMapTable, exporterProviderData.get(TSV.providerFileNames.mut.name()));
         }
     }
 
-    private List<List<String>> cbpMutJsonMapsToSheet(List<Map<String, Object>> jsonMap){
+    private List<List<String>> cbpMutJsonMapsToSheet(List<Map<String, Object>> jsonMap, List<List<String>> exportSheet){
         AtomicInteger rowCount = new AtomicInteger();
-        List<List<String>> sheet = new ArrayList<>();
         jsonMap.forEach(f -> {
             try {
                 rowCount.incrementAndGet();
@@ -94,18 +88,16 @@ public class CbpTransformer {
                 addBlanksToList(row, 6);
                 row.add(f.get("ncbiBuild").toString());
                 row.add("");
-                sheet.add(row);
+                exportSheet.add(row);
             }catch(NullPointerException e){
                 log.error(String.format("Missing value in Json Mut map. Skipping Json Map %d", rowCount.get()));
             }
 
         });
-        return sheet;
+        return exportSheet;
     }
 
-    private List<List<String>> cbpGisticsonMapsToSheet(List<Map<String,Object>> jsonMap){
-
-        List<List<String>> sheet = new ArrayList<>();
+    private List<List<String>> cbpGisticsonMapsToSheet(List<Map<String,Object>> jsonMap,  List<List<String>> exportSheet){
         jsonMap.forEach(f -> {
             List<String> row = new LinkedList<>();
             row.add(f.get(patientId).toString());
@@ -120,9 +112,9 @@ public class CbpTransformer {
             row.add(f.get("alteration").toString());
             addBlanksToList(row, 3);
 
-            sheet.add(row);
+            exportSheet.add(row);
         });
-        return sheet;
+        return exportSheet;
     }
 
     private Group createGroupWithJsonsFilename(String pathToJson) {

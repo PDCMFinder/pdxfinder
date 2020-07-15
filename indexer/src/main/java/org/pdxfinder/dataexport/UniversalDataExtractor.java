@@ -1,6 +1,6 @@
 package org.pdxfinder.dataexport;
 
-import org.pdxfinder.dataloaders.updog.TSV;
+import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.UtilityService;
@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import java.util.*;
 
@@ -33,58 +32,60 @@ public class UniversalDataExtractor {
     private List<List<String>> samplePlatformDescriptionSheetDataExport;
     private List<List<String>> drugDosingSheetDataExport;
 
-    private List<List<String>> mutationSheetDataExport;
-    private List<List<String>> cnaSheetDataExport;
-    private List<List<String>> cytogeneticsSheetDataExport;
-    private List<List<String>> expressionSheetDataExport;
-
     private Group ds;
-    private ExportSheets sheets;
-
-    private static String notSpecified = "Not Specified";
-    private static String patientOrigin = "patient";
     private boolean isHarmonized;
+
+    private static final String notSpecified = "Not Specified";
+    private static final String patientOrigin = "patient";
+    private static final String modelOrigin = "xenograft";
+    private static final String mut = "mutation";
+    private static final String cna = "copy number alteration";
+    private static final String expr = "expression";
+    private static final String cyto = "cytogenetics";
 
     @Autowired
     public UniversalDataExtractor(DataImportService dataImportService, UtilityService utilityService) {
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
     }
-    public void init(ExportSheets sheets, boolean isHarmonized){
-        this.sheets = sheets;
-        this.ds = sheets.getGroup();
+
+    public void init(Group group){
+        this.ds = group;
+        this.isHarmonized = false;
+    }
+
+    public void init(Group group, boolean isHarmonized){
+        this.ds = group;
         this.isHarmonized = isHarmonized;
-
-        patientSheetDataExport = sheets.get(TSV.metadataSheetNames.patient.name());
-        sampleSheetDataExport = sheets.get(TSV.metadataSheetNames.sample.name());
-        modelSheetDataExport = sheets.get(TSV.metadataSheetNames.model.name());
-        modelValidationSheetDataExport = sheets.get(TSV.metadataSheetNames.model_validation.name());
-        sharingAndContactSheetDataExport = sheets.get(TSV.metadataSheetNames.sharing.name());
-        loaderRelatedDataSheetDataExport = sheets.get(TSV.metadataSheetNames.loader.name());
-
-        samplePlatformDescriptionSheetDataExport = sheets.get(TSV.providerFileNames.sampleplatform.name());
-
-        drugDosingSheetDataExport = sheets.get(TSV.providerFileNames.drugdosing.name());
-        mutationSheetDataExport = sheets.get(TSV.providerFileNames.mut.name());
-        cnaSheetDataExport = sheets.get(TSV.providerFileNames.cna.name());
-        cytogeneticsSheetDataExport = sheets.get(TSV.providerFileNames.cytogenetics.name());
-        expressionSheetDataExport = sheets.get(TSV.providerFileNames.expression.name());
     }
 
-    public void extract(){
-        initPatientSheet();
-        initSampleSheet();
-        initModelDetails();
-        initModelValidations();
-        initSharingAndContact();
-        initLoaderRelatedData();
-        initSamplePlatformDescription();
-        initOmicData();
+    public ExportProviderSheets extract(Group group){
+        return extract(group, false);
     }
 
-    public void initPatientSheet() {
+    public ExportProviderSheets extract(Group group, boolean isHarmonized){
+        this.ds = group;
+        this.isHarmonized = isHarmonized;
+        ExportProviderSheets sheets = new ExportProviderSheets(group, isHarmonized);
+
+        sheets.set(TSV.metadataSheetNames.patient.name(), extractPatientSheet());
+        sheets.set(TSV.metadataSheetNames.sample.name(), extractSampleSheet());
+        sheets.set(TSV.metadataSheetNames.model.name(), extractModelDetails());
+        sheets.set(TSV.metadataSheetNames.model_validation.name(), extractModelValidations());
+        sheets.set(TSV.metadataSheetNames.sharing.name(), extractSharingAndContact());
+        sheets.set(TSV.metadataSheetNames.loader.name(), extractLoaderRelatedData());
+        sheets.set(TSV.providerFileNames.sampleplatform.name(), extractSamplePlatformDescription());
+        extractGroupOmicData(mut);
+        extractGroupOmicData(cna);
+        extractGroupOmicData(cyto);
+        extractGroupOmicData(expr);
+
+        return sheets;
+    }
+
+    public List<List<String>> extractPatientSheet() {
         List<Patient> patients = dataImportService.findPatientsByGroup(ds);
-
+        patientSheetDataExport = new ArrayList<>();
         for (Patient patient : patients) {
 
             List<String> dataRow = new ArrayList<>();
@@ -107,10 +108,12 @@ public class UniversalDataExtractor {
 
             patientSheetDataExport.add(dataRow);
         }
+        return patientSheetDataExport;
     }
 
-    public void initSampleSheet(){
+    public List<List<String>> extractSampleSheet(){
         List<Patient> patients = dataImportService.findPatientTumorAtCollectionDataByDS(ds);
+        sampleSheetDataExport = new ArrayList<>();
         for(Patient patient : patients){
             String patientId = patient.getExternalId();
             for(PatientSnapshot patientSnapshot : patient.getSnapshots()){
@@ -122,7 +125,7 @@ public class UniversalDataExtractor {
                     String collectionEvent = patientSnapshot.getCollectionEvent();
                     String elapsedTime = patientSnapshot.getElapsedTime();
                     String ageAtCollection = patientSnapshot.getAgeAtCollection();
-                    String diagnosis = getSampleDiagnosis(sample);
+                    String diagnosis = getSampleUnharmonizedDiagnosis(sample);
                     String tumorType = sample.getType().getName();
                     String primarySite = sample.getOriginTissue().getName();
                     String collectionSite = sample.getSampleSite().getName();
@@ -144,6 +147,7 @@ public class UniversalDataExtractor {
                     dataRow.add(elapsedTime);
                     dataRow.add(ageAtCollection);
                     dataRow.add(diagnosis);
+                    addHarmonizedDiagnosis(dataRow, sample);
                     dataRow.add(tumorType);
                     dataRow.add(primarySite);
                     dataRow.add(collectionSite);
@@ -161,19 +165,28 @@ public class UniversalDataExtractor {
                 }
             }
         }
+        return sampleSheetDataExport;
     }
 
-    private String getSampleDiagnosis(Sample sample) {
-        String diagnosis = "";
-        if (isHarmonized){
-            try{
-            diagnosis = sample.getSampleToOntologyRelationship().getOntologyTerm().getLabel();
-            } catch (NullPointerException e){
-                log.warn("Sample {} was not mapped to an ontology term", sample.getSourceSampleId());
-            }
-        } else{
-                diagnosis = sample.getDiagnosis();
+    private void addHarmonizedDiagnosis(List<String> dataRow, Sample sample){
+        if(isHarmonized){
+            String harmonizedDiagnosis = getHarmonizedDiagnosis(sample);
+            dataRow.add(harmonizedDiagnosis);
         }
+    }
+
+    private String getHarmonizedDiagnosis(Sample sample){
+        String diagnosis = "";
+        try{
+            diagnosis = sample.getSampleToOntologyRelationship().getOntologyTerm().getLabel();
+        } catch (NullPointerException e){
+            log.warn("Sample {} was not mapped to an ontology term", sample.getSourceSampleId());
+        }
+        return diagnosis;
+    }
+
+    private String getSampleUnharmonizedDiagnosis(Sample sample) {
+        String diagnosis = sample.getDiagnosis();
         return diagnosis;
     }
 
@@ -188,11 +201,11 @@ public class UniversalDataExtractor {
         return modelId;
     }
 
-    public void initModelDetails(){
+    public List<List<String>> extractModelDetails(){
 
         List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
+        modelSheetDataExport = new ArrayList<List<String>>();
         for(ModelCreation model : models){
-
             Map<String, ModelDetails> specimenMap = new HashMap<>();
             for(Specimen specimen : model.getSpecimens()){
 
@@ -212,8 +225,34 @@ public class UniversalDataExtractor {
                     engraftmentMaterialStatus,
                     passage);
             }
-            insertModelSheetDataFromSpecimenMap(specimenMap, model);
+            modelSheetDataExport.addAll(insertModelSheetDataFromSpecimenMap(specimenMap, model));
         }
+        return modelSheetDataExport;
+    }
+
+    private List<List<String>> insertModelSheetDataFromSpecimenMap(Map<String, ModelDetails> specimenMap, ModelCreation model){
+        modelSheetDataExport = new ArrayList<>();
+        String modelId = model.getSourcePdxId();
+        String pubmedIDs = getPubmedIDs(model);
+
+        for(Map.Entry<String, ModelDetails> entry : specimenMap.entrySet()){
+
+            ModelDetails md = entry.getValue();
+            List<String> dataRow = new ArrayList<>();
+
+            dataRow.add(modelId);
+            dataRow.add(md.getHostStrainName());
+            dataRow.add(md.getHostStrainNomenclature());
+            dataRow.add(md.getEngraftmentSite());
+            dataRow.add(md.getEngraftmentType());
+            dataRow.add(md.getEngraftmentMaterial());
+            dataRow.add(md.getEngraftmentMaterialStatus());
+            dataRow.add(md.getSortedPassages());
+            dataRow.add(pubmedIDs);
+
+            modelSheetDataExport.add(dataRow);
+        }
+        return modelSheetDataExport;
     }
 
     private String[] getEngraftmentMaterialInfo(Specimen specimen){
@@ -241,8 +280,8 @@ public class UniversalDataExtractor {
         return engraftmentType;
     }
 
-    public void initModelValidations(){
-
+    public List<List<String>> extractModelValidations(){
+        modelValidationSheetDataExport = new ArrayList<>();
         List<ModelCreation> models = dataImportService.findModelsWithSpecimensAndQAByDS(ds.getAbbreviation());
 
         for(ModelCreation model : models){
@@ -254,113 +293,115 @@ public class UniversalDataExtractor {
                 for (QualityAssurance qa : model.getQualityAssurance()) {
 
                     List<String> dataRow = new ArrayList<>();
-
                     String validationTechnique = qa.getTechnology();
                     String validationDescription = qa.getDescription();
                     String passages = qa.getPassages();
                     String nomenclature = qa.getValidationHostStrain();
-
                     dataRow.add(modelId);
                     dataRow.add(validationTechnique);
                     dataRow.add(validationDescription);
                     dataRow.add(passages);
                     dataRow.add(nomenclature);
-
                     modelValidationSheetDataExport.add(dataRow);
                 }
             }
         }
+        return modelValidationSheetDataExport;
     }
 
-    public void initSharingAndContact(){
-
+    public List<List<String>> extractSharingAndContact(){
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
+        sharingAndContactSheetDataExport = new ArrayList<>();
 
         for(ModelCreation model : models){
 
             LinkedHashMap<String, String> sharingAndContactRow = new LinkedHashMap<>();
-
             sharingAndContactRow.put("modelId", model.getSourcePdxId());
-
             Group providerGroup = getGroupByType(model, "Provider");
             Group accessGroup = getGroupByType(model, "Accessibility");
             Group projectGroup = getGroupByType(model, "Project");
-
             getGroupData(sharingAndContactRow, providerGroup, accessGroup, projectGroup);
             getExternalUrlData(sharingAndContactRow, model.getExternalUrls());
-            insertSharingAndContactDataForModel(sharingAndContactRow);
+
+            List<String> dataRow = new ArrayList<>();
+            dataRow.add(sharingAndContactRow.get("modelId"));
+            dataRow.add(sharingAndContactRow.get("providerType"));
+            dataRow.add(sharingAndContactRow.get("modelAccessibility"));
+            dataRow.add(sharingAndContactRow.get("accessModalities"));
+            dataRow.add(sharingAndContactRow.get("contactEmail"));
+            dataRow.add(sharingAndContactRow.get("contactName"));
+            dataRow.add(sharingAndContactRow.get("contactLink"));
+            dataRow.add(sharingAndContactRow.get("modelLink"));
+            dataRow.add(sharingAndContactRow.get("providerName"));
+            dataRow.add(sharingAndContactRow.get("providerAbbrev"));
+            dataRow.add(sharingAndContactRow.get("projectName"));
+            sharingAndContactSheetDataExport.add(dataRow);
         }
+        return sharingAndContactSheetDataExport;
     }
 
-    public void initLoaderRelatedData(){
-
+    public List<List<String>> extractLoaderRelatedData(){
+        loaderRelatedDataSheetDataExport = new ArrayList<>();
         List<String> dataRow = new ArrayList<>();
         dataRow.add(ds.getName());
         dataRow.add(ds.getAbbreviation());
         dataRow.add(ds.getUrl());
-
         loaderRelatedDataSheetDataExport.add(dataRow);
+        return loaderRelatedDataSheetDataExport;
     }
 
-    public void initSamplePlatformDescription(){
-
+    public List<List<String>> extractSamplePlatformDescription(){
+        samplePlatformDescriptionSheetDataExport = new ArrayList<>();
         List<ModelCreation> models = dataImportService.findModelXenograftPlatformSampleByDS(ds.getAbbreviation());
-
         for(ModelCreation model : models){
-
-            addPatientMolcharDataToSamplePlatform(model);
-            addXenoMolcharDataToSamplePlatform(model);
+            samplePlatformDescriptionSheetDataExport.addAll(addPatientMolcharDataToSamplePlatform(model));
+            samplePlatformDescriptionSheetDataExport.addAll(addXenoMolcharDataToSamplePlatform(model));
         }
+        return samplePlatformDescriptionSheetDataExport;
     }
 
-    public void initOmicData(){
-    initGenomicData(mutationSheetDataExport, "mutation");
-    initGenomicData(cnaSheetDataExport, "copy number alteration");
-    initGenomicData(cytogeneticsSheetDataExport, "cytogenetics");
-    initGenomicData(expressionSheetDataExport, "expression");
-   }
-
-
-    private void initGenomicData(List<List<String>> sheetData, String molcharType){
-
+    public List<List<String>> extractGroupOmicData(String molcharType){
+        List<List<String>> genomicExportSheet = new ArrayList<>();
         List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
-
         for(ModelCreation m: models){ ModelCreation model = dataImportService.
               findModelWithMolecularDataByDSAndIdAndMolcharType(
                   ds.getAbbreviation(),
                   m.getSourcePdxId(),
                   molcharType);
-
-            if(model != null){
-
-                String modelId = model.getSourcePdxId();
-                log.info("Exporting data for {}", modelId);
-
-                initPatientGenomicData(model, sheetData);
-                initXenoGenomicData(model, sheetData);
-            }
+            genomicExportSheet.addAll(extractModelsOmicData(model, molcharType));
         }
+        return genomicExportSheet;
     }
 
-    private void insertOmicDataToSheet(
+    public List<List<String>> extractModelsOmicData(ModelCreation model, String molcharType){
+        List<List<String>> modelsOmicExportSheet = new ArrayList<>();
+        if(model != null) {
+            String modelId = model.getSourcePdxId();
+            log.info("Exporting {} data for {}", molcharType, modelId);
+            modelsOmicExportSheet.addAll(extractPatientSampleOmicData(model, molcharType));
+            modelsOmicExportSheet.addAll(extractXenoSampleOmicData(model, molcharType));
+        }
+        return modelsOmicExportSheet;
+    }
+
+    private List<List<String>> parseOmicDataToSheet(
         ModelCreation model,
         String sampleId,
         String sampleOrigin,
         String molcharType,
         Specimen specimen,
-        MolecularCharacterization mc,
-        List<List<String>> sheetData){
+        MolecularCharacterization mc){
 
-        for(MarkerAssociation ma: mc.getMarkerAssociations()){
+        List<List<String>> sheetData = new ArrayList<>();
+        for(MarkerAssociation ma: mc.getMarkerAssociations()) {
             List<MolecularData> molecularData;
-            try{
+            try {
                 molecularData = ma.decodeMolecularData();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 log.error("No molecular data");
                 molecularData = new ArrayList<>();
             }
-            for(MolecularData md : molecularData) {
+            for (MolecularData md : molecularData) {
                 List<String> rowData = new ArrayList<>();
                 rowData.add(model.getSourcePdxId());
                 rowData.add(sampleId);
@@ -369,7 +410,7 @@ public class UniversalDataExtractor {
                 rowData.add(getHostStrainNameSymbol(specimen));
 
                 switch (molcharType) {
-                    case "mutation":
+                    case mut:
                         rowData.add(md.getMarker());
                         rowData.add(md.getAminoAcidChange());
                         rowData.add(md.getBiotype());
@@ -394,7 +435,7 @@ public class UniversalDataExtractor {
                         rowData.add(md.getGenomeAssembly());
                         rowData.add(mc.getPlatform().getName());
                         break;
-                    case "copy number alteration":
+                    case cna:
                         rowData.add(md.getChromosome());
                         rowData.add(md.getSeqStartPosition());
                         rowData.add(md.getSeqEndPosition());
@@ -411,7 +452,7 @@ public class UniversalDataExtractor {
                         rowData.add(md.getGenomeAssembly());
                         rowData.add(mc.getPlatform().getName());
                         break;
-                    case "cytogenetics":
+                    case cyto:
                         rowData.add("");
                         rowData.add(md.getMarker());
                         rowData.add(md.getCytogeneticsResult());
@@ -420,7 +461,7 @@ public class UniversalDataExtractor {
                         rowData.add("");
                         rowData.add("");
                         break;
-                    case "expression":
+                    case expr:
                         rowData.add(md.getChromosome());
                         rowData.add("");
                         rowData.add(md.getSeqStartPosition());
@@ -442,11 +483,12 @@ public class UniversalDataExtractor {
                         rowData.add(mc.getPlatform().getName());
                         break;
                     default:
-                        throw new IllegalArgumentException("Inappropriate Molecular data type passed");
+                        throw new IllegalArgumentException("Inappropriate molecular data type passed");
                 }
                 sheetData.add(rowData);
             }
         }
+        return sheetData;
     }
 
     private String getHostStrainNameSymbol(Specimen specimen) {
@@ -463,11 +505,8 @@ public class UniversalDataExtractor {
 
 
     private String getPubmedIDs(ModelCreation model){
-
         StringBuilder pubmedIDs = new StringBuilder();
-
         if(model.getGroups() != null){
-
             for(Group g : model.getGroups()){
 
                 if(g.getType().equals("Publication")){
@@ -483,61 +522,14 @@ public class UniversalDataExtractor {
         return pubmedIDs.toString();
     }
 
-    private void insertModelSheetDataFromSpecimenMap(Map<String, ModelDetails> specimenMap, ModelCreation model){
-
-        String modelId = model.getSourcePdxId();
-        String pubmedIDs = getPubmedIDs(model);
-
-        for(Map.Entry<String, ModelDetails> entry : specimenMap.entrySet()){
-
-            ModelDetails md = entry.getValue();
-            List<String> dataRow = new ArrayList<>();
-
-            dataRow.add(modelId);
-            dataRow.add(md.getHostStrainName());
-            dataRow.add(md.getHostStrainNomenclature());
-            dataRow.add(md.getEngraftmentSite());
-            dataRow.add(md.getEngraftmentType());
-            dataRow.add(md.getEngraftmentMaterial());
-            dataRow.add(md.getEngraftmentMaterialStatus());
-            dataRow.add(md.getSortedPassages());
-            dataRow.add(pubmedIDs);
-
-            modelSheetDataExport.add(dataRow);
-        }
-    }
-
-    private void insertSharingAndContactDataForModel(LinkedHashMap<String, String> sharingAndContactRow){
-        List<String> dataRow = new ArrayList<>();
-
-        dataRow.add(sharingAndContactRow.get("modelId"));
-        dataRow.add(sharingAndContactRow.get("providerType"));
-        dataRow.add(sharingAndContactRow.get("modelAccessibility"));
-        dataRow.add(sharingAndContactRow.get("accessModalities"));
-        dataRow.add(sharingAndContactRow.get("contactEmail"));
-        dataRow.add(sharingAndContactRow.get("contactName"));
-        dataRow.add(sharingAndContactRow.get("contactLink"));
-        dataRow.add(sharingAndContactRow.get("modelLink"));
-        dataRow.add(sharingAndContactRow.get("providerName"));
-        dataRow.add(sharingAndContactRow.get("providerAbbrev"));
-        dataRow.add(sharingAndContactRow.get("projectName"));
-
-        sharingAndContactSheetDataExport.add(dataRow);
-
-    }
-
     private Group getGroupByType(ModelCreation model, String type){
-
         if(model.getGroups() != null){
-
             for(Group g : model.getGroups()){
-
                 if(g.getType().equals(type)){
                     return g;
                 }
             }
         }
-
         return null;
     }
 
@@ -571,16 +563,13 @@ public class UniversalDataExtractor {
     }
 
     private void getExternalUrlData(LinkedHashMap<String, String> map, Collection<ExternalUrl> urls){
-
         map.put("contactEmail",  "");
         map.put("contactName",  "");
         map.put("contactLink",  "");
         map.put("modelLink",  "");
 
         if(urls != null){
-
             for(ExternalUrl ex: urls) {
-
                 if (ex.getType().equals("contact")) {
 
                     if (ex.getUrl() != null && ex.getUrl().contains("@")) {
@@ -616,7 +605,6 @@ public class UniversalDataExtractor {
             specimenMap.get(specimenMapKey).getPassages().add(passage);
         }
         else{
-
             ModelDetails md = new ModelDetails(
                 hostStrain.getName(),
                 hostStrain.getSymbol(),
@@ -629,14 +617,11 @@ public class UniversalDataExtractor {
         }
     }
 
-    private void addPatientMolcharDataToSamplePlatform(ModelCreation model){
-
+    private ArrayList<List<String>> addPatientMolcharDataToSamplePlatform(ModelCreation model){
+        ArrayList<List<String>> samplePlatformPatientSheetDataExport = new ArrayList<>();
         if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
-
             for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
-
                 List<String> dataRow = new ArrayList<>();
-
                 dataRow.add("");
                 dataRow.add(model.getSample().getSourceSampleId());
                 dataRow.add(patientOrigin);
@@ -645,7 +630,6 @@ public class UniversalDataExtractor {
                 dataRow.add(model.getSourcePdxId());
                 dataRow.add("");
                 dataRow.add("");
-
                 dataRow.add(mc.getType());
                 dataRow.add(mc.getPlatform().getName());
                 dataRow.add(mc.getTechnology());
@@ -656,13 +640,14 @@ public class UniversalDataExtractor {
                 dataRow.add("");
                 dataRow.add(mc.getPlatform().getUrl());
 
-                samplePlatformDescriptionSheetDataExport.add(dataRow);
+                samplePlatformPatientSheetDataExport.add(dataRow);
             }
         }
+        return samplePlatformPatientSheetDataExport;
     }
 
-    private void addXenoMolcharDataToSamplePlatform(ModelCreation model){
-
+    private List<List<String>> addXenoMolcharDataToSamplePlatform(ModelCreation model){
+    ArrayList<List<String>> samplePlatformXenoDataSheetDataExport = new ArrayList<>();
         if(Objects.nonNull(model.getSpecimens())){
             for(Specimen sp : model.getSpecimens()){
 
@@ -695,47 +680,43 @@ public class UniversalDataExtractor {
                         dataRow.add("");
                         dataRow.add(mc.getPlatform().getUrl());
 
-                        samplePlatformDescriptionSheetDataExport.add(dataRow);
+                        samplePlatformXenoDataSheetDataExport.add(dataRow);
                     }
                 }
             }
         }
-
+        return samplePlatformXenoDataSheetDataExport;
     }
 
-    private void initPatientGenomicData(ModelCreation model, List<List<String>> sheetData){
-
+    private List<List<String>> extractPatientSampleOmicData(ModelCreation model, String molcharType){
+        List<List<String>> patientOmic = new ArrayList<>();
         if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
-
             String sampleId = model.getSample().getSourceSampleId();
 
             for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
-
-                insertOmicDataToSheet(model, sampleId, patientOrigin, mc.getType(), null, mc, sheetData);
+                patientOmic.addAll(parseOmicDataToSheet(model, sampleId, patientOrigin, mc.getType(), null, mc));
             }
         } else {
             log.error("No molecular data on patient sample found for model {} \n", model.getSourcePdxId());
         }
+        return patientOmic;
     }
 
-    private void initXenoGenomicData(ModelCreation model, List<List<String>> sheetData){
+    private List<List<String>> extractXenoSampleOmicData(ModelCreation model, String molcharType) {
+    List<List<String>> xenograftOmic = new ArrayList<>();
+        if (model.getSpecimens() != null) {
+            for (Specimen sp : model.getSpecimens()) {
 
-        //then look for xenograft molchars
-        if(model.getSpecimens()!= null){
-
-            for(Specimen sp : model.getSpecimens()){
-
-                if(sp.getSample() != null && sp.getSample().getMolecularCharacterizations() != null){
-
+                if (sp.getSample() != null && sp.getSample().getMolecularCharacterizations() != null) {
                     String sampleId = sp.getSample().getSourceSampleId();
 
-                    for(MolecularCharacterization mc: sp.getSample().getMolecularCharacterizations()){
-
-                        insertOmicDataToSheet(model, sampleId,"xenograft", mc.getType(), sp, mc, sheetData);
+                    for (MolecularCharacterization mc : sp.getSample().getMolecularCharacterizations()) {
+                        xenograftOmic.addAll(parseOmicDataToSheet(model, sampleId, modelOrigin, mc.getType(), sp, mc));
                     }
                 }
             }
         } else log.error("No specimens found for model {}", model.getId());
+        return xenograftOmic;
     }
 
     private String getHostStrainName(Specimen sp){
