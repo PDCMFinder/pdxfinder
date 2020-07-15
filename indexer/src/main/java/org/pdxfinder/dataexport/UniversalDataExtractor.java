@@ -694,7 +694,9 @@ public class UniversalDataExtractor {
             String sampleId = model.getSample().getSourceSampleId();
 
             for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
-                patientOmic.addAll(parseOmicDataToSheet(model, sampleId, patientOrigin, mc.getType(), null, mc));
+                if(mc.getType().equals(molcharType)){
+                    patientOmic.addAll(parseOmicDataToSheet(model, sampleId, patientOrigin, mc.getType(), null, mc));
+                }
             }
         } else {
             log.error("No molecular data on patient sample found for model {} \n", model.getSourcePdxId());
@@ -711,6 +713,7 @@ public class UniversalDataExtractor {
                     String sampleId = sp.getSample().getSourceSampleId();
 
                     for (MolecularCharacterization mc : sp.getSample().getMolecularCharacterizations()) {
+                        if(mc.getType().equals(molcharType))
                         xenograftOmic.addAll(parseOmicDataToSheet(model, sampleId, modelOrigin, mc.getType(), sp, mc));
                     }
                 }
