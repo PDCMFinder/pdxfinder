@@ -27,9 +27,6 @@ public class ExporterTemplates {
 
     private static final Logger log = LoggerFactory.getLogger(ExporterTemplates.class);
 
-    public ExporterTemplates(String templateDir) throws IOException {
-        this(templateDir, false);
-    }
 
     public ExporterTemplates(String templateDir, boolean isharmonized) throws IOException {
         this.templateDir = templateDir;
@@ -37,7 +34,6 @@ public class ExporterTemplates {
         this.isHarmonized = isharmonized;
 
         loadTemplates();
-        validateMetadataSheetCount();
         adjustMetadataTemplateIfHarmonized();
         addAllSheetsToMap();
     }
@@ -75,12 +71,6 @@ public class ExporterTemplates {
         templatesMap.put(TSV.templateNames.cna_template.name() ,cnaTemplate);
         templatesMap.put(TSV.templateNames.cytogenetics_template.name() ,cytoTemplate);
         templatesMap.put(TSV.templateNames.expression_template.name() ,exprTemplate);
-    }
-
-    private void validateMetadataSheetCount() throws IOException{
-      if (metadataTemplate.getNumberOfSheets() != TSV.numberOfMetadataSheets.numberSheets.count){
-          throw new IOException("metadata template has the incorrect number of sheets");
-        }
     }
 
     public XSSFWorkbook getTemplate(String template){

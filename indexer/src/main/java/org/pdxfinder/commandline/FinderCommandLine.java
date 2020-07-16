@@ -169,7 +169,6 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Autowired
         private FinderExporter finderExporter;
-
         @Option(
                 names = {"-d", "--data-dir"},
                 description = "Path of the PDX Finder data directory " +
@@ -177,10 +176,11 @@ public class FinderCommandLine implements Callable<Integer> {
         private File dataDirectory;
 
         @Option(
-                names = {"-o", "--harmonized"},
+                names = {"-h", "--harmonized"},
                 description = "Exports the NCIT ontology information"
         )
         private boolean isHarmonized;
+
 
         @ArgGroup(multiplicity = "0..1")
         Export.Exclusive datasetRequested = new Export.Exclusive();

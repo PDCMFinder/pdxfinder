@@ -189,6 +189,18 @@ public class TSV {
         loader
     }
 
+    //Sample Platform sheet, these are the internal strings in the DB
+    public enum molecular_characterisation_type{
+
+        cyto("cytogenetic"),
+        expression("expression"),
+        mut("mutation"),
+        cna("copy number alteration");
+
+        public final String mcType;
+
+        molecular_characterisation_type(String mcType) { this.mcType = mcType; }
+    }
 
     public enum numberOfMetadataSheets{
         numberSheets(6);

@@ -1,10 +1,7 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.lang3.StringUtils;
-import org.pdxfinder.dataexport.ExportProviderSheets;
-import org.pdxfinder.dataexport.ExporterTemplates;
 import org.pdxfinder.dataexport.UniversalDataExporter;
-import org.pdxfinder.dataexport.UniversalDataExtractor;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
@@ -27,13 +24,11 @@ public class FinderExporter {
     private static final Logger log = LoggerFactory.getLogger(FinderExporter.class);
 
     private DataImportService dataImportService;
-    private UniversalDataExtractor universalDataExtractor;
     private UniversalDataExporter universalDataExporter;
 
     @Autowired
-    FinderExporter(DataImportService dataImportService, UniversalDataExtractor universalDataExtractor, UniversalDataExporter universalDataExporter){
+    FinderExporter(DataImportService dataImportService, UniversalDataExporter universalDataExporter){
         this.dataImportService = dataImportService;
-        this.universalDataExtractor = universalDataExtractor;
         this.universalDataExporter = universalDataExporter;
     }
     public void run(File dataDirectory, String provider, boolean loadAll, boolean isHarmonized) throws IOException {
@@ -67,15 +62,13 @@ public class FinderExporter {
         });
     }
 
-    public void export(File rootDir, String dataSourceAbbrev, boolean isharmonized) throws IOException {
+    public void export(File rootDir, String dataSourceAbbrev, boolean isHarmonized) throws IOException {
         Group ds = dataImportService.findProviderGroupByAbbrev(dataSourceAbbrev);
         if(ds == null) {
             log.error("Datasource {} not found. ",dataSourceAbbrev);
             return;
         }
-        ExporterTemplates xDogSheets = new ExporterTemplates(rootDir + "/template", isharmonized);
-        ExportProviderSheets providerSheets = universalDataExtractor.extract(ds, isharmonized);
-        universalDataExporter.export(rootDir + "/export",providerSheets, xDogSheets);
+        universalDataExporter.exportAllFromGroup(rootDir.getAbsolutePath(), ds, isHarmonized, rootDir + "/templates");
     }
 
     public void setDefaultDirectory(String defaultDirectory) {

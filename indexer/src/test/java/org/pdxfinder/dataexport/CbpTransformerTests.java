@@ -36,7 +36,7 @@ public class CbpTransformerTests extends BaseTest {
     @Mock
     private OmicTransformationService omicTransformationService;
     @Mock
-    private UniversalDataExporter universalDataExporter;
+    private UniversalDataWriterUtilities universalDataWriterUtilities;
 
     @InjectMocks
     private CbpTransformer cbpTransformer;

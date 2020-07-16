@@ -11,14 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-
 /*
  * Created by csaba on 02/10/2019.
  */
 @Service
-public class UniversalDataExtractor {
+public class UniversalDataExtractionUtilities {
 
-    private static final Logger log = LoggerFactory.getLogger(UniversalDataExtractor.class);
+    private static final Logger log = LoggerFactory.getLogger(UniversalDataExtractionUtilities.class);
 
     protected UtilityService utilityService;
     protected DataImportService dataImportService;
@@ -38,20 +37,15 @@ public class UniversalDataExtractor {
     private static final String notSpecified = "Not Specified";
     private static final String patientOrigin = "patient";
     private static final String modelOrigin = "xenograft";
-    private static final String mut = "mutation";
-    private static final String cna = "copy number alteration";
-    private static final String expr = "expression";
-    private static final String cyto = "cytogenetics";
 
     @Autowired
-    public UniversalDataExtractor(DataImportService dataImportService, UtilityService utilityService) {
+    public UniversalDataExtractionUtilities(DataImportService dataImportService, UtilityService utilityService) {
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
     }
 
     public void init(Group group){
-        this.ds = group;
-        this.isHarmonized = false;
+       init(group,false);
     }
 
     public void init(Group group, boolean isHarmonized){
@@ -59,28 +53,36 @@ public class UniversalDataExtractor {
         this.isHarmonized = isHarmonized;
     }
 
-    public ExportProviderSheets extract(Group group){
-        return extract(group, false);
-    }
-
-    public ExportProviderSheets extract(Group group, boolean isHarmonized){
-        this.ds = group;
-        this.isHarmonized = isHarmonized;
-        ExportProviderSheets sheets = new ExportProviderSheets(group, isHarmonized);
-
+    public ExportProviderSheets extractMetadata(ExportProviderSheets sheets){
+        this.ds = sheets.getGroup();
         sheets.set(TSV.metadataSheetNames.patient.name(), extractPatientSheet());
         sheets.set(TSV.metadataSheetNames.sample.name(), extractSampleSheet());
         sheets.set(TSV.metadataSheetNames.model.name(), extractModelDetails());
         sheets.set(TSV.metadataSheetNames.model_validation.name(), extractModelValidations());
         sheets.set(TSV.metadataSheetNames.sharing.name(), extractSharingAndContact());
         sheets.set(TSV.metadataSheetNames.loader.name(), extractLoaderRelatedData());
-        sheets.set(TSV.providerFileNames.sampleplatform.name(), extractSamplePlatformDescription());
-        extractGroupOmicData(mut);
-        extractGroupOmicData(cna);
-        extractGroupOmicData(cyto);
-        extractGroupOmicData(expr);
-
         return sheets;
+    }
+
+    public ExportProviderSheets extracSamplePlatform(ExportProviderSheets sheets){
+        this.ds = sheets.getGroup();
+        sheets.set(TSV.providerFileNames.sampleplatform.name(), extractSamplePlatformDescription());
+        return sheets;
+    }
+
+    public List<ModelCreation> getAllModelsByGroupAndMoleculartype(Group group, String molcharType){
+        List<ModelCreation> modelsWithMolType = new ArrayList<>();
+        List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
+        for(ModelCreation m: models){ ModelCreation model = dataImportService.
+                findModelWithMolecularDataByDSAndIdAndMolcharType(
+                        ds.getAbbreviation(),
+                        m.getSourcePdxId(),
+                        molcharType);
+            if(model != null) {
+                modelsWithMolType.add(model);
+            }
+        }
+        return modelsWithMolType;
     }
 
     public List<List<String>> extractPatientSheet() {
@@ -360,19 +362,6 @@ public class UniversalDataExtractor {
         return samplePlatformDescriptionSheetDataExport;
     }
 
-    public List<List<String>> extractGroupOmicData(String molcharType){
-        List<List<String>> genomicExportSheet = new ArrayList<>();
-        List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
-        for(ModelCreation m: models){ ModelCreation model = dataImportService.
-              findModelWithMolecularDataByDSAndIdAndMolcharType(
-                  ds.getAbbreviation(),
-                  m.getSourcePdxId(),
-                  molcharType);
-            genomicExportSheet.addAll(extractModelsOmicData(model, molcharType));
-        }
-        return genomicExportSheet;
-    }
-
     public List<List<String>> extractModelsOmicData(ModelCreation model, String molcharType){
         List<List<String>> modelsOmicExportSheet = new ArrayList<>();
         if(model != null) {
@@ -398,7 +387,8 @@ public class UniversalDataExtractor {
             try {
                 molecularData = ma.decodeMolecularData();
             } catch (Exception e) {
-                log.error("No molecular data");
+                log.error("Error decoding molecular Data on sample Id {} " +
+                        "for molecularCharacterization type {}", sampleId, mc.getType());
                 molecularData = new ArrayList<>();
             }
             for (MolecularData md : molecularData) {
@@ -410,7 +400,7 @@ public class UniversalDataExtractor {
                 rowData.add(getHostStrainNameSymbol(specimen));
 
                 switch (molcharType) {
-                    case mut:
+                    case "mutation":
                         rowData.add(md.getMarker());
                         rowData.add(md.getAminoAcidChange());
                         rowData.add(md.getBiotype());
@@ -435,7 +425,7 @@ public class UniversalDataExtractor {
                         rowData.add(md.getGenomeAssembly());
                         rowData.add(mc.getPlatform().getName());
                         break;
-                    case cna:
+                    case "copy number alteration":
                         rowData.add(md.getChromosome());
                         rowData.add(md.getSeqStartPosition());
                         rowData.add(md.getSeqEndPosition());
@@ -452,7 +442,7 @@ public class UniversalDataExtractor {
                         rowData.add(md.getGenomeAssembly());
                         rowData.add(mc.getPlatform().getName());
                         break;
-                    case cyto:
+                    case "cytogenetics":
                         rowData.add("");
                         rowData.add(md.getMarker());
                         rowData.add(md.getCytogeneticsResult());
@@ -461,7 +451,7 @@ public class UniversalDataExtractor {
                         rowData.add("");
                         rowData.add("");
                         break;
-                    case expr:
+                    case "expression":
                         rowData.add(md.getChromosome());
                         rowData.add("");
                         rowData.add(md.getSeqStartPosition());
@@ -493,7 +483,7 @@ public class UniversalDataExtractor {
 
     private String getHostStrainNameSymbol(Specimen specimen) {
         String hostStrainSymbol = "";
-        if (specimen.getHostStrain() != null && specimen.getHostStrain().getSymbol() != null) {
+        if (specimen != null && specimen.getHostStrain() != null && specimen.getHostStrain().getSymbol() != null) {
             hostStrainSymbol = specimen.getHostStrain().getSymbol();
            }
         return hostStrainSymbol;
@@ -699,7 +689,7 @@ public class UniversalDataExtractor {
                 }
             }
         } else {
-            log.error("No molecular data on patient sample found for model {} \n", model.getSourcePdxId());
+            log.info("No molecular data found for patient sample for model {} \n", model.getSourcePdxId());
         }
         return patientOmic;
     }

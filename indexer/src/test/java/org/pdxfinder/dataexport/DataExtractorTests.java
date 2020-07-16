@@ -1,36 +1,29 @@
 package org.pdxfinder.dataexport;
 
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
+import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
 
-public class DataExtractorTest extends BaseTest {
+public class DataExtractorTests extends BaseTest {
 
     @Mock
     private DataImportService dataImportService;
 
     @InjectMocks
-    protected UniversalDataExtractor extractor;
+    protected UniversalDataExtractionUtilities extractor;
 
     Group providerGroup;
 
@@ -38,6 +31,12 @@ public class DataExtractorTest extends BaseTest {
     private static final String biotype = "protien_coding";
     private static final String codingSequenceChange = "3154G>A";
     private static final String variantClass = "SNV";
+    private static final String cnaLog2RCNA = "-0.01234";
+    private static final String marker = "SMAD3";
+    private static final String patientSampleId = "s123";
+    private static final String xenoSampleId = "xs123";
+    private static final String mutMolType = TSV.molecular_characterisation_type.mut.mcType;
+    private static final String cnaMolType = TSV.molecular_characterisation_type.cna.mcType;
 
     @Before
     public void setUp() {
@@ -47,18 +46,15 @@ public class DataExtractorTest extends BaseTest {
 
     @Test
     public void Given_PatientAndProvider_When_GetPatientSheetIsCalled_Then_PatientDataIsInRowOne() {
-
         when(dataImportService.findPatientsByGroup(providerGroup))
           .thenReturn(getPatientListForTest());
 
         List<List<String>> patientData  = extractor.extractPatientSheet();
-
         Assert.assertEquals("p123", patientData.get(0).get(0));
     }
 
     @Test
     public void Given_PatientAndModelAndSample_When_PatientSampleSheetIsCalled_Then_PatientDataIsInRowOne(){
-
         Patient patient = new Patient("p123", "male", "", "", providerGroup);
         PatientSnapshot patientSnapshot = new PatientSnapshot();
         patientSnapshot.setAgeAtCollection("65");
@@ -138,124 +134,80 @@ public class DataExtractorTest extends BaseTest {
 
         List<List<String>> samplePlatformDescription = extractor.extractSamplePlatformDescription();
 
-        Assert.assertEquals("s123", samplePlatformDescription.get(0).get(1));
-        Assert.assertEquals("xs123", samplePlatformDescription.get(1).get(1));
-
+        Assert.assertEquals(patientSampleId, samplePlatformDescription.get(0).get(1));
+        Assert.assertEquals(xenoSampleId, samplePlatformDescription.get(2).get(1));
     }
 
     @Test
-    public void Given_ModelwithMutationData_When_initGenomicDataIsCalled_Then_MutationDataIsInRowOne(){
-
+    public void Given_XenograftSamplewithMutationAndCna_When_extractGroupOmicDataIsCalled_Then_returnAppropriateDataForEach(){
         List<ModelCreation> modelList = getModelListForTest();
 
         when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
                 .thenReturn(modelList);
 
         when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
-                providerGroup.getAbbreviation(),"m123", "mutation"))
+                providerGroup.getAbbreviation(),"m123", mutMolType))
                 .thenReturn(modelList.get(0));
 
-        universalDataExporter.setDs(providerGroup);
-        universalDataExporter.initOmicData();
-        List<List<String>> mutationData = universalDataExporter.getMutationSheetDataExport();
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
+                providerGroup.getAbbreviation(),"m123", cnaMolType))
+                .thenReturn(modelList.get(0));
 
+        List<List<String>> mutationData = extractor.extractGroupOmicData(mutMolType);
+        List<List<String>> cnaData = extractor.extractGroupOmicData(cnaMolType);
         Assert.assertTrue(mutationData.get(0).contains(ncbiId));
         Assert.assertTrue(mutationData.get(0).contains(biotype));
         Assert.assertTrue(mutationData.get(0).contains(codingSequenceChange));
         Assert.assertTrue(mutationData.get(0).contains(variantClass));
+        Assert.assertFalse(mutationData.get(0).contains(cnaLog2RCNA));
+        Assert.assertFalse(mutationData.get(0).contains(marker));
 
+        Assert.assertTrue(cnaData.get(0).contains(cnaLog2RCNA));
+        Assert.assertTrue(cnaData.get(0).contains(marker));
+        Assert.assertFalse(cnaData.get(0).contains(biotype));
+        Assert.assertFalse(cnaData.get(0).contains(variantClass));
+    }
+
+    @Test
+    public void Given_PatientSamplewithMutationAndCna_When_extractGroupOmicDataIsCalled_Then_returnAppropriateDataForEach(){
+        List<ModelCreation> modelList = getModelListForTest();
+
+        when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
+                .thenReturn(modelList);
+
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
+                providerGroup.getAbbreviation(),"m123", mutMolType))
+                .thenReturn(modelList.get(0));
+
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
+                providerGroup.getAbbreviation(),"m123", cnaMolType))
+                .thenReturn(modelList.get(0));
+
+        List<List<String>> mutationData = extractor.extractGroupOmicData(mutMolType);
+        List<List<String>> cnaData = extractor.extractGroupOmicData(cnaMolType);
+        Assert.assertTrue(mutationData.get(0).contains(ncbiId));
+        Assert.assertFalse(mutationData.get(0).contains(marker));
+        Assert.assertTrue(cnaData.get(0).contains(marker));
+        Assert.assertFalse(cnaData.get(0).contains(biotype));
     }
 
 
     @Test
-    public void Given_SheetRowData_When_UpdateSheetIsCalled_Then_SheetIsUpdated(){
+    public void Given_ModelwithMutationData_When_extractModelDataIsCalledwithDifferentMolcType_Then_NoDataIsRetrieved(){
+        List<ModelCreation> modelList = getModelListForTest();
 
-        Workbook wb = new XSSFWorkbook();
-        Sheet sheet1 = wb.createSheet("Sheet1");
+        when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
+                .thenReturn(modelList);
 
-        List<String> rowData = new ArrayList<>(Arrays.asList("1","2","3","4"));
-        List<List<String>> data = new ArrayList<>();
-        data.add(rowData);
+        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
+                providerGroup.getAbbreviation(),"m123", mutMolType))
+                .thenReturn(modelList.get(0));
 
-        //universalDataExtractor.updateSheetWithData(sheet1, data, 1, 1);
-
-        Assert.assertEquals("2", sheet1.getRow(0).getCell(1).getStringCellValue());
+        List<List<String>> expressionData = extractor.extractGroupOmicData("expression");
+        Assert.assertTrue(expressionData.size() == 0);
     }
-
-    @Test
-    public void Given_dataIsReadyToExport_When_exportIsCalled_Then_createCorrectFileStructure() throws IOException {
-
-        Path metaData = Paths.get( "/tmp/metadata_template.xlsx");
-        Path samplePlatform = Paths.get("/tmp/sampleplatform_template.xlsx" );
-        Path mutation = Paths.get("/tmp/mutation_template.xlsx");
-        Path cnaTemplate = Paths.get("/tmp/cna_template.xlsx");
-
-        List<List<String>> genericSheet = new ArrayList<>();
-        List<String> genericColumn = new ArrayList<>();
-        genericSheet.add(genericColumn);
-
-        extractor.setPatientSheetDataExport(genericSheet);
-        extractor.setSampleSheetDataExport(genericSheet);
-        extractor.setPatientTreatmentSheetDataExport(genericSheet);
-        extractor.setModelSheetDataExport(genericSheet);
-        extractor.setPdxModelValidationSheetDataExport(genericSheet);
-        extractor.setSamplePlatformDescriptionSheetDataExport(genericSheet);
-        extractor.setSharingAndContactSheetDataExport(genericSheet);
-        extractor.setCytogeneticsSheetDataExport(genericSheet);
-        extractor.setLoaderRelatedDataSheetDataExport(genericSheet);
-        extractor.setDrugDosingSheetDataExport(genericSheet);
-        extractor.setCnaSheetDataExport(genericSheet);
-        extractor.setMutationSheetDataExport(genericSheet);
-
-
-        Workbook metaDataXlsx = new XSSFWorkbook();
-        Workbook samplePlatformXlsx = new XSSFWorkbook();
-        Workbook mutationXlsx = new XSSFWorkbook();                                                           
-        Workbook cnaTemplateXlsx = new XSSFWorkbook();
-
-        for(int i = 0; i < 7; i++) {
-            metaDataXlsx.createSheet(String.format("%s", i));
-        }
-
-        samplePlatformXlsx.createSheet("0");
-        mutationXlsx.createSheet("0");
-        cnaTemplateXlsx.createSheet("0");
-
-        metaDataXlsx.write(new FileOutputStream(metaData.toFile()));
-        samplePlatformXlsx.write(new FileOutputStream(samplePlatform.toFile()));
-        mutationXlsx.write(new FileOutputStream(mutation.toFile()));
-        cnaTemplateXlsx.write(new FileOutputStream(cnaTemplate.toFile()));
-
-        try {
-            extractor.setTemplateDir("/tmp");
-            extractor.setDs(providerGroup);
-            extractor.extractPatientSheet();
-            //universalDataExtractor.export("/tmp");
-        } finally {
-
-            Files.delete(metaData);
-            Files.delete(samplePlatform);
-            Files.delete(mutation);
-            Files.delete(cnaTemplate);
-        }
-
-        Path expectedProviderDir = Paths.get("/tmp/TG");
-        Path expectedCnaDir = Paths.get("/tmp/TG/cna");
-        Path expectedMutDir = Paths.get("/tmp/TG/mut");
-        Path expectedMetaData = Paths.get("/tmp/TG/metadata.xlsx");
-
-        Assert.assertTrue(expectedProviderDir.toFile().exists());
-        Assert.assertTrue(expectedCnaDir.toFile().exists());
-        Assert.assertTrue(expectedMutDir.toFile().exists());
-        Assert.assertTrue(expectedMetaData.toFile().exists());
-
-    }
-
-
-
 
     private List<ModelCreation> getModelListForTest(){
-
         List<ModelCreation> modelCreationList = new ArrayList<>();
 
         ModelCreation model = new ModelCreation();
@@ -282,53 +234,44 @@ public class DataExtractorTest extends BaseTest {
         model.addQualityAssurance(qualityAssurance);
 
         Sample patientSample = new Sample();
-        patientSample.setSourceSampleId("s123");
+        patientSample.setSourceSampleId(patientSampleId);
 
         model.setSample(patientSample);
 
-        MolecularCharacterization molecularCharacterization = new MolecularCharacterization();
-        molecularCharacterization.setType("mutation");
-        molecularCharacterization.setTechnology("techtest");
-
-        MarkerAssociation ma = new MarkerAssociation();
-        ma.setMolecularDataString("[{\"biotype\": \"" + biotype + "\",\"codingSequenceChange\":\"" + codingSequenceChange + "\"," +
-                "\"variantClass\":\""+ variantClass + "\",\"codonChange\"" +
-                ":\"Gtt/Att\",\"aminoAcidChange\":\"E763*\",\"consequence\":\"\",\"functionalPrediction\":\"Nonsense_Mutation\"," +
-                "\"readDepth\":\"403\",\"alleleFrequency\":\"0.464\",\"chromosome\":\"5\",\"seqStartPosition\":\"112173578\"," +
-                "\"refAllele\":\"G\",\"altAllele\":\"T\",\"ucscGeneId\":\"\",\"ncbiGeneId\":\"" + ncbiId + "\",\"ncbiTranscriptId\":" +
-                "\"XR_929159.2\",\"existingVariations\":\"CM106354,COSM5010432\",\"genomeAssembly\":\"hg19\",\"nucleotideChange\"" +
-                ":\"\",\"marker\":\"APC\"}]");
-
-        molecularCharacterization.setMarkerAssociations(Collections.singletonList(ma));
-        Platform platform = new Platform();
-        platform.setName("platform");
-        platform.setUrl("platformurl");
-
-        molecularCharacterization.setPlatform(platform);
-        patientSample.addMolecularCharacterization(molecularCharacterization);
-
-        //setting up the xeno sample
         Specimen specimen = new Specimen();
         specimen.setPassage("1");
         specimen.setHostStrain(new HostStrain("hssymbol", "hsname"));
 
         Sample xenoSample = new Sample();
-        xenoSample.setSourceSampleId("xs123");
+        xenoSample.setSourceSampleId(xenoSampleId);
         specimen.setSample(xenoSample);
-        xenoSample.addMolecularCharacterization(molecularCharacterization);
         model.addSpecimen(specimen);
 
+        String mutJson = "[{\"biotype\": \"" + biotype + "\",\"codingSequenceChange\":\"" + codingSequenceChange + "\"," +
+                "\"variantClass\":\""+ variantClass + "\",\"codonChange\"" +
+                ":\"Gtt/Att\",\"aminoAcidChange\":\"E763*\",\"consequence\":\"\",\"functionalPrediction\":\"Nonsense_Mutation\"," +
+                "\"readDepth\":\"403\",\"alleleFrequency\":\"0.464\",\"chromosome\":\"5\",\"seqStartPosition\":\"112173578\"," +
+                "\"refAllele\":\"G\",\"altAllele\":\"T\",\"ucscGeneId\":\"\",\"ncbiGeneId\":\"" + ncbiId + "\",\"ncbiTranscriptId\":" +
+                "\"XR_929159.2\",\"existingVariations\":\"CM106354,COSM5010432\",\"genomeAssembly\":\"hg19\",\"nucleotideChange\"" +
+                ":\"\",\"marker\":\"APC\"}]";
+
+        String cnaJson = "[{\"chromosome\":\"\",\"seqStartPosition\":\"\",\"genomeAssembly\":\"\"," +
+                "\"seqEndPosition\":\"\",\"cnaLog10RCNA\":\"\",\"cnaLog2RCNA\":\"" + cnaLog2RCNA + "\"," +
+                "\"cnaCopyNumberStatus\":\"Normal\",\"cnaGisticValue\":\"\"" +
+                ",\"cnaPicnicValue\":\"\",\"marker\":\"" + marker + "\"}]";
+
+        Platform platform = new Platform();
+        platform.setName("platform");
+        platform.setUrl("platformurl");
+
+        MolecularCharacterization mutMc = createMolecularDataStructure(mutMolType, mutJson, platform);
+        MolecularCharacterization cnaMc = createMolecularDataStructure(cnaMolType, cnaJson, platform);
+        xenoSample.addMolecularCharacterization(mutMc);
+        xenoSample.addMolecularCharacterization(cnaMc);
+        patientSample.addMolecularCharacterization(mutMc);
+        patientSample.addMolecularCharacterization(cnaMc);
 
         modelCreationList.add(model);
-
-        //setting up cna data
-        MolecularCharacterization molecularCharacterization2 = new MolecularCharacterization();
-        molecularCharacterization2.setType("copy number alteration");
-        molecularCharacterization2.setPlatform(platform);
-        MolecularData md2 = new MolecularData();
-        md2.setCnaCopyNumberStatus("cnaStatus");
-        xenoSample.addMolecularCharacterization(molecularCharacterization2);
-
         return modelCreationList;
     }
 
@@ -342,9 +285,20 @@ public class DataExtractorTest extends BaseTest {
         List<Patient> patientList = new ArrayList<>();
         patientList.add(patient);
 
-
-
         return patientList;
+    }
+
+    private MolecularCharacterization createMolecularDataStructure(String molType, String markerAssociation, Platform platform){
+        MolecularCharacterization molecularCharacterization = new MolecularCharacterization();
+        molecularCharacterization.setType(molType);
+        molecularCharacterization.setTechnology("techtest");
+
+        MarkerAssociation ma = new MarkerAssociation();
+        ma.setMolecularDataString(markerAssociation);
+
+        molecularCharacterization.setMarkerAssociations(Collections.singletonList(ma));
+        molecularCharacterization.setPlatform(platform);
+        return molecularCharacterization;
     }
 
 

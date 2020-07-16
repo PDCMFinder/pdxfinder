@@ -67,11 +67,6 @@ public class ExportProviderSheets {
         sharingAndContactSheetDataExport = new ArrayList<>();
         loaderRelatedDataSheetDataExport = new ArrayList<>();
         samplePlatformSheetDataExport = new ArrayList<>();
-        drugDosingSheetDataExport = new ArrayList<>();
-        mutationSheetDataExport = new ArrayList<>();
-        cnaSheetDataExport = new ArrayList<>();
-        cytogeneticsSheetDataExport = new ArrayList<>();
-        expressionSheetDataExport = new ArrayList<>();
     }
 
     private void createExportSheetMap() {
@@ -82,10 +77,6 @@ public class ExportProviderSheets {
         exportSheetsMap.put(TSV.metadataSheetNames.sharing.name(),sharingAndContactSheetDataExport);
         exportSheetsMap.put(TSV.metadataSheetNames.loader.name(),loaderRelatedDataSheetDataExport);
         exportSheetsMap.put(TSV.providerFileNames.sampleplatform.name(),samplePlatformSheetDataExport);
-        exportSheetsMap.put(TSV.providerFileNames.drugdosing.name(),drugDosingSheetDataExport);
-        exportSheetsMap.put(TSV.providerFileNames.mut.name(),mutationSheetDataExport);
-        exportSheetsMap.put(TSV.providerFileNames.cna.name(),cnaSheetDataExport);
-        exportSheetsMap.put(TSV.providerFileNames.cytogenetics.name(),cytogeneticsSheetDataExport);
     }
 
     private void initBlankSheet() {
