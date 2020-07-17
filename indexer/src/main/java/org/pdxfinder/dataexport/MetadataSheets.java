@@ -5,7 +5,7 @@ import org.pdxfinder.graph.dao.Group;
 
 import java.util.*;
 
-public class ExportProviderSheets {
+public class MetadataSheets {
 
     private List<List<String>> patientSheetDataExport;
     private List<List<String>> patientSampleSheetDataExport;
@@ -29,11 +29,7 @@ public class ExportProviderSheets {
     private Group group;
     private boolean isHarmonized;
 
-    public ExportProviderSheets(Group group){
-        this(group, false);
-    }
-
-    public ExportProviderSheets(Group group, boolean isHarmonized) {
+    public MetadataSheets(Group group, boolean isHarmonized) {
         Objects.requireNonNull(group, "ExportSheets must have a group provider");
         this.group = group;
         this.isHarmonized = isHarmonized;
@@ -66,7 +62,6 @@ public class ExportProviderSheets {
         pdxModelValidationSheetDataExport = new ArrayList<>();
         sharingAndContactSheetDataExport = new ArrayList<>();
         loaderRelatedDataSheetDataExport = new ArrayList<>();
-        samplePlatformSheetDataExport = new ArrayList<>();
     }
 
     private void createExportSheetMap() {
@@ -76,7 +71,6 @@ public class ExportProviderSheets {
         exportSheetsMap.put(TSV.metadataSheetNames.model_validation.name(),pdxModelValidationSheetDataExport);
         exportSheetsMap.put(TSV.metadataSheetNames.sharing.name(),sharingAndContactSheetDataExport);
         exportSheetsMap.put(TSV.metadataSheetNames.loader.name(),loaderRelatedDataSheetDataExport);
-        exportSheetsMap.put(TSV.providerFileNames.sampleplatform.name(),samplePlatformSheetDataExport);
     }
 
     private void initBlankSheet() {

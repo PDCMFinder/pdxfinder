@@ -51,7 +51,7 @@ public class UniversalDataWriterUtilities {
     public void writeSingleOmicFileToTsv(String exportLocation, Sheet template,
                                         List<List<String>> exportSheet) throws IOException {
         createExportDirectories(exportLocation);
-        copyHeadersFromSheetToTsv(template, exportLocation);
+        saveHeadersToTsv(template, exportLocation);
         appendDataToOmicTsvFile(exportSheet, exportLocation);
     }
 
@@ -60,15 +60,15 @@ public class UniversalDataWriterUtilities {
         Files.createDirectories(parentDirectory);
     }
 
-    void copyHeadersFromSheetToTsv(Sheet template, String exportFileLocation) {
+    public void saveHeadersToTsv(Sheet template, String exportFileLocation) {
         try (FileWriter fileWriter = new FileWriter(exportFileLocation)) {
-            copyHeadersFromSheetToTsv(template, fileWriter);
+            saveHeadersToTsv(template, fileWriter);
         } catch (IOException e) {
             log.error("IO Error writiner headers from {} %n {}", template.getSheetName(), e.toString());
         }
     }
 
-void appendDataToOmicTsvFile(List<List<String>> exportSheet, String exportFileLocation) {
+    public void appendDataToOmicTsvFile(List<List<String>> exportSheet, String exportFileLocation) {
         try(FileWriter fileWriter = new FileWriter(exportFileLocation, true)) {
             if (exportSheet != null) {
                 writeDataToTsv(exportSheet, fileWriter);
@@ -78,15 +78,15 @@ void appendDataToOmicTsvFile(List<List<String>> exportSheet, String exportFileLo
         }
     }
 
-    private void copyHeadersFromSheetToTsv(Sheet xlsxTemplate, FileWriter fileWriter) throws IOException {
+    private void saveHeadersToTsv(Sheet xlsxTemplate, FileWriter fileWriter) throws IOException {
         for (int j = 0; j < xlsxTemplate.getRow(0).getLastCellNum(); j++) {
             Cell cell;
             try {
                 cell = xlsxTemplate.getRow(0).getCell(j);
                 fileWriter.append(cell.toString());
                 fileWriter.append("\t");
-            } catch (Exception e) {
-                log.error("Exception in loading export headers");
+            } catch (IOException e) {
+                log.error("IOException in loading export headers");
             }
         }
         fileWriter.append("\n");
@@ -99,7 +99,7 @@ void appendDataToOmicTsvFile(List<List<String>> exportSheet, String exportFileLo
                     fileWriter.append(data.get(rowIndex).get(columnIndex));
                     fileWriter.append("\t");
                 } catch (IOException e) {
-                    log.error("Exception writing data to TSV on {}:{}", rowIndex, columnIndex);
+                    log.error("IOException writing data to TSV on {}:{}", rowIndex, columnIndex);
                 }
             }
             fileWriter.append("\n");

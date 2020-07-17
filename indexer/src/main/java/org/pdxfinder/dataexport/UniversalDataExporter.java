@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -31,36 +30,36 @@ public class UniversalDataExporter {
     }
 
     private XSSFWorkbook metadataTemplate;
-    private XSSFWorkbook samplePlatformTemplate;
-    private Group dataSource;
     private Path exportProviderDir;
 
     public void exportAllFromGroup(String exportDir, Group dataSource, boolean isHarmonized, String templateDir) throws IOException {
-        this.dataSource = dataSource;
         this.exportProviderDir = Paths.get(exportDir + "/" + dataSource.getAbbreviation());
         ExporterTemplates templates = new ExporterTemplates(templateDir, isHarmonized);
-        ExportProviderSheets providerSheets = new ExportProviderSheets(dataSource, isHarmonized);
+        MetadataSheets providerSheets = new MetadataSheets(dataSource, isHarmonized);
 
         try {
-            createExportDir();
-            extractionUtilities.extractMetadata(providerSheets);
-            extractionUtilities.extracSamplePlatform(providerSheets);
-            saveMetadataToXlsx(providerSheets, templates);
-            saveSamplePlatformToXlsx(providerSheets, templates);
-            proccessOmicSheets(templates);
+            writerUtilities.createExportDirectories(exportProviderDir.toString());
+            exportMetadata(providerSheets,templates, dataSource);
+            exportSamplePlatform(templates, dataSource);
+            exportAllOmicSheets(templates, dataSource);
 
         } catch(IOException e) {
             log.error("IO error while exporting data for {} %n {}",dataSource.getAbbreviation(), e.toString());
         }
     }
 
-    public void createExportDir() throws IOException {
-        if (!exportProviderDir.toFile().exists()) {
-            Files.createDirectories(exportProviderDir);
-        }
+    public void exportSamplePlatform(ExporterTemplates templates,Group group) throws IOException {
+        List<List<String>> samplePlatform = extractionUtilities.extractSamplePlatform(group);
+        XSSFWorkbook samplePlatformTemplate = templates.getTemplate(TSV.templateNames.sampleplatform_template.name());
+        saveSamplePlatformToXlsx(samplePlatform, samplePlatformTemplate);
     }
 
-    private void saveMetadataToXlsx(ExportProviderSheets providerData, ExporterTemplates templates) throws IOException {
+    public void exportMetadata(MetadataSheets providerSheets, ExporterTemplates templates, Group dataSource) throws IOException {
+        extractionUtilities.extractMetadata(providerSheets);
+        saveMetadataToXlsx(providerSheets, templates);
+    }
+
+    private void saveMetadataToXlsx(MetadataSheets providerData, ExporterTemplates templates) throws IOException {
         metadataTemplate = templates.getTemplate(TSV.templateNames.metadata_template.name());
         int sheetNumber = 0;
         for(TSV.metadataSheetNames sheetName: TSV.metadataSheetNames.values()){
@@ -73,22 +72,37 @@ public class UniversalDataExporter {
         }
     }
 
-    private void saveSamplePlatformToXlsx(ExportProviderSheets providerData, ExporterTemplates templates) throws IOException {
-        samplePlatformTemplate = templates.getTemplate(TSV.templateNames.sampleplatform_template.name());
+    private void saveSamplePlatformToXlsx(List<List<String>> samplePlatform, XSSFWorkbook samplePlatformTemplate) throws IOException {
         writerUtilities.updateXlsxSheetWithData(samplePlatformTemplate.getSheetAt(0),
-                providerData.get(TSV.providerFileNames.sampleplatform.name()), 6, 1);
-        if(samplePlatformSheetHasData( providerData)) {
+                samplePlatform, 6, 1);
+        if(!samplePlatform.isEmpty()){
             writerUtilities.writXlsxFromWorkbook(samplePlatformTemplate, exportProviderDir + "/sampleplatform.xlsx");
         }
     }
 
-     void extractAndSaveOmicByBatch(String molecularType, XSSFWorkbook template, String exportURI) throws IOException {
+    private void exportAllOmicSheets(ExporterTemplates templates, Group dataSource) throws IOException {
+        XSSFWorkbook mutationTemplate = templates.getTemplate(TSV.templateNames.mutation_template.name());
+        XSSFWorkbook cnaTemplate = templates.getTemplate(TSV.templateNames.cna_template.name());
+        XSSFWorkbook cytoTemplate = templates.getTemplate(TSV.templateNames.cytogenetics_template.name());
+        XSSFWorkbook exprTemplate = templates.getTemplate(TSV.templateNames.expression_template.name());
+        String mutExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.mut.name();
+        String cnaExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.cna.name();
+        String expressionExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.expression.name();
+        String cytogeneticsExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.cyto.name();
+        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.mut.mcType ,mutationTemplate, mutExportURI,dataSource);
+        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.cna.mcType ,cnaTemplate, cnaExportURI, dataSource);
+        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.cyto.mcType ,cytoTemplate, expressionExportURI, dataSource);
+        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.expression.mcType ,exprTemplate, cytogeneticsExportURI,dataSource);
+
+    }
+
+    public void extractAndSaveOmicByBatch(String molecularType, XSSFWorkbook template, String exportURI, Group dataSource) throws IOException {
         Sheet templateSheet = template.getSheetAt(0);
         List<ModelCreation> models = extractionUtilities.getAllModelsByGroupAndMoleculartype(dataSource, molecularType);
         int counter = 0;
         writerUtilities.createExportDirectories(exportURI);
         if(models.size() > 1){
-            writerUtilities.copyHeadersFromSheetToTsv(templateSheet, exportURI);
+            writerUtilities.saveHeadersToTsv(templateSheet, exportURI);
         }
 
         List<List<String>> modelsOmicData = new ArrayList<>();
@@ -102,23 +116,7 @@ public class UniversalDataExporter {
         }
     }
 
-     private void proccessOmicSheets(ExporterTemplates templates) throws IOException {
-        XSSFWorkbook mutationTemplate = templates.getTemplate(TSV.templateNames.mutation_template.name());
-        XSSFWorkbook cnaTemplate = templates.getTemplate(TSV.templateNames.cna_template.name());
-        XSSFWorkbook cytoTemplate = templates.getTemplate(TSV.templateNames.cytogenetics_template.name());
-        XSSFWorkbook exprTemplate = templates.getTemplate(TSV.templateNames.expression_template.name());
-        String mutExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.mut.name();
-        String cnaExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.cna.name();
-        String expressionExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.expression.name();
-        String cytogeneticsExportURI = exportProviderDir +  dataSource.getAbbreviation() + TSV.molecular_characterisation_type.cyto.name();
-        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.mut.mcType ,mutationTemplate, mutExportURI);
-        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.cna.mcType ,cnaTemplate, cnaExportURI);
-        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.cyto.mcType ,cytoTemplate, expressionExportURI);
-        extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.expression.mcType ,exprTemplate, cytogeneticsExportURI);
-
-    }
-
-    private boolean allMetadataSheetsHaveData(ExportProviderSheets providerData){
+    private boolean allMetadataSheetsHaveData(MetadataSheets providerData){
         for(TSV.metadataSheetNames sheetName: TSV.metadataSheetNames.values()){
             if (providerData.get(sheetName.name()).isEmpty()) {
                 return false;
@@ -127,7 +125,4 @@ public class UniversalDataExporter {
         return true;
     }
 
-    private boolean samplePlatformSheetHasData(ExportProviderSheets providerData) {
-        return !providerData.get(TSV.providerFileNames.sampleplatform.name()).isEmpty();
-    }
 }

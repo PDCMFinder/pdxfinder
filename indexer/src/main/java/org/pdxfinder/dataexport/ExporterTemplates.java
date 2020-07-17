@@ -3,8 +3,6 @@ package org.pdxfinder.dataexport;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.pdxfinder.TSV;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,9 +22,6 @@ public class ExporterTemplates {
     private Map<String, XSSFWorkbook> templatesMap;
     private String templateDir;
     private boolean isHarmonized;
-
-    private static final Logger log = LoggerFactory.getLogger(ExporterTemplates.class);
-
 
     public ExporterTemplates(String templateDir, boolean isharmonized) throws IOException {
         this.templateDir = templateDir;
@@ -48,7 +43,6 @@ public class ExporterTemplates {
     private XSSFWorkbook getWorkbookFromFS(String templatePath) throws IOException {
         XSSFWorkbook workbook;
         File file = new File(templatePath);
-        log.debug("Loading template {}", templatePath);
         if (!file.exists()) throw new IOException(String.format("Template %s was not found", templatePath));
         FileInputStream fileInputStream = new FileInputStream(file);
         workbook = new XSSFWorkbook(fileInputStream);
@@ -56,12 +50,12 @@ public class ExporterTemplates {
     }
 
     private void loadTemplates() throws IOException {
-        metadataTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.metadata_template);
-        samplePlatformTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.sampleplatform_template);
-        mutationTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.mutation_template);
-        cnaTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.cna_template);
-        cytoTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.cytogenetics_template);
-        exprTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.expression_template);
+        metadataTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.metadata_template.fileName);
+        samplePlatformTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.sampleplatform_template.fileName);
+        mutationTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.mutation_template.fileName);
+        cnaTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.cna_template.fileName);
+        cytoTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.cytogenetics_template.fileName);
+        exprTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.expression_template.fileName);
     }
 
     private void addAllSheetsToMap() {

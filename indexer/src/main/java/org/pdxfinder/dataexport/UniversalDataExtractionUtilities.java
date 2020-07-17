@@ -53,7 +53,7 @@ public class UniversalDataExtractionUtilities {
         this.isHarmonized = isHarmonized;
     }
 
-    public ExportProviderSheets extractMetadata(ExportProviderSheets sheets){
+    public MetadataSheets extractMetadata(MetadataSheets sheets){
         this.ds = sheets.getGroup();
         sheets.set(TSV.metadataSheetNames.patient.name(), extractPatientSheet());
         sheets.set(TSV.metadataSheetNames.sample.name(), extractSampleSheet());
@@ -64,10 +64,9 @@ public class UniversalDataExtractionUtilities {
         return sheets;
     }
 
-    public ExportProviderSheets extracSamplePlatform(ExportProviderSheets sheets){
-        this.ds = sheets.getGroup();
-        sheets.set(TSV.providerFileNames.sampleplatform.name(), extractSamplePlatformDescription());
-        return sheets;
+    public List<List<String>> extractSamplePlatform(Group group){
+        this.ds = group;
+        return extractSamplePlatformDescription();
     }
 
     public List<ModelCreation> getAllModelsByGroupAndMoleculartype(Group group, String molcharType){

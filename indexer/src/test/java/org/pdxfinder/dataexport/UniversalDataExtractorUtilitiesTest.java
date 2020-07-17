@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 
-public class DataExtractorTests extends BaseTest {
+public class UniversalDataExtractorUtilitiesTest extends BaseTest {
 
     @Mock
     private DataImportService dataImportService;
@@ -141,20 +141,10 @@ public class DataExtractorTests extends BaseTest {
     @Test
     public void Given_XenograftSamplewithMutationAndCna_When_extractGroupOmicDataIsCalled_Then_returnAppropriateDataForEach(){
         List<ModelCreation> modelList = getModelListForTest();
+        ModelCreation testModel = modelList.get(0);
 
-        when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
-                .thenReturn(modelList);
-
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
-                providerGroup.getAbbreviation(),"m123", mutMolType))
-                .thenReturn(modelList.get(0));
-
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
-                providerGroup.getAbbreviation(),"m123", cnaMolType))
-                .thenReturn(modelList.get(0));
-
-        List<List<String>> mutationData = extractor.extractGroupOmicData(mutMolType);
-        List<List<String>> cnaData = extractor.extractGroupOmicData(cnaMolType);
+        List<List<String>> mutationData = extractor.extractModelsOmicData(modelList.get(0),mutMolType);
+        List<List<String>> cnaData = extractor.extractModelsOmicData(testModel,cnaMolType);
         Assert.assertTrue(mutationData.get(0).contains(ncbiId));
         Assert.assertTrue(mutationData.get(0).contains(biotype));
         Assert.assertTrue(mutationData.get(0).contains(codingSequenceChange));
@@ -171,20 +161,9 @@ public class DataExtractorTests extends BaseTest {
     @Test
     public void Given_PatientSamplewithMutationAndCna_When_extractGroupOmicDataIsCalled_Then_returnAppropriateDataForEach(){
         List<ModelCreation> modelList = getModelListForTest();
-
-        when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
-                .thenReturn(modelList);
-
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
-                providerGroup.getAbbreviation(),"m123", mutMolType))
-                .thenReturn(modelList.get(0));
-
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
-                providerGroup.getAbbreviation(),"m123", cnaMolType))
-                .thenReturn(modelList.get(0));
-
-        List<List<String>> mutationData = extractor.extractGroupOmicData(mutMolType);
-        List<List<String>> cnaData = extractor.extractGroupOmicData(cnaMolType);
+        ModelCreation testModel = modelList.get(0);
+        List<List<String>> mutationData = extractor.extractModelsOmicData(testModel, mutMolType);
+        List<List<String>> cnaData = extractor.extractModelsOmicData(testModel, cnaMolType);
         Assert.assertTrue(mutationData.get(0).contains(ncbiId));
         Assert.assertFalse(mutationData.get(0).contains(marker));
         Assert.assertTrue(cnaData.get(0).contains(marker));
@@ -195,15 +174,8 @@ public class DataExtractorTests extends BaseTest {
     @Test
     public void Given_ModelwithMutationData_When_extractModelDataIsCalledwithDifferentMolcType_Then_NoDataIsRetrieved(){
         List<ModelCreation> modelList = getModelListForTest();
-
-        when(dataImportService.findModelsWithSharingAndContactByDS((providerGroup.getAbbreviation())))
-                .thenReturn(modelList);
-
-        when(dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
-                providerGroup.getAbbreviation(),"m123", mutMolType))
-                .thenReturn(modelList.get(0));
-
-        List<List<String>> expressionData = extractor.extractGroupOmicData("expression");
+        ModelCreation testModel = modelList.get(0);
+        List<List<String>> expressionData = extractor.extractModelsOmicData(testModel,"expression");
         Assert.assertTrue(expressionData.size() == 0);
     }
 
