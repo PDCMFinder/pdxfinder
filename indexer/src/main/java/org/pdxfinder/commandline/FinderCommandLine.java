@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
     subcommands = {
         FinderCommandLine.Load.class,
         FinderCommandLine.Export.class,
+        FinderCommandLine.ExportMappings.class,
         FinderCommandLine.Transform.class,
         CommandLine.HelpCommand.class
     }
@@ -158,6 +159,78 @@ public class FinderCommandLine implements Callable<Integer> {
         }
     }
 
+    @Component
+    @Order(value = -100)
+    @Command(name = "exportMapping",
+            description = "Exports a subset of mappings defined by a group",
+            mixinStandardHelpOptions = true,
+            exitCodeOnExecutionException = 34)
+    static class ExportMappings implements Callable<Integer>{
+
+        @Option(
+                names = {"-d", "--data-dir"},
+                required = true,
+                description = "Path of the PDX Finder data directory " +
+                        "(default: [${DEFAULT-VALUE}], set in application.properties)")
+        private File dataDirectory;
+
+        @ArgGroup(multiplicity = "0..1")
+        ExportMappings.Exclusive datasetRequested = new ExportMappings.Exclusive();
+
+        static class Exclusive {
+
+            @Option(names = {"-g", "--group"}, arity = "1",
+                    description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
+                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            private DataProviderGroup dataProviderGroup;
+
+            @Option(names = {"-o", "--only"}, arity = "1..*",
+                    description = "Load only the data for the listed dataProvider. " +
+                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            private DataProvider[] dataProvider;
+
+            public DataProviderGroup getDataProviderGroup() {
+                return dataProviderGroup;
+            }
+
+            public DataProvider[] getDataProvider() {
+                return dataProvider;
+            }
+        }
+
+        @Autowired
+        FinderMappingExporter finderMappingExporter;
+
+        @Override
+        public Integer call() throws Exception {
+
+            List<DataProvider> providersRequested = getListOfRequestedProviders();
+            finderMappingExporter.run(dataDirectory, providersRequested);
+            return 0;
+        }
+
+
+
+        List<DataProvider> getListOfRequestedProviders() {
+
+            Optional<DataProvider[]> dataProviders = Optional.ofNullable(
+                    datasetRequested.getDataProvider()
+            );
+
+            Optional<DataProviderGroup> dataProviderGroup = Optional.ofNullable(
+                    datasetRequested.getDataProviderGroup()
+            );
+
+            if (dataProviders.isPresent()) {
+                return Arrays.asList(dataProviders.get());
+            } else if (dataProviderGroup.isPresent()) {
+                return DataProviderGroup.getProvidersFrom(dataProviderGroup.get());
+            } else {
+                return new ArrayList<>();
+            }
+        }
+
+    }
 
     @Component
     @Order(value = -100)
