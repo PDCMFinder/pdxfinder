@@ -1,16 +1,15 @@
 package org.pdxfinder.dataexport;
 
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
+import org.pdxfinder.TSV;
 import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.utils.CbpTransformer;
@@ -19,11 +18,15 @@ import org.pdxfinder.utils.CbpTransformer.cbioType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -44,9 +47,9 @@ public class CbpTransformerTests extends BaseTest {
 
     private File jsonDummy;
     private File exportFolder;
-    private File templatesFolder;
     private cbioType mutDataType;
     private cbioType gisticDataType;
+private String templatesFolder;
 
     @Before
     public void init() throws IOException {
@@ -57,30 +60,31 @@ public class CbpTransformerTests extends BaseTest {
         TemporaryFolder rootFolder = new TemporaryFolder();
         rootFolder.create();
         exportFolder = rootFolder.newFolder();
-        templatesFolder = rootFolder.newFolder();
-        createMockTemplate();
+
+        TemporaryFolder templateRoot = new TemporaryFolder();
+        templateRoot.create();
+        templatesFolder = templateRoot.getRoot().getAbsolutePath();
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.metadata_template.fileName, 7);
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.sampleplatform_template.fileName, 2);
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.mutation_template.fileName, 2);
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.cna_template.fileName, 2);
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.cytogenetics_template.fileName, 2);
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.expression_template.fileName, 2);
     }
 
-    public void createMockTemplate() throws IOException {
+    private void writeWorkbook(String directory, int sheetCount) throws IOException {
+        OutputStream out = new FileOutputStream(directory);
         XSSFWorkbook workbook = new XSSFWorkbook();
-        Sheet omic = workbook.createSheet("Test");
-        Row headers = omic.createRow(0);
-        for(int i = 0; i < 25; i++){
-            headers.createCell(i).setCellValue(i );
+        for (int i = 0; i < sheetCount; i++) {
+            workbook.createSheet();
         }
-
-        FileOutputStream out = new FileOutputStream(new File(templatesFolder.getAbsoluteFile() + "/mutation_template.xlsx"));
         workbook.write(out);
-        out.close();
-
-        FileOutputStream cnaOut = new FileOutputStream(new File(templatesFolder.getAbsoluteFile() + "/cna_template.xlsx"));
-        workbook.write(cnaOut);
-        out.close();
     }
+
 
     @Test(expected = IOException.class)
     public void Given_nonExistentJsonFilesArePassed_WhenExportCBPisCalled_Then_throwIOexception() throws IOException {
-        cbpTransformer.exportCBP(exportFolder, templatesFolder, new File("/tmp/not/existing"), mutDataType);
+        cbpTransformer.exportCBP(exportFolder, new File(templatesFolder), new File("/tmp/not/existing"), mutDataType);
     }
 
     @Test(expected = IOException.class)
@@ -88,8 +92,10 @@ public class CbpTransformerTests extends BaseTest {
         cbpTransformer.exportCBP(exportFolder, new File("/Fake/Path/"), jsonDummy, mutDataType);
     }
 
-    @Ignore
+    @Test
     public void Give_JsonArrayAndValidImportDirectory_When_exportsIsCalled__ThenNewMutDirExists() throws IOException {
+        String mut = TSV.molecular_characterisation_type.mut.mcType;
+        String mutFileId = TSV.molecular_characterisation_type.mut.name();
         String ns = "Not Specified";
 
         List<Map<String, Object>> dummyListMap = new ArrayList<Map<String,Object >>();
@@ -107,10 +113,11 @@ public class CbpTransformerTests extends BaseTest {
         when(utilityService.serializeJSONToMaps(jsonDummy.getAbsolutePath()))
                 .thenReturn(dummyListMap);
 
+        cbpTransformer.exportCBP(exportFolder, new File(templatesFolder), jsonDummy, mutDataType);
 
-        cbpTransformer.exportCBP(exportFolder, templatesFolder, jsonDummy, mutDataType);
-
-        //Mockito.verify(universalDataExporter, times(1)).export
+        String filename = Paths.get(jsonDummy.getAbsolutePath()).getFileName().toString();
+        String expectedExportURI = String.format("%s/%s/%s/%s_%s",exportFolder, filename,"mut",filename, mutFileId);
+        verify(universalDataWriterUtilities).writeSingleOmicFileToTsv(eq(expectedExportURI), any(Sheet.class), anyList());
     }
 }
 

@@ -41,9 +41,7 @@ public class CbpTransformer {
     private static String patientId = "patientId";
     private static String sampleId = "sampleId";
     private static String entrezGeneId = "EntrezGeneId";
-    private static String mut = TSV.molecular_characterisation_type.mut.mcType;
     private static String mutFileId = TSV.molecular_characterisation_type.mut.name();
-    private static String cna = TSV.molecular_characterisation_type.cna.mcType;
     private static String cnaFileId = TSV.molecular_characterisation_type.cna.name();
     public enum cbioType {
         MUT,
@@ -60,14 +58,14 @@ public class CbpTransformer {
             List<Map<String, Object>> listMapTable = utilityService.serializeJSONToMaps(pathToJson.getAbsolutePath());
             List<List<String>> cbioParsedData = cbpMapsToSheetsByDataType(listMapTable, dataType);
 
-            Path providerDir = Paths.get(exportDir + jsonGroup.getAbbreviation());
+            Path providerDir = Paths.get(exportDir + "/" + jsonGroup.getAbbreviation());
             String exportUri = "";
             if(dataType.equals(cbioType.MUT)) {
-                exportUri = String.format("{}/{}/{}_{}", providerDir,mut,jsonGroup.getAbbreviation(),mutFileId);
+                exportUri = String.format("%s/%s/%s_%s", providerDir,mutFileId,jsonGroup.getAbbreviation(),mutFileId);
                 Sheet mutationTemplate = templates.getTemplate(TSV.templateNames.mutation_template.name()).getSheetAt(0);
                 universalDataWriterUtilities.writeSingleOmicFileToTsv(exportUri,mutationTemplate, cbioParsedData);
             } else if(dataType.equals(cbioType.GISTIC)){
-                exportUri = String.format("{}/{}/{}_{}", providerDir,cna,jsonGroup.getAbbreviation(),cnaFileId);
+                exportUri = String.format("%s/%s/%s_%s", providerDir,cnaFileId,jsonGroup.getAbbreviation(),cnaFileId);
                 Sheet cnaTemplate = templates.getTemplate(TSV.templateNames.cna_template.name()).getSheetAt(0);
                 universalDataWriterUtilities.writeSingleOmicFileToTsv(exportUri,cnaTemplate, cbioParsedData);
             }
