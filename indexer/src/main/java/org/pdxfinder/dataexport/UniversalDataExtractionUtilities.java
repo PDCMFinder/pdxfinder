@@ -53,8 +53,8 @@ public class UniversalDataExtractionUtilities {
         this.isHarmonized = isHarmonized;
     }
 
-    public MetadataSheets extractMetadata(MetadataSheets sheets){
-        this.ds = sheets.getGroup();
+    public MetadataSheets extractMetadata(Group group, MetadataSheets sheets){
+        this.ds = group;
         sheets.set(TSV.metadataSheetNames.patient.name(), extractPatientSheet());
         sheets.set(TSV.metadataSheetNames.sample.name(), extractSampleSheet());
         sheets.set(TSV.metadataSheetNames.model.name(), extractModelDetails());
@@ -71,10 +71,10 @@ public class UniversalDataExtractionUtilities {
 
     public List<ModelCreation> getAllModelsByGroupAndMoleculartype(Group group, String molcharType){
         List<ModelCreation> modelsWithMolType = new ArrayList<>();
-        List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(ds.getAbbreviation());
+        List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(group.getAbbreviation());
         for(ModelCreation m: models){ ModelCreation model = dataImportService.
                 findModelWithMolecularDataByDSAndIdAndMolcharType(
-                        ds.getAbbreviation(),
+                        group.getAbbreviation(),
                         m.getSourcePdxId(),
                         molcharType);
             if(model != null) {

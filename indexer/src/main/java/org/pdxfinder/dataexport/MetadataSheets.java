@@ -7,6 +7,7 @@ import java.util.*;
 
 public class MetadataSheets {
 
+    private List<List<String>> checklistDataExport;
     private List<List<String>> patientSheetDataExport;
     private List<List<String>> patientSampleSheetDataExport;
     private List<List<String>> pdxModelSheetDataExport;
@@ -14,13 +15,6 @@ public class MetadataSheets {
     private List<List<String>> sharingAndContactSheetDataExport;
     private List<List<String>> loaderRelatedDataSheetDataExport;
 
-    private List<List<String>> samplePlatformSheetDataExport;
-    private List<List<String>> drugDosingSheetDataExport;
-
-    private List<List<String>> mutationSheetDataExport;
-    private List<List<String>> cnaSheetDataExport;
-    private List<List<String>> cytogeneticsSheetDataExport;
-    private List<List<String>> expressionSheetDataExport;
 
     private Map<String, List<List<String>>> exportSheetsMap;
 
@@ -65,6 +59,7 @@ public class MetadataSheets {
     }
 
     private void createExportSheetMap() {
+        exportSheetsMap.put(TSV.metadataSheetNames.checklist.name(), checklistDataExport);
         exportSheetsMap.put(TSV.metadataSheetNames.patient.name(),patientSheetDataExport);
         exportSheetsMap.put(TSV.metadataSheetNames.sample.name(),patientSampleSheetDataExport);
         exportSheetsMap.put(TSV.metadataSheetNames.model.name(),pdxModelSheetDataExport);

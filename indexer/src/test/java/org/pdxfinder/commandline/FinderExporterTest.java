@@ -41,7 +41,7 @@ public class FinderExporterTest extends BaseTest {
     public void given_loadAllisTrue_When_runIsCalled_Then_CallExportAll() throws IOException {
         finderExporter.setDefaultDirectory(tempFile.getAbsolutePath());
         finderExporter.run(null, null, true,false );
-        verify(finderExporter).exportAllGroups(any(File.class), false) ;
+        verify(finderExporter).exportAllGroups(any(File.class), eq(false)) ;
     }
 
     @Test

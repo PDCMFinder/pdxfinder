@@ -176,7 +176,7 @@ public class FinderCommandLine implements Callable<Integer> {
         private File dataDirectory;
 
         @Option(
-                names = {"-h", "--harmonized"},
+                names = {"-o", "--harmonized"},
                 description = "Exports the NCIT ontology information"
         )
         private boolean isHarmonized;

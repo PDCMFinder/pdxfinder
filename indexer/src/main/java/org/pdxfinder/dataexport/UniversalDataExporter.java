@@ -51,11 +51,11 @@ public class UniversalDataExporter {
     public void exportSamplePlatform(ExporterTemplates templates,Group group) throws IOException {
         List<List<String>> samplePlatform = extractionUtilities.extractSamplePlatform(group);
         XSSFWorkbook samplePlatformTemplate = templates.getTemplate(TSV.templateNames.sampleplatform_template.name());
-        saveSamplePlatformToXlsx(samplePlatform, samplePlatformTemplate);
+        saveSamplePlatformToXlsx(samplePlatformTemplate, samplePlatform);
     }
 
     public void exportMetadata(MetadataSheets providerSheets, ExporterTemplates templates, Group dataSource) throws IOException {
-        extractionUtilities.extractMetadata(providerSheets);
+        extractionUtilities.extractMetadata(dataSource, providerSheets);
         saveMetadataToXlsx(providerSheets, templates);
     }
 
@@ -72,7 +72,7 @@ public class UniversalDataExporter {
         }
     }
 
-    private void saveSamplePlatformToXlsx(List<List<String>> samplePlatform, XSSFWorkbook samplePlatformTemplate) throws IOException {
+    private void saveSamplePlatformToXlsx(XSSFWorkbook samplePlatformTemplate, List<List<String>> samplePlatform) throws IOException {
         writerUtilities.updateXlsxSheetWithData(samplePlatformTemplate.getSheetAt(0),
                 samplePlatform, 6, 1);
         if(!samplePlatform.isEmpty()){
@@ -99,26 +99,30 @@ public class UniversalDataExporter {
     public void extractAndSaveOmicByBatch(String molecularType, XSSFWorkbook template, String exportURI, Group dataSource) throws IOException {
         Sheet templateSheet = template.getSheetAt(0);
         List<ModelCreation> models = extractionUtilities.getAllModelsByGroupAndMoleculartype(dataSource, molecularType);
-        int counter = 0;
-        writerUtilities.createExportDirectories(exportURI);
-        if(models.size() > 1){
+        if(models.size() > 0) {
+            writerUtilities.createExportDirectories(exportURI);
             writerUtilities.saveHeadersToTsv(templateSheet, exportURI);
-        }
+            List<List<String>> modelsOmicData = new ArrayList<>();
 
-        List<List<String>> modelsOmicData = new ArrayList<>();
-        for(ModelCreation model: models){
-            modelsOmicData.addAll(extractionUtilities.extractModelsOmicData(model, molecularType));
-            if(counter % 10 == 0){
+            int counter = 0;
+            for (ModelCreation model : models) {
+                modelsOmicData.addAll(extractionUtilities.extractModelsOmicData(model, molecularType));
+                if (counter % 10 == 0) {
+                    writerUtilities.appendDataToOmicTsvFile(modelsOmicData, exportURI);
+                    modelsOmicData.clear();
+                }
+                counter++;
+            }
+            if (!modelsOmicData.isEmpty()) {
                 writerUtilities.appendDataToOmicTsvFile(modelsOmicData, exportURI);
                 modelsOmicData.clear();
             }
-            counter++;
         }
     }
 
     private boolean allMetadataSheetsHaveData(MetadataSheets providerData){
         for(TSV.metadataSheetNames sheetName: TSV.metadataSheetNames.values()){
-            if (providerData.get(sheetName.name()).isEmpty()) {
+            if (providerData.get(sheetName.name()) != null && !providerData.get(sheetName.name()).isEmpty() ) {
                 return false;
             }
         }
