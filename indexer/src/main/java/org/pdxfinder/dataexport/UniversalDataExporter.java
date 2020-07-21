@@ -24,7 +24,7 @@ public class UniversalDataExporter {
     private UniversalDataExtractionUtilities extractionUtilities;
 
     @Autowired
-    void UniversalDataExporter(UniversalDataWriterUtilities writerUtilities, UniversalDataExtractionUtilities extractionUtilities){
+    UniversalDataExporter(UniversalDataWriterUtilities writerUtilities, UniversalDataExtractionUtilities extractionUtilities){
         this.writerUtilities = writerUtilities;
         this.extractionUtilities = extractionUtilities;
     }
@@ -35,11 +35,11 @@ public class UniversalDataExporter {
     public void exportAllFromGroup(String exportDir, Group dataSource, boolean isHarmonized, String templateDir) throws IOException {
         this.exportProviderDir = Paths.get(exportDir + "/" + dataSource.getAbbreviation());
         ExporterTemplates templates = new ExporterTemplates(templateDir, isHarmonized);
-        MetadataSheets providerSheets = new MetadataSheets(dataSource, isHarmonized);
+        MetadataSheets providerSheets = new MetadataSheets(dataSource);
 
         try {
             writerUtilities.createExportDirectories(exportProviderDir.toString());
-            exportMetadata(providerSheets,templates, dataSource);
+            exportMetadata(providerSheets,templates, dataSource, isHarmonized);
             exportSamplePlatform(templates, dataSource);
             exportAllOmicSheets(templates, dataSource);
 
@@ -54,8 +54,8 @@ public class UniversalDataExporter {
         saveSamplePlatformToXlsx(samplePlatformTemplate, samplePlatform);
     }
 
-    public void exportMetadata(MetadataSheets providerSheets, ExporterTemplates templates, Group dataSource) throws IOException {
-        extractionUtilities.extractMetadata(dataSource, providerSheets);
+    public void exportMetadata(MetadataSheets providerSheets, ExporterTemplates templates, Group dataSource, boolean isHarmonized) throws IOException {
+        extractionUtilities.extractMetadata(dataSource, providerSheets, isHarmonized);
         saveMetadataToXlsx(providerSheets, templates);
     }
 
@@ -99,7 +99,7 @@ public class UniversalDataExporter {
     public void extractAndSaveOmicByBatch(String molecularType, XSSFWorkbook template, String exportURI, Group dataSource) throws IOException {
         Sheet templateSheet = template.getSheetAt(0);
         List<ModelCreation> models = extractionUtilities.getAllModelsByGroupAndMoleculartype(dataSource, molecularType);
-        if(models.size() > 0) {
+        if(models.isEmpty()) {
             writerUtilities.createExportDirectories(exportURI);
             writerUtilities.saveHeadersToTsv(templateSheet, exportURI);
             List<List<String>> modelsOmicData = new ArrayList<>();

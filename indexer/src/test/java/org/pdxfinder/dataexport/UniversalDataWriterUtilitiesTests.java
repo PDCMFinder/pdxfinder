@@ -76,7 +76,7 @@ public class UniversalDataWriterUtilitiesTests extends BaseTest {
             Assert.assertEquals(String.format("%.1f", index), header);
             index++;
         }
-        Assert.assertEquals(reader.readLine(), null);
+        Assert.assertEquals( null, reader.readLine());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class UniversalDataWriterUtilitiesTests extends BaseTest {
 
         testForSequentialCellValues(actualDelimitedCellValues1);
         testForSequentialCellValues(actualDelimitedCellValues2);
-        Assert.assertEquals(reader.readLine(), null);
+        Assert.assertEquals( null, reader.readLine());
     }
 
     private void testForSequentialCellValues(String[] delimitedCellValues){

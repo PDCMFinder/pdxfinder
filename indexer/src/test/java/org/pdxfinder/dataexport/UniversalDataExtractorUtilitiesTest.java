@@ -41,7 +41,6 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
     @Before
     public void setUp() {
         providerGroup = Group.createProviderGroup("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
-        extractor.init(providerGroup);
     }
 
     @Test
@@ -49,7 +48,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         when(dataImportService.findPatientsByGroup(providerGroup))
           .thenReturn(getPatientListForTest());
 
-        List<List<String>> patientData  = extractor.extractPatientSheet();
+        List<List<String>> patientData  = extractor.extractPatientSheet(providerGroup);
         Assert.assertEquals("p123", patientData.get(0).get(0));
     }
 
@@ -83,9 +82,9 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         when(dataImportService.findModelBySample(sample))
           .thenReturn(modelCreation);
 
-        extractor.extractSampleSheet();
+        extractor.extractSampleSheet(providerGroup, false);
 
-        List<List<String>> patientSampleSheet = extractor.extractSampleSheet();
+        List<List<String>> patientSampleSheet = extractor.extractSampleSheet(providerGroup, false);
         Assert.assertEquals("p123", patientSampleSheet.get(0).get(0));
     }
 
@@ -95,11 +94,11 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         when( dataImportService.findModelsWithSpecimensAndQAByDS(providerGroup.getAbbreviation()))
           .thenReturn(getModelListForTest());
 
-        extractor.extractModelDetails();
-        extractor.extractModelValidations();
+        extractor.extractModelDetails(providerGroup);
+        extractor.extractModelValidations(providerGroup);
 
-        List<List<String>> pdxModelDetails = extractor.extractModelDetails();
-        List<List<String>> pdxModelValidations = extractor.extractModelValidations();
+        List<List<String>> pdxModelDetails = extractor.extractModelDetails(providerGroup);
+        List<List<String>> pdxModelValidations = extractor.extractModelValidations(providerGroup);
 
         Assert.assertEquals("m123", pdxModelDetails.get(0).get(0));
         Assert.assertEquals("hsname", pdxModelDetails.get(0).get(1));
@@ -114,7 +113,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation()))
           .thenReturn(getModelListForTest());
 
-        List<List<String>> sharingAndContact = extractor.extractSharingAndContact();
+        List<List<String>> sharingAndContact = extractor.extractSharingAndContact(providerGroup);
 
         Assert.assertEquals("m123", sharingAndContact.get(0).get(0));
         Assert.assertEquals("Academia", sharingAndContact.get(0).get(1));
@@ -122,7 +121,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
 
     @Test
     public void Given_Provider_When_GetLoaderRelatedSheetIsCalled_Then_DataIsInRowOne(){
-        List<List<String>> loaderRelatedData = extractor.extractLoaderRelatedData();
+        List<List<String>> loaderRelatedData = extractor.extractLoaderRelatedData(providerGroup);
         Assert.assertEquals("TG", loaderRelatedData.get(0).get(1));
     }
 
@@ -132,7 +131,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         when(dataImportService.findModelXenograftPlatformSampleByDS(providerGroup.getAbbreviation()))
           .thenReturn(getModelListForTest());
 
-        List<List<String>> samplePlatformDescription = extractor.extractSamplePlatformDescription();
+        List<List<String>> samplePlatformDescription = extractor.extractSamplePlatformDescription(providerGroup);
 
         Assert.assertEquals(patientSampleId, samplePlatformDescription.get(0).get(1));
         Assert.assertEquals(xenoSampleId, samplePlatformDescription.get(2).get(1));
@@ -176,7 +175,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         List<ModelCreation> modelList = getModelListForTest();
         ModelCreation testModel = modelList.get(0);
         List<List<String>> expressionData = extractor.extractModelsOmicData(testModel,"expression");
-        Assert.assertTrue(expressionData.size() == 0);
+        Assert.assertEquals(0, expressionData.size());
     }
 
     private List<ModelCreation> getModelListForTest(){

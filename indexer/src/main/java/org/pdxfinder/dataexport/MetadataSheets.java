@@ -19,33 +19,14 @@ public class MetadataSheets {
     private Map<String, List<List<String>>> exportSheetsMap;
 
     private List<List<String>> blankSheet;
-    private List<String> blankList;
-    private Group group;
-    private boolean isHarmonized;
 
-    public MetadataSheets(Group group, boolean isHarmonized) {
+    public MetadataSheets(Group group) {
         Objects.requireNonNull(group, "ExportSheets must have a group provider");
-        this.group = group;
-        this.isHarmonized = isHarmonized;
 
         initDataExportSheets();
         createExportSheetMap();
         initBlankSheet();
     }
-
-    public List<List<String>> get(String exportSheets) {
-        return exportSheetsMap.getOrDefault(exportSheets, blankSheet);
-    }
-
-    public void set(String enumName, List<List<String>> sheetData){
-        exportSheetsMap.put(enumName, sheetData);
-    }
-
-    public Group getGroup(){
-        return group;
-    }
-
-    public boolean isHarmonized(){ return this.isHarmonized; }
 
     private void initDataExportSheets() {
         exportSheetsMap = new HashMap<>();
@@ -70,7 +51,16 @@ public class MetadataSheets {
 
     private void initBlankSheet() {
         blankSheet = new ArrayList<>();
-        blankList = new ArrayList<>();
+        List<String> blankList = new ArrayList<>();
         blankSheet.add(blankList);
     }
+
+    public List<List<String>> get(String exportSheets) {
+        return exportSheetsMap.getOrDefault(exportSheets, blankSheet);
+    }
+
+    public void set(String enumName, List<List<String>> sheetData){
+        exportSheetsMap.put(enumName, sheetData);
+    }
+
 }
