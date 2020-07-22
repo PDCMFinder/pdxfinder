@@ -1,11 +1,11 @@
 package org.pdxfinder.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -70,7 +71,32 @@ public class UtilityService {
         return csvMaps;
     }
 
+    public String serializeToCsvWithIncludeNonEmpty(List<?> pojoList) throws IOException {
 
+        CsvMapper csvMapper = new CsvMapper();
+        List<Map<String, Object>> dataList = mapper.convertValue(pojoList, new TypeReference<List<Map<String, Object>>>(){});
+        List<List<String>> csvData = new ArrayList<>();
+        List<String> csvHead = new ArrayList<>();
+
+        AtomicInteger counter = new AtomicInteger();
+        dataList.forEach( row ->{
+            List<String> rowData = new ArrayList<>();
+            row.forEach((key,value)->{
+                rowData.add(String.valueOf(value));
+                if (counter.get() == 0){
+                    csvHead.add(key);
+                }
+            });
+            csvData.add(rowData);
+            counter.getAndIncrement();
+        });
+
+        CsvSchema.Builder builder = CsvSchema.builder();
+        csvHead.forEach(builder::addColumn);
+
+        CsvSchema  schema = builder.build().withHeader();
+        return csvMapper.writer(schema).writeValueAsString(csvData);
+    }
 
     public Map<String, List<Map<String, String>> > serializeAndGroupFileContent(String fileName, String groupColumn) {
 
