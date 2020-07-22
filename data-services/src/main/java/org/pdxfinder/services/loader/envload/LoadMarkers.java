@@ -27,7 +27,7 @@ public class LoadMarkers {
     public void loadGenes(String dataURL) {
         Instant start = Instant.now();
 
-        log.info("Downloading latest marker data from {}...", dataURL);
+        log.info("Downloading latest marker data from {}...", dataURL.substring(0, 50));
         BufferedReader reader = downloadDataFromURL(dataURL);
         List<Marker> markers = parseMarkers(reader);
         dataImportService.saveAllMarkers(markers);

@@ -1,11 +1,8 @@
 package org.pdxfinder.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
+import com.github.openjson.*;
 import org.pdxfinder.services.TransformerService;
 import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
@@ -13,14 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -44,6 +39,7 @@ import java.util.Map;
  * Created by csaba on 08/10/2018.
  */
 @Component
+@PropertySource("classpath:datafeed.properties")
 @Order(value = 0)
 public class CreateLocalFeeds implements CommandLineRunner {
 

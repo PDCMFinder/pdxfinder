@@ -11,8 +11,7 @@ import org.mockito.Spy;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.graph.dao.Patient;
 import org.pdxfinder.graph.dao.PatientSnapshot;
-import org.pdxfinder.graph.repositories.PatientRepository;
-import org.pdxfinder.graph.repositories.PatientSnapshotRepository;
+import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.DataImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,11 +19,32 @@ import java.util.HashSet;
 
 public class DataImportServiceTests extends BaseTest {
 
-    @Mock
-    private PatientSnapshotRepository patientSnapshotRepository;
-
-    @Mock
-    private PatientRepository patientRepository;
+    @Mock private TumorTypeRepository tumorTypeRepository;
+    @Mock private HostStrainRepository hostStrainRepository;
+    @Mock private EngraftmentTypeRepository engraftmentTypeRepository;
+    @Mock private EngraftmentSiteRepository engraftmentSiteRepository;
+    @Mock private EngraftmentMaterialRepository engraftmentMaterialRepository;
+    @Mock private GroupRepository groupRepository;
+    @Mock private PatientRepository patientRepository;
+    @Mock private ModelCreationRepository modelCreationRepository;
+    @Mock private TissueRepository tissueRepository;
+    @Mock private PatientSnapshotRepository patientSnapshotRepository;
+    @Mock private SampleRepository sampleRepository;
+    @Mock private MarkerRepository markerRepository;
+    @Mock private MarkerAssociationRepository markerAssociationRepository;
+    @Mock private MolecularCharacterizationRepository molecularCharacterizationRepository;
+    @Mock private QualityAssuranceRepository qualityAssuranceRepository;
+    @Mock private OntologyTermRepository ontologyTermRepository;
+    @Mock private SpecimenRepository specimenRepository;
+    @Mock private PlatformRepository platformRepository;
+    @Mock private PlatformAssociationRepository platformAssociationRepository;
+    @Mock private DataProjectionRepository dataProjectionRepository;
+    @Mock private TreatmentSummaryRepository treatmentSummaryRepository;
+    @Mock private TreatmentProtocolRepository treatmentProtocolRepository;
+    @Mock private CurrentTreatmentRepository currentTreatmentRepository;
+    @Mock private ExternalUrlRepository externalUrlRepository;
+    @Mock private DrugRepository drugRepository;
+    @Mock private TreatmentRepository treatmentRepository;
 
     @Spy
     @InjectMocks
@@ -107,22 +127,6 @@ public class DataImportServiceTests extends BaseTest {
         Assert.assertEquals(COLLECTION_DATE, actualSnapshot.getDateAtCollection());
         Assert.assertEquals(COLLECTION_EVENT, actualSnapshot.getCollectionEvent());
         Assert.assertEquals(ELAPSED_TIME, actualSnapshot.getDateAtCollection());
-    }
-
-    @Test
-    public void Given_GetPatientSnapshot6Param_When_PatientInDB_Then_ReturnNewPSforPatient(){
-
-        when(patientRepository.findByExternalIdAndGroup(EXTERNAL_ID, GROUP))
-                .thenReturn(PATIENT);
-
-        when(dataImportService.getPatientSnapshot(PATIENT, AGE_AT_COLLECTION))
-                .thenReturn(actualSnapshot);
-
-        actualSnapshot = dataImportService.getPatientSnapshot(EXTERNAL_ID, SEX, RACE,
-                ETHNICITY, AGE_AT_COLLECTION, GROUP);
-
-        Assert.assertEquals(PATIENT, actualSnapshot.getPatient());
-        Assert.assertEquals(AGE_AT_COLLECTION, actualSnapshot.getAgeAtCollection());
     }
 
     @Test

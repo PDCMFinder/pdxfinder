@@ -1,0 +1,19 @@
+@import url("app.css");
+
+body {
+    background: #fff;
+    padding: 2em;
+}
+
+.header {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.error > .Level{
+    color: darkred;
+}
+
+.info {
+    color: #3b5999;
+}

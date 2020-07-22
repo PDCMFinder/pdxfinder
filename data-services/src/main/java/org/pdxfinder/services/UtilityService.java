@@ -1,11 +1,7 @@
 package org.pdxfinder.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -27,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -49,35 +44,6 @@ public class UtilityService {
     //Delimiter used in CSV file
     private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
-
-
-
-    public String serializeToCsvWithIncludeNonEmpty(List<?> pojoList) throws IOException {
-
-        CsvMapper csvMapper = new CsvMapper();
-        List<Map<String, Object>> dataList = mapper.convertValue(pojoList, new TypeReference<List<Map<String, Object>>>(){});
-        List<List<String>> csvData = new ArrayList<>();
-        List<String> csvHead = new ArrayList<>();
-
-        AtomicInteger counter = new AtomicInteger();
-        dataList.forEach( row ->{
-            List<String> rowData = new ArrayList<>();
-            row.forEach((key,value)->{
-                rowData.add(String.valueOf(value));
-                if (counter.get() == 0){
-                    csvHead.add(key);
-                }
-            });
-            csvData.add(rowData);
-            counter.getAndIncrement();
-        });
-
-        CsvSchema.Builder builder = CsvSchema.builder();
-        csvHead.forEach(builder::addColumn);
-
-        CsvSchema  schema = builder.build().withHeader();
-        return csvMapper.writer(schema).writeValueAsString(csvData);
-    }
 
     /*************************************************************************************************************
      *                                           DATA SERIALIZER METHODS SECTION                                 *
@@ -163,73 +129,17 @@ public class UtilityService {
         return groupedMap;
     }
 
-
-
-
-
-
-
-
-
-
-
     /*************************************************************************************************************
      *                                  MICROSOFT EXCEL FILE HANDLER SECTION                                     *
      ************************************************************************************************************/
 
-
-
-    // EXCEL FILE READER : READ EXCEL FILE USING ITERATOR, NOT VERY SAFE FOR EMPTY/FORMATTED CELLS
-    public List<Map<String, String>> serializeExcelData(String excelURL) {
-
-        FileInputStream inputStream = convertFileToStream(excelURL);
-
-        int dataRow = 0;
-        List<String> tableHead = new ArrayList<>();
-        List<Map<String, String>> csvMap = new ArrayList<>();
-
-        try(Workbook workbook = WorkbookFactory.create(inputStream)) {
-            Row row;
-            Sheet spreadsheet = workbook.getSheetAt(0);
-            Iterator<Row> rowIterator = spreadsheet.iterator();
-
-            while (rowIterator.hasNext()) // Read the rows
-            {
-                row = rowIterator.next();
-                Iterator<Cell> cellIterator = row.cellIterator();
-
-                if (dataRow == 0) {
-                    tableHead = getXlsTableHeadData(cellIterator);
-
-                } else {
-                    Map<String, String> rowMap = getXlsCellData(cellIterator, tableHead);
-                    csvMap.add(rowMap);
-                }
-                dataRow++;
-            }
-
-            inputStream.close();
-        } catch (IOException | InvalidFormatException ex) {
-            log.warn(ex.getMessage());
-        }
-
-        return csvMap;
-    }
-
-
-
-
     // EXCEL FILE READER : READ EXCEL FILE WITHOUT USING ITERATOR, SAFER LOADING FOR EMPTY CELLS
     public List<Map<String, String>> serializeExcelDataNoIterator(String excelURL, int sheet, int startRow) {
-
         FileInputStream inputStream = convertFileToStream(excelURL);
-
         return serializeExcelDataNoIterator(inputStream, sheet, startRow);
-
     }
 
     public List<Map<String, String>> serializeExcelDataNoIterator(InputStream inputStream, int sheet, int startRow) {
-
         List<String> tableHead = new ArrayList<>();
         List<Map<String, String>> csvMap = new ArrayList<>();
 
@@ -299,11 +209,6 @@ public class UtilityService {
         return csvMap;
     }
 
-
-
-
-
-    // EXCEL WRITER : CREATE .XLSX FILE
     public void writeXLSXFile(List<Map<String, String>> dataList,String fileName, String sheetName) {
 
         String excelFileName = homeDir+"/Downloads/"+fileName;
@@ -356,70 +261,6 @@ public class UtilityService {
 
     }
 
-
-
-    // EXCEL WRITER : CREATE .XLS FILE
-    public void writeXLSFile() throws IOException {
-
-        String excelFileName = "";//name of excel file
-
-        String sheetName = "Sheet1";//name of sheet
-
-        try (HSSFWorkbook wb = new HSSFWorkbook()) {
-            HSSFSheet sheet = wb.createSheet(sheetName);
-
-            //iterating r number of rows
-            for (int r = 0; r < 5; r++) {
-                HSSFRow row = sheet.createRow(r);
-
-                //iterating c number of columns
-                for (int c = 0; c < 5; c++) {
-                    HSSFCell cell = row.createCell(c);
-
-                    cell.setCellValue("Cell " + r + " " + c);
-                }
-            }
-
-            FileOutputStream fileOut = new FileOutputStream(excelFileName);
-
-            //write this workbook to an Outputstream.
-            wb.write(fileOut);
-            fileOut.flush();
-            fileOut.close();
-        }
-    }
-
-
-
-    // GET SMALL SECTIONS OF EXCEL: RETRIEVE FIRST ROW OF EXCEL SHEET
-    public List<String> getXlsHead(String excelURL, int sheet) {
-
-        FileInputStream inputStream = convertFileToStream(excelURL);
-
-        List<String> tableHead = new ArrayList<>();
-
-        try(Workbook workbook = WorkbookFactory.create(inputStream)) {
-            Row row;
-            Sheet spreadsheet = workbook.getSheetAt(sheet);
-            Iterator<Row> rowIterator = spreadsheet.iterator();
-
-            while (rowIterator.hasNext())
-            {
-                row = rowIterator.next();
-
-                Iterator<Cell> cellIterator = row.cellIterator();
-                tableHead = getXlsTableHeadData(cellIterator);
-                break;
-            }
-
-        }catch (Exception e){
-            log.warn(e.getMessage());
-        }
-
-        return tableHead;
-    }
-
-
     // GET SMALL SECTIONS OF EXCEL: RETRIEVE FIRST ROW OF EXCEL SHEET
     public List<String> getXlsTableHeadData(Iterator<Cell> cellIterator){
 
@@ -437,31 +278,6 @@ public class UtilityService {
         return data;
     }
 
-
-
-
-    // GET SMALL SECTIONS OF EXCEL: RETRIEVE BODY ROWS OF EXCEL SHEET
-    private Map<String, String> getXlsCellData(Iterator<Cell> cellIterator, List<String> tableHead){
-
-        Map<String, String> rowMap = new HashMap();
-
-        int column = 0;
-        while (cellIterator.hasNext())
-        {
-            Cell cell = cellIterator.next();
-
-            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-                rowMap.put(tableHead.get(column).trim(), cell.getNumericCellValue() + "");
-            }else {
-                rowMap.put(tableHead.get(column).trim(), cell.getStringCellValue() + "");
-            }
-            column++;
-        }
-        return rowMap;
-    }
-
-
-
     // EXCEL CUSTOMIZER : SET EXCEL CELL FONT SIZE AND COLOR
     private CellStyle setXLSFont(Workbook wb, int fontSize, IndexedColors colors){
 
@@ -478,20 +294,6 @@ public class UtilityService {
         return headerCellStyle;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /*************************************************************************************************************
      *                                           CSV FILE HANDLER SECTION                                      *
      ************************************************************************************************************/
@@ -500,9 +302,6 @@ public class UtilityService {
 
         String[] stringArr = multipartFile.getOriginalFilename().split("\\.");
         String type = stringArr[stringArr.length - 1];
-
-        // multipartFile.getContentType()
-
         InputStream inputStream = null;
         List<Map<String, String>> dataList = new ArrayList<>();
 
@@ -709,14 +508,6 @@ public class UtilityService {
         // write to csv at the specified destination
         writeCsvFile(stringMapList, destination);
     }
-
-
-
-
-
-
-
-
     /*************************************************************************************************************
      *                                           JSON FILE HANDLER SECTION                                      *
      ************************************************************************************************************/
@@ -935,6 +726,7 @@ public class UtilityService {
             for (File file : filDir) {
 
                 if (file.isFile()) {
+                    log.info(file.getName());
                     fileNames.add(file.getName());
                 }
             }

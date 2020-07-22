@@ -2,9 +2,7 @@ package org.pdxfinder.services.ds;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
+import com.github.openjson.*;
 import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.repositories.DataProjectionRepository;
 import org.pdxfinder.services.search.WebFacetSection;

@@ -1,10 +1,6 @@
 package org.pdxfinder;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
+import com.github.openjson.*;
 import org.pdxfinder.accessionidtatamodel.AccessionData;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.services.DataImportService;
@@ -13,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;

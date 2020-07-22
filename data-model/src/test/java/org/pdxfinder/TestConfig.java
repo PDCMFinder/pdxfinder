@@ -19,7 +19,7 @@ public class TestConfig{
 
     @Bean
     public org.neo4j.ogm.config.Configuration getConfiguration() {
-        return new org.neo4j.ogm.config.Configuration();
+        return new org.neo4j.ogm.config.Configuration.Builder().build();
     }
 
     @Bean

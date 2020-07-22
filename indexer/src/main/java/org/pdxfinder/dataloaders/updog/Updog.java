@@ -7,9 +7,7 @@ import org.slf4j.*;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.nio.file.*;
 import java.util.*;
 
 @Component
@@ -52,7 +50,11 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        new ErrorReporter(validationErrors).truncate(50).logErrors();
+        Validator.reportAnyErrors(validationErrors);
+
+        log.error("There were {} errors found. Check {} for details.",
+            validationErrors.size(),
+            "log/validation_errors.html");
 
         if (!validateOnly) {
             domainObjectCreator.loadDomainObjects(combinedTableSet, updogProviderDirectory);

@@ -1,7 +1,6 @@
 package org.pdxfinder.postload;
 
-import com.google.gson.Gson;
-import org.neo4j.ogm.json.JSONObject;
+import com.github.openjson.*;
 import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;
@@ -1168,11 +1167,8 @@ public class CreateDataProjections implements ApplicationContextAware{
             mfqDP.setLabel("ModelForQuery");
         }
 
-        //log.info("MFQ value toString:"+modelForQueryDP.toString());
-        Gson gson = new Gson();
-        String jsonMfqDP = gson.toJson(this.modelForQueryDP);
+        String jsonMfqDP = JSONObject.wrap(modelForQueryDP).toString();
         mfqDP.setValue(jsonMfqDP);
-        //log.info("MFQ value:"+jsonMfqDP);
         dataImportService.saveDataProjection(mfqDP);
 
 
@@ -1210,44 +1206,30 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     private void createModelDrugResponseDataProjection(){
 
-        log.info("Creating Model Drug Response DP");
+        log.info("Creating Model Drug Response Data Projection");
 
         List<TreatmentSummary> treatmentSummaries = drugService.getModelTreatmentSummariesWithDrugAndResponse();
 
         for(TreatmentSummary ts : treatmentSummaries){
-
             ModelCreation model = dataImportService.findModelByTreatmentSummary(ts);
-
             //check if treatment is linked to a model
             if(model != null){
-
                 Long modelId = model.getId();
-
                 for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
-
                     //this bit adds the drugA + drugB + drugC etc to the options
                     String drugName = tp.getTreatmentString(true);
                     String response = tp.getResponse().getDescription();
                     addToModelDrugResponseDP(modelId, drugName, response);
 
-
                     //we also need to deal with regimens
                     List<String> regimenDrugs = new ArrayList<>();
                     for(TreatmentComponent tc: tp.getComponents()){
-
                         Treatment t = tc.getTreatment();
                         OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
-
                         if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
-
-
-
                             for(OntologyTerm ot2: ot.getSubclassOf()){
-
                                 regimenDrugs.add(ot2.getLabel());
-
                             }
-
                         }
                     }
 
@@ -1261,14 +1243,13 @@ public class CreateDataProjections implements ApplicationContextAware{
                 }
             }
         }
-        System.out.println();
 
     }
 
 
     private void createPatientTreatmentDataProjection(){
 
-        log.info("Creating patient treatment DP");
+        log.info("Creating patient treatment data projection");
 
         List<TreatmentSummary> treatmentSummaries = drugService.getPatientTreatmentSummariesWithDrug();
 
@@ -1346,7 +1327,7 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     private void createFrequentlyMutatedGenesDataProjection(){
 
-        log.info("Creating Frequently Mutated Genes DP");
+        log.info("Creating Frequently Mutated Genes data projection");
 
         for(Map.Entry<String, Set<Long>> entry : frequentlyMutatedMarkers.entrySet() ){
 
@@ -1511,114 +1492,17 @@ public class CreateDataProjections implements ApplicationContextAware{
             ddDP.setLabel("drug dosing counter");
         }
 
-        JSONObject json;
-
-
-        try{
-            json = new JSONObject(mutatedPlatformMarkerVariantModelDP.toString());
-            pmvmDP.setValue(json.toString());
-        }
-        catch(Exception e){
-
-            e.printStackTrace();
-            log.error(mutatedPlatformMarkerVariantModelDP.toString());
-        }
-
-        try{
-            json = new JSONObject(mutatedMarkerVariantDP.toString());
-            mvDP.setValue(json.toString());
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(mutatedMarkerVariantDP.toString());
-        }
-        try{
-            json = new JSONObject(modelDrugResponseDP.toString());
-            drugDP.setValue(json.toString());
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(modelDrugResponseDP.toString());
-        }
-
-        try{
-            json = new JSONObject(immunoHistoChemistryDP.toString());
-            ihcDP.setValue(json.toString());
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(immunoHistoChemistryDP.toString());
-        }
-
-        try{
-            json = new JSONObject(copyNumberAlterationDP.toString());
-            cnaDP.setValue(json.toString());
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(copyNumberAlterationDP.toString());
-        }
-
-        try{
-            json = new JSONObject(dataAvailableDP.toString());
-            daDP.setValue(json.toString());
-        }
-        catch(Exception e){
-
-            e.printStackTrace();
-            log.error(dataAvailableDP.toString());
-        }
-
-        try{
-            json = new JSONObject(patientTreatmentDP.toString());
-            ptDP.setValue(json.toString());
-            System.out.println();
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(patientTreatmentDP.toString());
-        }
-
-
-        try{
-            fmgDP.setValue(frequentlyMutatedMarkersDP.toString());
-        }
-        catch(Exception e){
-
-            e.printStackTrace();
-            log.error(frequentlyMutatedMarkersDP.toString());
-        }
-
-        try{
-            json = new JSONObject(cytogeneticsDP.toString());
-            cytoDP.setValue(json.toString());
-
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(cytogeneticsDP.toString());
-        }
-
-        try{
-            json = new JSONObject(expressionDP.toString());
-            expDP.setValue(json.toString());
-
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(expressionDP.toString());
-        }
-
-        try{
-            json = new JSONObject(drugDosingDP.toString());
-            ddDP.setValue(json.toString());
-
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            log.error(drugDosingDP.toString());
-        }
-
+        pmvmDP.setValue(createJsonString(mutatedPlatformMarkerVariantModelDP));
+        mvDP.setValue(createJsonString(mutatedMarkerVariantDP));
+        drugDP.setValue(createJsonString(modelDrugResponseDP));
+        ihcDP.setValue(createJsonString(immunoHistoChemistryDP));
+        cnaDP.setValue(createJsonString(copyNumberAlterationDP));
+        daDP.setValue(createJsonString(dataAvailableDP));
+        ptDP.setValue(createJsonString(patientTreatmentDP));
+        fmgDP.setValue(createJsonString(frequentlyMutatedMarkersDP));
+        cytoDP.setValue(createJsonString(cytogeneticsDP));
+        expDP.setValue(createJsonString(expressionDP));
+        ddDP.setValue(createJsonString(drugDosingDP));
 
         dataImportService.saveDataProjection(pmvmDP);
         dataImportService.saveDataProjection(mvDP);
@@ -1631,23 +1515,16 @@ public class CreateDataProjections implements ApplicationContextAware{
         dataImportService.saveDataProjection(cytoDP);
         dataImportService.saveDataProjection(expDP);
         dataImportService.saveDataProjection(ddDP);
-
     }
 
 
-
     private String createJsonString(Object jstring){
-
-        try{
-
-            JSONObject json = new JSONObject(jstring);
-            return json.toString();
+        try {
+            return JSONObject.wrap(jstring).toString();
         }
         catch(Exception e){
-
-            e.printStackTrace();
+            log.error("There was an error serializing the map object to JSON - {}...", jstring.toString().substring(0, 200));
         }
-
         return "";
     }
 
