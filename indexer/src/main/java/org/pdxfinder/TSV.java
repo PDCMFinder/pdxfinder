@@ -192,7 +192,7 @@ public class TSV {
     //Sample Platform sheet, these are the internal strings in the DB
     public enum molecular_characterisation_type{
 
-        cyto("cytogenetic"),
+        cyto("cytogenetics"),
         expression("expression"),
         mut("mutation"),
         cna("copy number alteration");
@@ -216,7 +216,7 @@ public class TSV {
         patienttreatment_template("patienttreatment_template.xlsx"),
         cna_template("cna_template.xlsx"),
         expression_template("expression_template.xlsx"),
-        cytogenetics_template("cytogenetics_template.xslx"),
+        cytogenetics_template("cytogenetics_template.xlsx"),
         mutation_template("mutation_template.xlsx"),
         drugdosing_template("drugdosing_template.xlsx");
 

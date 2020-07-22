@@ -51,6 +51,7 @@ public class UniversalDataWriterUtilitiesTests extends BaseTest {
         String testExportURI = String.format("%s/%s/%s/data_mut.tsv", rootFolderURI, "testProvider", "mut");
         universalDataWriterUtilities.createExportDirectories(testExportURI);
         Assert.assertTrue(Paths.get(testExportURI).getParent().toFile().exists());
+
     }
 
     @Test

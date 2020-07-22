@@ -68,7 +68,7 @@ public class FinderExporter {
             log.error("Datasource {} not found. ",dataSourceAbbrev);
             return;
         }
-        universalDataExporter.exportAllFromGroup(rootDir.getAbsolutePath(), ds, isHarmonized, rootDir + "/templates");
+        universalDataExporter.exportAllFromGroup(rootDir.getAbsolutePath() + "/export", ds, isHarmonized, rootDir + "/template");
     }
 
     public void setDefaultDirectory(String defaultDirectory) {

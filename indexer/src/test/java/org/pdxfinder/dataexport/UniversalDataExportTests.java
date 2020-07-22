@@ -16,6 +16,8 @@ import org.pdxfinder.graph.dao.ModelCreation;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,7 +74,7 @@ public class UniversalDataExportTests extends BaseTest {
 
     @Test
     public void Given_dummyTemplatesAndNoData_ExportSamplePlatform_ExtractionUtilitesAreCalledWithoutWrite() throws IOException {
-        universalDataExporter.exportSamplePlatform(templates, group);
+        universalDataExporter.exportSamplePlatform(templates, group, templateDir);
 
         verify(extractionUtilities, times(1)).extractSamplePlatform(group);
         verify(writerUtilities, times(1)).updateXlsxSheetWithData(any(Sheet.class),
@@ -86,7 +88,7 @@ public class UniversalDataExportTests extends BaseTest {
         when(extractionUtilities.extractSamplePlatform(group)).thenReturn(testSheet);
 
         XSSFWorkbook samplePlatformTemplate = templates.getTemplate(TSV.templateNames.sampleplatform_template.name());
-        universalDataExporter.exportSamplePlatform(templates, group);
+        universalDataExporter.exportSamplePlatform(templates, group, templateDir);
 
         verify(writerUtilities).updateXlsxSheetWithData(eq(samplePlatformTemplate.getSheetAt(0)),
                 any(ArrayList.class), anyInt(), anyInt());
@@ -95,10 +97,10 @@ public class UniversalDataExportTests extends BaseTest {
 
     @Test
     public void Given_dummyTemplatesAndNoData_ExportMetadata_ExtractionUtilitesAreCalledWithoutWrite() throws IOException {
-        MetadataSheets  metadataSheets = new MetadataSheets(group, false);
-        when(extractionUtilities.extractMetadata(group, metadataSheets)).thenReturn(metadataSheets);
+        MetadataSheets  metadataSheets = new MetadataSheets(group);
+        when(extractionUtilities.extractMetadata(group, metadataSheets, false)).thenReturn(metadataSheets);
 
-        universalDataExporter.exportMetadata(metadataSheets, templates, group);
+        universalDataExporter.exportMetadata(metadataSheets, templates, group, false, templateDir);
         verify(writerUtilities, times(7)).updateXlsxSheetWithData(any(Sheet.class),
                 any(List.class), anyInt(), anyInt());
 
@@ -108,8 +110,8 @@ public class UniversalDataExportTests extends BaseTest {
     @Test
     public void Given_NoModels_When_callToExtractAndSaveOmicsByBatch_Then_doNotRun() throws IOException {
         String molecularType = "Mutation";
-        String testExportURI = "/path/to/export";
-        when(extractionUtilities.getAllModelsByGroupAndMoleculartype(group,molecularType))
+        Path testExportURI = Paths.get("/path/to/export");
+        when(extractionUtilities.getAllModelsByGroupAndMoleculartype(group, molecularType))
                 .thenReturn(new ArrayList<>());
 
         universalDataExporter.extractAndSaveOmicByBatch(molecularType,
@@ -122,7 +124,7 @@ public class UniversalDataExportTests extends BaseTest {
     @Test
     public void Given_aSingleModel_When_callToExtractAndSaveOmicsByBatch_Then_runOnce() throws IOException {
         String molecularType = "Mutation";
-        String testExportURI = "/path/to/export";
+        Path testExportURI = Paths.get("/path/to/export");
         ModelCreation testModel = new ModelCreation();
         when(extractionUtilities.getAllModelsByGroupAndMoleculartype(group,molecularType))
                 .thenReturn(Collections.singletonList(testModel));
@@ -130,15 +132,15 @@ public class UniversalDataExportTests extends BaseTest {
         universalDataExporter.extractAndSaveOmicByBatch(molecularType,
                 templates.getTemplate(TSV.templateNames.mutation_template.name()),testExportURI, group);
 
-        verify(writerUtilities).saveHeadersToTsv(any(Sheet.class),eq(testExportURI));
+        verify(writerUtilities).saveHeadersToTsv(any(Sheet.class),eq(testExportURI.toString()));
         verify(extractionUtilities).extractModelsOmicData(eq(testModel), eq(molecularType));
-        verify(writerUtilities).appendDataToOmicTsvFile(anyList(), eq(testExportURI));
+        verify(writerUtilities).appendDataToOmicTsvFile(anyList(), eq(testExportURI.toString()));
     }
 
     @Test
     public void Given_elevenModel_When_callToExtractAndSaveOmicsByBatch_Then_runOnceInBatchThenAgain() throws IOException {
         String molecularType = "Mutation";
-        String testExportURI = "/path/to/export";
+        Path testExportURI = Paths.get("/path/to/export");
         ModelCreation[] testModelList = new ModelCreation[11];
         for(int i = 0; i < 11; i++){
             testModelList[i] = new ModelCreation();
@@ -150,8 +152,8 @@ public class UniversalDataExportTests extends BaseTest {
         universalDataExporter.extractAndSaveOmicByBatch(molecularType,
                 templates.getTemplate(TSV.templateNames.mutation_template.name()),testExportURI, group);
 
-        verify(writerUtilities).saveHeadersToTsv(any(Sheet.class),eq(testExportURI));
+        verify(writerUtilities).saveHeadersToTsv(any(Sheet.class),eq(testExportURI.toString()));
         verify(extractionUtilities, times(11)).extractModelsOmicData(any(ModelCreation.class), eq(molecularType));
-        verify(writerUtilities, times(2)).appendDataToOmicTsvFile(anyList(), eq(testExportURI));
+        verify(writerUtilities, times(2)).appendDataToOmicTsvFile(anyList(), eq(testExportURI.toString()));
     }
 }

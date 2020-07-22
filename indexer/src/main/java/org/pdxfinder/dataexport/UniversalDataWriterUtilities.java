@@ -56,9 +56,13 @@ public class UniversalDataWriterUtilities {
     }
 
     public void createExportDirectories(String exportFileLocation) throws IOException {
-        Path parentDirectory = Paths.get(exportFileLocation).getParent();
-        Files.createDirectories(parentDirectory);
-    }
+        Path directory = Paths.get(exportFileLocation);
+        Files.createDirectories(directory);
+        if(!directory.toFile().exists()) {
+            throw new IOException(String.format("Failed to create file directory at %s",
+                    directory.toAbsolutePath().toString()));
+        }
+        }
 
     public void saveHeadersToTsv(Sheet template, String exportFileLocation) {
         try (FileWriter fileWriter = new FileWriter(exportFileLocation)) {

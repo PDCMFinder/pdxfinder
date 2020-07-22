@@ -44,6 +44,7 @@ public class UniversalDataExtractionUtilities {
     }
 
     public MetadataSheets extractMetadata(Group group, MetadataSheets sheets, boolean isHarmonized){
+        sheets.set(TSV.metadataSheetNames.checklist.name(), new ArrayList<>());
         sheets.set(TSV.metadataSheetNames.patient.name(), extractPatientSheet(group));
         sheets.set(TSV.metadataSheetNames.sample.name(), extractSampleSheet(group, isHarmonized));
         sheets.set(TSV.metadataSheetNames.model.name(), extractModelDetails(group));
@@ -58,19 +59,11 @@ public class UniversalDataExtractionUtilities {
     }
 
     public List<ModelCreation> getAllModelsByGroupAndMoleculartype(Group group, String molcharType){
-        List<ModelCreation> modelsWithMolType = new ArrayList<>();
-        List<ModelCreation> models = dataImportService.findModelsWithSharingAndContactByDS(group.getAbbreviation());
-        for(ModelCreation m: models){ ModelCreation model = dataImportService.
-                findModelWithMolecularDataByDSAndIdAndMolcharType(
+        return dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
                         group.getAbbreviation(),
-                        m.getSourcePdxId(),
                         molcharType);
-            if(model != null) {
-                modelsWithMolType.add(model);
-            }
         }
-        return modelsWithMolType;
-    }
+
 
     public List<List<String>> extractPatientSheet(Group group) {
         List<Patient> patients = dataImportService.findPatientsByGroup(group);
@@ -246,8 +239,8 @@ public class UniversalDataExtractionUtilities {
     private String[] getEngraftmentMaterialInfo(Specimen specimen){
         String[] engraftmentInfo = {NOT_SPECIFIED, NOT_SPECIFIED};
         if(Objects.nonNull(specimen.getEngraftmentMaterial())){
-          engraftmentInfo[1] =  specimen.getEngraftmentMaterial().getName();
-          engraftmentInfo[2] = specimen.getEngraftmentMaterial().getState();
+          engraftmentInfo[0] =  specimen.getEngraftmentMaterial().getName();
+          engraftmentInfo[1] = specimen.getEngraftmentMaterial().getState();
         }
         return engraftmentInfo;
     }
@@ -382,20 +375,18 @@ public class UniversalDataExtractionUtilities {
                 rowData.add(model.getSourcePdxId());
                 rowData.add(sampleId);
                 rowData.add(sampleOrigin);
-                rowData.add(getPassage(sampleOrigin, specimen));
                 rowData.add(getHostStrainNameSymbol(specimen));
-
+                rowData.add(getPassage(sampleOrigin, specimen));
                 switch (molcharType) {
                     case "mutation":
                         rowData.add(md.getMarker());
-                        rowData.add(md.getAminoAcidChange());
                         rowData.add(md.getBiotype());
                         rowData.add(md.getCodingSequenceChange());
                         rowData.add(md.getVariantClass());
-                        rowData.add(md.getNucleotideChange());
                         rowData.add(md.getCodonChange());
                         rowData.add(md.getAminoAcidChange());
                         rowData.add(md.getConsequence());
+                        rowData.add(md.getFunctionalPrediction());
                         rowData.add(md.getReadDepth());
                         rowData.add(md.getAlleleFrequency());
                         rowData.add(md.getChromosome());
@@ -479,18 +470,14 @@ public class UniversalDataExtractionUtilities {
         return (!sampleOrigin.equals(PATIENT_ORIGIN) && specimen != null) ? specimen.getPassage() : "" ;
     }
 
-
     private String getPubmedIDs(ModelCreation model){
         StringBuilder pubmedIDs = new StringBuilder();
         if(model.getGroups() != null){
             for(Group g : model.getGroups()){
-
                 if(g.getType().equals("Publication")){
-
                     if(pubmedIDs.length() != 0){
                         pubmedIDs.append(",");
                     }
-
                     pubmedIDs.append(g.getPubMedId());
                 }
             }
@@ -674,19 +661,23 @@ public class UniversalDataExtractionUtilities {
                     patientOmic.addAll(parseOmicDataToSheet(model, sampleId, PATIENT_ORIGIN, mc.getType(), null, mc));
                 }
             }
-        } else {
-            log.info("No molecular data found for patient sample for model {} \n", model.getSourcePdxId());
         }
         return patientOmic;
     }
 
     private List<List<String>> extractXenoSampleOmicDataForEachSpecimen(ModelCreation model, String molcharType) {
         List<List<String>> xenograftOmic = new ArrayList<>();
-        for (Specimen specimen : model.getSpecimens()) {
-            if (specimenHasMolecularCharacterizations(specimen)) {
-                extractXenoSampleOmicDataForEachMolecularCharacterization(specimen, molcharType, model);
+        if(model.getSpecimens() != null) {
+            for (Specimen specimen : model.getSpecimens()) {
+                if (specimenHasMolecularCharacterizations(specimen)) {
+                    xenograftOmic.addAll(
+                            extractXenoSampleOmicDataForEachMolecularCharacterization(specimen, molcharType, model));
                 }
             }
+        }
+        if(xenograftOmic.isEmpty()){
+            log.error("Problem extracting omic data for {}", model.getSourcePdxId());
+        }
         return xenograftOmic;
     }
 
