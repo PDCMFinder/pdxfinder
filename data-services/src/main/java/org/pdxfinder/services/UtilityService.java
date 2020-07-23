@@ -752,7 +752,6 @@ public class UtilityService {
             for (File file : filDir) {
 
                 if (file.isFile()) {
-                    log.info(file.getName());
                     fileNames.add(file.getName());
                 }
             }
