@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ContextConfiguration(classes = {TestConfig.class})
-@TestPropertySource(locations = {"classpath:ogm.properties"})
+@TestPropertySource(locations = {"classpath:application.properties"})
 @Transactional
 @Ignore
 public class BaseTest {
