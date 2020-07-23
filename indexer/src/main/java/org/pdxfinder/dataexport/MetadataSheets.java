@@ -1,9 +1,11 @@
 package org.pdxfinder.dataexport;
 
 import org.pdxfinder.TSV;
-import org.pdxfinder.graph.dao.Group;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MetadataSheets {
 
@@ -15,14 +17,10 @@ public class MetadataSheets {
     private List<List<String>> sharingAndContactSheetDataExport;
     private List<List<String>> loaderRelatedDataSheetDataExport;
 
-
     private Map<String, List<List<String>>> exportSheetsMap;
-
     private List<List<String>> blankSheet;
 
-    public MetadataSheets(Group group) {
-        Objects.requireNonNull(group, "ExportSheets must have a group provider");
-
+    public MetadataSheets() {
         initDataExportSheets();
         createExportSheetMap();
         initBlankSheet();
@@ -31,6 +29,7 @@ public class MetadataSheets {
     private void initDataExportSheets() {
         exportSheetsMap = new HashMap<>();
 
+        checklistDataExport = new ArrayList<>();
         patientSheetDataExport = new ArrayList<>();
         patientSampleSheetDataExport = new ArrayList<>();
         pdxModelSheetDataExport = new ArrayList<>();

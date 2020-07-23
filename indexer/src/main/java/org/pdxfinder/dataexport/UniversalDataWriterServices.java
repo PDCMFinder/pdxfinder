@@ -18,9 +18,9 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 @Component
-public class UniversalDataWriterUtilities {
+public class UniversalDataWriterServices {
 
-    private static final Logger log = LoggerFactory.getLogger(UniversalDataWriterUtilities.class);
+    private static final Logger log = LoggerFactory.getLogger(UniversalDataWriterServices.class);
 
     public void writXlsxFromWorkbook(XSSFWorkbook dataWorkbook, String fileLocation) throws IOException {
         FileOutputStream fileOut = new FileOutputStream(fileLocation);

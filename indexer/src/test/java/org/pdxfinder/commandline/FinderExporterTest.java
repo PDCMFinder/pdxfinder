@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.pdxfinder.BaseTest;
-import org.pdxfinder.dataexport.UniversalDataExtractionUtilities;
+import org.pdxfinder.dataexport.UniversalDataExtractionServices;
 import org.pdxfinder.services.DataImportService;
 
 import java.io.File;
@@ -27,7 +27,7 @@ public class FinderExporterTest extends BaseTest {
     @Mock
     private DataImportService dataImportService;
     @Mock
-    private UniversalDataExtractionUtilities universalDataExtractionUtilities;
+    private UniversalDataExtractionServices universalDataExtractionUtilities;
 
     @Spy
     @InjectMocks

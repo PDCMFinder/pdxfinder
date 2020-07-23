@@ -20,11 +20,11 @@ import java.util.List;
 public class UniversalDataExporter {
 
     private static final Logger log = LoggerFactory.getLogger(UniversalDataExporter.class);
-    private UniversalDataWriterUtilities writerUtilities;
-    private UniversalDataExtractionUtilities extractionUtilities;
+    private UniversalDataWriterServices writerUtilities;
+    private UniversalDataExtractionServices extractionUtilities;
 
     @Autowired
-    UniversalDataExporter(UniversalDataWriterUtilities writerUtilities, UniversalDataExtractionUtilities extractionUtilities){
+    UniversalDataExporter(UniversalDataWriterServices writerUtilities, UniversalDataExtractionServices extractionUtilities){
         this.writerUtilities = writerUtilities;
         this.extractionUtilities = extractionUtilities;
     }
@@ -32,7 +32,7 @@ public class UniversalDataExporter {
     public void exportAllFromGroup(String exportDir, Group dataSource, boolean isHarmonized, String templateDir) throws IOException {
         String exportProviderDir = Paths.get(String.format("%s/%s/",exportDir ,dataSource.getAbbreviation())).toString();
         ExporterTemplates templates = new ExporterTemplates(templateDir, isHarmonized);
-        MetadataSheets providerSheets = new MetadataSheets(dataSource);
+        MetadataSheets providerSheets = new MetadataSheets();
         writerUtilities.createExportDirectories(exportProviderDir);
 
         try {

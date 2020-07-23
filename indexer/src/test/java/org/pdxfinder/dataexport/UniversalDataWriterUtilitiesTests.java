@@ -27,7 +27,7 @@ public class UniversalDataWriterUtilitiesTests extends BaseTest {
     private DataImportService dataImportService;
 
     @InjectMocks
-    protected UniversalDataWriterUtilities universalDataWriterUtilities;
+    protected UniversalDataWriterServices universalDataWriterUtilities;
 
 
     @Test

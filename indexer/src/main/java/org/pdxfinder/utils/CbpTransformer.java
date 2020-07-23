@@ -4,7 +4,7 @@ package org.pdxfinder.utils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.pdxfinder.TSV;
 import org.pdxfinder.dataexport.ExporterTemplates;
-import org.pdxfinder.dataexport.UniversalDataWriterUtilities;
+import org.pdxfinder.dataexport.UniversalDataWriterServices;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.services.OmicTransformationService;
 import org.pdxfinder.services.UtilityService;
@@ -29,10 +29,10 @@ public class CbpTransformer {
 
     private UtilityService utilityService;
     private OmicTransformationService omicTransformationService;
-    private UniversalDataWriterUtilities universalDataWriterUtilities;
+    private UniversalDataWriterServices universalDataWriterUtilities;
 
     CbpTransformer(UtilityService utilityService, OmicTransformationService omicTransformationService,
-                   UniversalDataWriterUtilities universalDataWriterUtilities){
+                   UniversalDataWriterServices universalDataWriterUtilities){
         this.utilityService = utilityService;
         this.omicTransformationService = omicTransformationService;
         this.universalDataWriterUtilities = universalDataWriterUtilities;

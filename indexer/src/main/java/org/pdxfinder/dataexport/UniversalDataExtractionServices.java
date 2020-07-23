@@ -15,9 +15,9 @@ import java.util.*;
  * Created by csaba on 02/10/2019.
  */
 @Service
-public class UniversalDataExtractionUtilities {
+public class UniversalDataExtractionServices {
 
-    private static final Logger log = LoggerFactory.getLogger(UniversalDataExtractionUtilities.class);
+    private static final Logger log = LoggerFactory.getLogger(UniversalDataExtractionServices.class);
 
     private UtilityService utilityService;
     private DataImportService dataImportService;
@@ -38,7 +38,7 @@ public class UniversalDataExtractionUtilities {
     private static final String MODEL_ORIGIN = "xenograft";
 
     @Autowired
-    public UniversalDataExtractionUtilities(DataImportService dataImportService, UtilityService utilityService) {
+    public UniversalDataExtractionServices(DataImportService dataImportService, UtilityService utilityService) {
         this.dataImportService = dataImportService;
         this.utilityService = utilityService;
     }

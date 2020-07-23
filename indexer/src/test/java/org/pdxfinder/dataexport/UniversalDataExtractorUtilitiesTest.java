@@ -23,7 +23,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
     private DataImportService dataImportService;
 
     @InjectMocks
-    protected UniversalDataExtractionUtilities extractor;
+    protected UniversalDataExtractionServices extractor;
 
     Group providerGroup;
 

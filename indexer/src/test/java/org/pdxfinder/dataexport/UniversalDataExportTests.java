@@ -28,10 +28,10 @@ import static org.mockito.Mockito.*;
 public class UniversalDataExportTests extends BaseTest {
 
     @Mock
-    private UniversalDataWriterUtilities writerUtilities;
+    private UniversalDataWriterServices writerUtilities;
 
     @Mock
-    private UniversalDataExtractionUtilities extractionUtilities;
+    private UniversalDataExtractionServices extractionUtilities;
 
     @InjectMocks
     private UniversalDataExporter universalDataExporter;
@@ -96,15 +96,15 @@ public class UniversalDataExportTests extends BaseTest {
     }
 
     @Test
-    public void Given_dummyTemplatesAndNoData_ExportMetadata_ExtractionUtilitesAreCalledWithoutWrite() throws IOException {
-        MetadataSheets  metadataSheets = new MetadataSheets(group);
+    public void Given_dummyTemplatesAndNoData_ExportMetadata_ExtractionUtilitesAreCalledWithoutWriting() throws IOException {
+        MetadataSheets  metadataSheets = new MetadataSheets();
         when(extractionUtilities.extractMetadata(group, metadataSheets, false)).thenReturn(metadataSheets);
 
         universalDataExporter.exportMetadata(metadataSheets, templates, group, false, templateDir);
         verify(writerUtilities, times(7)).updateXlsxSheetWithData(any(Sheet.class),
                 any(List.class), anyInt(), anyInt());
 
-        verify(writerUtilities).writXlsxFromWorkbook(any(XSSFWorkbook.class), anyString());
+        verify(writerUtilities, never()).writXlsxFromWorkbook(any(XSSFWorkbook.class), anyString());
     }
 
     @Test
