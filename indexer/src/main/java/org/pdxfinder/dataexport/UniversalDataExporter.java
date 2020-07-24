@@ -48,7 +48,8 @@ public class UniversalDataExporter {
     public void exportSamplePlatform(ExporterTemplates templates, Group group, String exportProviderDir) throws IOException {
         List<List<String>> samplePlatform = extractionUtilities.extractSamplePlatform(group);
         XSSFWorkbook samplePlatformTemplate = templates.getTemplate(TSV.templateNames.sampleplatform_template.name());
-        saveSamplePlatformToXlsx(samplePlatformTemplate, samplePlatform, exportProviderDir);
+        String samplePlatformURI = String.format("%s/%s_sampleplatform.xlsx", exportProviderDir, group.getAbbreviation());
+        saveSamplePlatformToXlsx(samplePlatformTemplate, samplePlatform, samplePlatformURI);
     }
 
     public void exportMetadata(MetadataSheets providerSheets, ExporterTemplates templates, Group dataSource, boolean isHarmonized, String exportProviderDir) throws IOException {
@@ -67,14 +68,14 @@ public class UniversalDataExporter {
         if(allMetadataSheetsHaveData(providerData)) {
             String metadataFileURI = String.format("%s/%s_metadata.xlsx", exportProviderDir, dataSource.getAbbreviation());
             writerUtilities.writXlsxFromWorkbook(metadataTemplate, metadataFileURI);
-        } else { log.error("Empty or Null metadata sheet! Did not save metadata."); }
+        } else { log.error("Empty or Null metadata sheet. Skipping export of Metadata."); }
     }
 
-    private void saveSamplePlatformToXlsx(XSSFWorkbook samplePlatformTemplate, List<List<String>> samplePlatform, String exportProviderDir) throws IOException {
+    private void saveSamplePlatformToXlsx(XSSFWorkbook samplePlatformTemplate, List<List<String>> samplePlatform, String samplePlatformURI) throws IOException {
         writerUtilities.updateXlsxSheetWithData(samplePlatformTemplate.getSheetAt(0),
                 samplePlatform, 6, 1);
         if(!samplePlatform.isEmpty()){
-            writerUtilities.writXlsxFromWorkbook(samplePlatformTemplate, exportProviderDir + "/sampleplatform.xlsx");
+            writerUtilities.writXlsxFromWorkbook(samplePlatformTemplate, samplePlatformURI);
         }
     }
 
@@ -127,6 +128,7 @@ public class UniversalDataExporter {
     private boolean allMetadataSheetsHaveData(MetadataSheets providerData){
         for(TSV.metadataSheetNames sheetName: TSV.metadataSheetNames.values()){
             if (providerData.get(sheetName.name()) == null || providerData.get(sheetName.name()).isEmpty() ) {
+                log.error("Metadata sheet {} was not found. Skipping metadata export", sheetName.name());
                 return false;
             }
         }

@@ -44,7 +44,7 @@ public class UniversalDataExtractionServices {
     }
 
     public MetadataSheets extractMetadata(Group group, MetadataSheets sheets, boolean isHarmonized){
-        sheets.set(TSV.metadataSheetNames.checklist.name(), new ArrayList<>());
+        sheets.set(TSV.metadataSheetNames.checklist.name(), extractChecklist());
         sheets.set(TSV.metadataSheetNames.patient.name(), extractPatientSheet(group));
         sheets.set(TSV.metadataSheetNames.sample.name(), extractSampleSheet(group, isHarmonized));
         sheets.set(TSV.metadataSheetNames.model.name(), extractModelDetails(group));
@@ -52,6 +52,14 @@ public class UniversalDataExtractionServices {
         sheets.set(TSV.metadataSheetNames.sharing.name(), extractSharingAndContact(group));
         sheets.set(TSV.metadataSheetNames.loader.name(), extractLoaderRelatedData(group));
         return sheets;
+    }
+
+    public List<List<String>> extractChecklist(){
+        List<List<String>> checklist = new ArrayList<>();
+        List<String> deprecatedMessageRow = new ArrayList<>();
+        deprecatedMessageRow.add("");
+        checklist.add(deprecatedMessageRow);
+        return checklist;
     }
 
     public List<List<String>> extractSamplePlatform(Group group){
