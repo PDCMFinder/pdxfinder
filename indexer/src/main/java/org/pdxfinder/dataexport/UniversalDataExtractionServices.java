@@ -353,7 +353,7 @@ public class UniversalDataExtractionServices {
         List<List<String>> modelsOmicExportSheet = new ArrayList<>();
         if(model != null) {
             String modelId = model.getSourcePdxId();
-            log.info("Exporting {} data for {}", molcharType, modelId);
+            log.info("ModelId {}: Starting extraction of omic {} data",modelId, molcharType);
             modelsOmicExportSheet.addAll(extractPatientSampleOmicData(model, molcharType));
             modelsOmicExportSheet.addAll(extractXenoSampleOmicDataForEachSpecimen(model, molcharType));
         }
@@ -666,6 +666,7 @@ public class UniversalDataExtractionServices {
 
             for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
                 if(mc.getType().equals(molcharType)){
+                    log.info("ModelId {}: Extracting patient sample {} information",model.getSourcePdxId(), sampleId);
                     patientOmic.addAll(parseOmicDataToSheet(model, sampleId, PATIENT_ORIGIN, mc.getType(), null, mc));
                 }
             }
@@ -682,9 +683,9 @@ public class UniversalDataExtractionServices {
                             extractXenoSampleOmicDataForEachMolecularCharacterization(specimen, molcharType, model));
                 }
             }
-        }
-        if(xenograftOmic.isEmpty()){
-            log.error("Problem extracting omic data for {}", model.getSourcePdxId());
+            if(xenograftOmic.isEmpty()){
+                log.error("ModelId {}: Error extracting xenograft information", model.getSourcePdxId());
+            }
         }
         return xenograftOmic;
     }
@@ -693,7 +694,9 @@ public class UniversalDataExtractionServices {
         List<List<String>> OmicData = new ArrayList<>();
         for (MolecularCharacterization mc : specimen.getSample().getMolecularCharacterizations()) {
             if (mc.getType().equals(molcharType)) {
-                OmicData.addAll(parseOmicDataToSheet(model, specimen.getSample().getSourceSampleId(),
+                String sampleId = specimen.getSample().getSourceSampleId();
+                log.info("ModelId {}: Extracting sample {} information", model.getSourcePdxId(), sampleId);
+                OmicData.addAll(parseOmicDataToSheet(model, sampleId,
                         MODEL_ORIGIN, mc.getType(), specimen, mc));
             }
         }
