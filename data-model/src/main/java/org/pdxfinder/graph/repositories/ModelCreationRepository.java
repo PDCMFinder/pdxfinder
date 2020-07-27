@@ -208,19 +208,21 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     List<ModelCreation> findModelPlatformSampleByDS(@Param("dataSource") String dataSource);
 
 
-    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) and mod.sourcePdxId = {modelId} " +
+    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) " +
             "WITH mod " +
-            "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation) " +
+            "MATCH (mod)--(samp:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation) " +
             "WHERE mc.type = {type}  "+
-            "WITH mod, iir, psamp, cbr, mc, assoc, mAss " +
+            "WITH mod, samp, cbr, mc, assoc, mAss " +
+            "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample) " +
+            "WITH iir, psamp, mod, samp, cbr, mc, assoc, mAss " +
             "OPTIONAL MATCH (mod)-[spr:SPECIMENS]-(sp:Specimen)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization)-[assoc2:ASSOCIATED_WITH]->(mAss2:MarkerAssociation) " +
             "WHERE mc2.type = {type} "+
-            "WITH mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, assoc, mAss, assoc2, mAss2 " +
+            "WITH iir, psamp, mod, samp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, assoc, mAss, assoc2, mAss2 " +
             "OPTIONAL MATCH (sp)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
             "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
-            "RETURN mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
-    ModelCreation findModelWithMolecularDataByDSAndIdAndMolcharType(@Param("dataSource") String dataSource, @Param("modelId") String modelId, @Param("type") String type);
+            "RETURN mod, iir, psamp, samp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
+List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
             "WITH mod SKIP {from} LIMIT {to}" +

@@ -2,8 +2,10 @@ package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
-import org.pdxfinder.dataloaders.updog.TSV;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.*;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -13,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class ModelCreationCreatorTest {
 

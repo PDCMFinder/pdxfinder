@@ -119,9 +119,7 @@ public class LinkSamplesToNCITTerms {
                         //log.info("Mapping "+diagnosis+" to "+mappingRule.getOntologyTerm());
                     }
                 }
-
             }
-
             startNode += batchSize;
         }
 

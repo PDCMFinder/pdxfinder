@@ -8,29 +8,28 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.LoadDiseaseOntology;
+import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
 import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
-import org.pdxfinder.services.constants.DataProvider;
-import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SetDataVisibility;
 import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
 import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
 
-import java.nio.file.Path;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class FinderLoaderTest extends BaseTest {
 

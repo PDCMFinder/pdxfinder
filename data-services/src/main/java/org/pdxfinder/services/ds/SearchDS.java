@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.*;
 import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.repositories.DataProjectionRepository;
-import org.pdxfinder.services.search.WebFacetSection;
-import org.pdxfinder.services.search.WebFacetContainer;
 import org.pdxfinder.services.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,6 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 
 import static java.lang.Long.parseLong;
 

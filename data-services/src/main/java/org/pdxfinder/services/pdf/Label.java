@@ -81,7 +81,7 @@ public enum Label {
 
     private String value;
 
-    private Label(String val) {
+    Label(String val) {
         value = val;
     }
 

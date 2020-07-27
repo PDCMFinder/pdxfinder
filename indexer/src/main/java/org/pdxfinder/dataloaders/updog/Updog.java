@@ -3,12 +3,18 @@ package org.pdxfinder.dataloaders.updog;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
 import org.pdxfinder.dataloaders.updog.tablevalidation.*;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class Updog {
@@ -50,11 +56,7 @@ public class Updog {
         combinedTableSet.putAll(treatmentTableSet);
 
         validationErrors = validateTableSet(combinedTableSet, omicsTableSet.keySet(), provider);
-        Validator.reportAnyErrors(validationErrors);
-
-        log.error("There were {} errors found. Check {} for details.",
-            validationErrors.size(),
-            "log/validation_errors.html");
+        new ErrorReporter(validationErrors).truncate(50).logErrors();
 
         if (!validateOnly) {
             domainObjectCreator.loadDomainObjects(combinedTableSet, updogProviderDirectory);
