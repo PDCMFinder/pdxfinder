@@ -6,7 +6,7 @@ public enum Operator {
     IN("_in:");
 
     private String value;
-    private Operator(String val) {
+    Operator(String val) {
         value = val;
     }
     public String get() {

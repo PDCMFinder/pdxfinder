@@ -13,10 +13,9 @@ import org.pdxfinder.services.reporting.LogEntity;
 import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -324,9 +323,9 @@ public class DataImportService {
         return modelCreationRepository.findModelPlatformSampleByDS(ds);
     }
 
-    public ModelCreation findModelWithMolecularDataByDSAndIdAndMolcharType(String dataSource, String modelId, String molcharType){
+    public List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(String dataSource, String molcharType){
 
-        return modelCreationRepository.findModelWithMolecularDataByDSAndIdAndMolcharType(dataSource, modelId, molcharType);
+        return modelCreationRepository.findModelsWithMolecularDataByDSAndMolcharType(dataSource, molcharType);
     }
 
     public List<ModelCreation> findModelsWithSharingAndContactByDS(String ds){

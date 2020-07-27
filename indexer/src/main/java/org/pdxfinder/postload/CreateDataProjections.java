@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
-
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -1097,7 +1096,7 @@ public class CreateDataProjections implements ApplicationContextAware{
             // Add all top level systems (translated) to the Model
             for (String s : allOntologyTerms.stream().map(OntologyTerm::getLabel).collect(Collectors.toSet())) {
 
-                if (cancerSystemMap.keySet().contains(s)) {
+                if (cancerSystemMap.containsKey(s)) {
 
                     if (mfq.getCancerSystem() == null) {
                         mfq.setCancerSystem(new ArrayList<>());

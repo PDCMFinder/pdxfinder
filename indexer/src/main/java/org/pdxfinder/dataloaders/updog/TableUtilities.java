@@ -8,7 +8,8 @@ import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.selection.Selection;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 public final class TableUtilities {
 

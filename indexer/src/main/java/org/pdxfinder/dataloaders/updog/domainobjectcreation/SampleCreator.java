@@ -1,6 +1,6 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
-import org.pdxfinder.dataloaders.updog.TSV;
+import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.dao.Tissue;
 import org.pdxfinder.graph.dao.TumorType;

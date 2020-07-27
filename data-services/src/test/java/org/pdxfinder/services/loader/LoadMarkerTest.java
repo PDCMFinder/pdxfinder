@@ -10,10 +10,9 @@ import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 
-import java.io.IOException;
-
 import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 public class LoadMarkerTest extends BaseTest {
 

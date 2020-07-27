@@ -2,9 +2,10 @@ package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
 
 public class ErrorReporter {
 
