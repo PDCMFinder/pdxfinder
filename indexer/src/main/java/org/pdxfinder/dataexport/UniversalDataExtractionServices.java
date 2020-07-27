@@ -67,7 +67,7 @@ public class UniversalDataExtractionServices {
     }
 
     public List<ModelCreation> getAllModelsByGroupAndMoleculartype(Group group, String molcharType){
-        return dataImportService.findModelWithMolecularDataByDSAndIdAndMolcharType(
+        return dataImportService.findModelsWithMolecularDataByDSAndMolcharType(
                         group.getAbbreviation(),
                         molcharType);
         }

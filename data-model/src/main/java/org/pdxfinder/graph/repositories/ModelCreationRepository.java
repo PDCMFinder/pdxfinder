@@ -222,7 +222,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
             "RETURN mod, iir, psamp, samp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
-    List<ModelCreation> findModelWithMolecularDataByDSAndIdAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
+List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
             "WITH mod SKIP {from} LIMIT {to}" +
