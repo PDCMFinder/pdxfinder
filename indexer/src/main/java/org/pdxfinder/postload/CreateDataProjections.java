@@ -1171,7 +1171,7 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     }
 
-    private void saveDP(String dpName, Object values){
+    public DataProjection saveDP(String dpName, Object values){
 
         DataProjection dataProjection = dataImportService.findDataProjectionByLabel(dpName);
 
@@ -1181,7 +1181,7 @@ public class CreateDataProjections implements ApplicationContextAware{
         }
 
         dataProjection.setValue(createJsonString(values));
-        dataImportService.saveDataProjection(dataProjection);
+        return dataImportService.saveDataProjection(dataProjection);
     }
 
     private String createJsonString(Object jstring){
@@ -1261,5 +1261,53 @@ public class CreateDataProjections implements ApplicationContextAware{
 
     public void setPatientTreatmentDP(Map<String, Set<Long>> patientTreatmentDP) {
         this.patientTreatmentDP = patientTreatmentDP;
+    }
+
+    public Map<String, Map<String, Map<String, Set<Long>>>> getMutatedPlatformMarkerVariantModelDP() {
+        return mutatedPlatformMarkerVariantModelDP;
+    }
+
+    public Map<String, Set<String>> getMutatedMarkerVariantDP() {
+        return mutatedMarkerVariantDP;
+    }
+
+    public List<ModelForQuery> getModelForQueryDP() {
+        return modelForQueryDP;
+    }
+
+    public Map<String, Map<String, Set<Long>>> getModelDrugResponseDP() {
+        return modelDrugResponseDP;
+    }
+
+    public Map<String, Map<String, Set<Long>>> getImmunoHistoChemistryDP() {
+        return immunoHistoChemistryDP;
+    }
+
+    public Map<String, Map<String, Set<Long>>> getCytogeneticsDP() {
+        return cytogeneticsDP;
+    }
+
+    public Map<String, Set<Long>> getCopyNumberAlterationDP() {
+        return copyNumberAlterationDP;
+    }
+
+    public Map<String, Map<String, Set<Long>>> getExpressionDP() {
+        return expressionDP;
+    }
+
+    public Map<String, List<DataAvailableDTO>> getDataAvailableDP() {
+        return dataAvailableDP;
+    }
+
+    public List<MutatedMarkerData> getFrequentlyMutatedMarkersDP() {
+        return frequentlyMutatedMarkersDP;
+    }
+
+    public Map<String, Set<Long>> getDrugDosingDP() {
+        return drugDosingDP;
+    }
+
+    public Map<String, Set<Long>> getPatientTreatmentDP() {
+        return patientTreatmentDP;
     }
 }
