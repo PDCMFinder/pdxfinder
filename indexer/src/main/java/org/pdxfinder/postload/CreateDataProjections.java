@@ -522,133 +522,6 @@ public class CreateDataProjections implements ApplicationContextAware{
     }
 
 
-    private void addCharlesRiverCNA() throws Exception {
-
-        log.info("Loading additional datasets for CRL.");
-
-        String templateFileStr = finderRootDir + "/data/UPDOG/CRL/metadata.xlsx";
-        String markerTemplateFileStr = finderRootDir + "/data/UPDOG/CRL/cna_tested_markers/list.csv";
-
-        File markerListFile = new File(markerTemplateFileStr);
-        File templateFile = new File(templateFileStr);
-
-        Set<Marker> markerSet = new HashSet<>();
-
-        if (markerListFile.exists() && templateFile.exists()) {
-
-            List<List<String>> markerList = utilityService.serializeCSVToArrayList(markerTemplateFileStr);
-
-            //STEP1: get the marker symbols from the csv file then find the corresponding marker node and add it to a set
-            log.info("Found " + markerList.size() + " markers in the marker file.");
-            for (int i = 1; i < markerList.size(); i++) {
-
-                if (i % 500 == 0) {
-                    log.info("Collected " + i + " markers from the repository.");
-                }
-
-                String markerSymbol = markerList.get(i).get(0);
-
-                //skip all symbols with dot in them
-                if (markerSymbol.contains(".")) {
-
-                    MarkerLogEntity le = new MarkerLogEntity(this.getClass().getSimpleName(), "CRL", "-", "copy number alteration", "Not Specified", markerSymbol, "", "");
-                    le.setMessage(markerSymbol + " is an unrecognised symbol");
-                    le.setType("ERROR");
-                    continue;
-
-                }
-
-
-                //log.info("Looking up: "+markerSymbol);
-                NodeSuggestionDTO nsdto = dataImportService.getSuggestedMarker(this.getClass().getSimpleName(), "CRL", "-", markerSymbol, "copy number alteration", "Not Specified");
-
-                if (nsdto.getNode() == null) {
-
-                    //uh oh, we found an unrecognised marker symbol, abort, abort!!!!
-                    reportManager.addMessage(nsdto.getLogEntity());
-
-                    continue;
-                } else {
-
-                    Marker marker = (Marker) nsdto.getNode();
-                    markerSet.add(marker);
-
-                }
-
-            }
-
-
-            //STEP2:
-
-            Set<Long> modelIdSet = new HashSet<>();
-
-            UniversalLoader updog = new UniversalLoader(reportManager, utilityService, dataImportService);
-            updog.setFinderRootDir(finderRootDir);
-
-            updog.initTemplates(templateFileStr);
-
-            List<List<String>> datasetDerived = updog.getSamplePlatformDescriptionSheetData();
-            int row = 6;
-
-            for (List<String> derivedDatasetRow : datasetDerived) {
-
-                String sampleId = derivedDatasetRow.get(0);
-
-                String origin = derivedDatasetRow.get(1);
-                String passage = derivedDatasetRow.get(2);
-                String nomenclature = derivedDatasetRow.get(3);
-                String modelId = derivedDatasetRow.get(4);
-                String molCharType = derivedDatasetRow.get(5);
-                String platformName = derivedDatasetRow.get(6);
-                String platformTechnology = derivedDatasetRow.get(7);
-                String platformDescription = derivedDatasetRow.get(8);
-                String analysisProtocol = derivedDatasetRow.get(9);
-
-                //SKIP everything that is not cna
-                if (!molCharType.toLowerCase().equals("copy number alteration")) {
-
-                    row++;
-                    continue;
-                }
-
-
-                ModelCreation modelCreation = dataImportService.findModelByIdAndDataSource(modelId, "CRL");
-
-                if(modelCreation != null){
-
-                    modelIdSet.add(modelCreation.getId());
-                }
-                else{
-                    log.error("Not found model: "+modelId);
-                }
-
-
-            }
-
-
-            //STEP3: save the same markers for all models
-
-            for(Marker m: markerSet){
-                if(copyNumberAlterationDP.containsKey(m.getHgncSymbol())){
-
-                    copyNumberAlterationDP.get(m.getHgncSymbol()).addAll(modelIdSet);
-                }
-                else{
-
-                    copyNumberAlterationDP.put(m.getHgncSymbol(), modelIdSet);
-                }
-
-            }
-
-
-            log.info("DONE faking CNA data for CRL.");
-
-        }
-        else{
-            log.error("Missing files for creating CRL CNA projection.");
-        }
-    }
-
     private void addToOneParamDP(Map<String, Set<Long>> collection, String key, Long modelId){
 
         if(key == null || key.isEmpty()) return;
@@ -657,7 +530,6 @@ public class CreateDataProjections implements ApplicationContextAware{
             collection.get(key).add(modelId);
         }
         else{
-
             Set<Long> s = new HashSet();
             s.add(modelId);
             collection.put(key, s);
@@ -668,138 +540,51 @@ public class CreateDataProjections implements ApplicationContextAware{
     private void addToTwoParamDP(Map<String, Map<String, Set<Long>>> collection, String key1, String key2, Long modelId){
 
         if(collection.containsKey(key1)){
-
             if(collection.get(key1).containsKey(key2)){
                 collection.get(key1).get(key2).add(modelId);
-
             }
             else{
-
                 Set<Long> set = new HashSet<>();
                 set.add(modelId);
                 collection.get(key1).put(key2, set);
             }
         }
         else{
-
             Set<Long> set = new HashSet<>();
             set.add(modelId);
-
             Map<String, Set<Long>> map = new HashMap<>();
             map.put(key2, set);
-
             collection.put(key1, map);
         }
-
     }
 
 
     private void addToThreeParamDP(Map<String, Map<String, Map<String, Set<Long>>>> collection, String key1, String key2, String key3, Long modelId){
 
         if(collection.containsKey(key1)){
-
             if(collection.get(key1).containsKey(key2)){
-
                 if(collection.get(key1).get(key2).containsKey(key3)){
-
                     collection.get(key1).get(key2).get(key3).add(modelId);
                 }
                 else{
-
                     Set<Long> models = new HashSet<>(Arrays.asList(modelId));
                     collection.get(key1).get(key2).put(key3,models);
                 }
-
             }
             else{
-
                 Set<Long> models = new HashSet<>(Arrays.asList(modelId));
-
                 Map<String, Set<Long>> map3 = new HashMap();
                 map3.put(key3,models);
-
                 collection.get(key1).put(key2, map3);
-
             }
-
-
-
         }
         else{
 
             Set<Long> models = new HashSet<>(Arrays.asList(modelId));
-
             Map<String, Set<Long>> map3 = new HashMap();
             map3.put(key3,models);
-
             Map map2 = new HashMap();
             map2.put(key2, map3);
-
-            collection.put(key1, map2);
-        }
-
-
-    }
-
-    private void addToFourParamDP(Map<String, Map<String, Map<String, Map<String, Set<Long>>>>> collection, String key1, String key2, String key3, String key4, Long modelId){
-
-        if(collection.containsKey(key1)){
-
-            if(collection.get(key1).containsKey(key2)){
-
-                if(collection.get(key1).get(key2).containsKey(key3)){
-
-                    if(collection.get(key1).get(key2).get(key3).containsKey(key4)){
-
-                        collection.get(key1).get(key2).get(key3).get(key4).add(modelId);
-                    }
-                    else{
-
-                        Set<Long> models = new HashSet<>(Arrays.asList(modelId));
-
-                        collection.get(key1).get(key2).get(key3).put(key4, models);
-                    }
-
-                }
-                else{
-
-                    Set<Long> models = new HashSet<>(Arrays.asList(modelId));
-
-                    Map<String, Set<Long>> map4 = new HashMap();
-                    map4.put(key4, models);
-
-                    collection.get(key1).get(key2).put(key3, map4);
-                }
-
-            }
-            else{
-
-                Set<Long> models = new HashSet<>(Arrays.asList(modelId));
-
-                Map<String, Set<Long>> map4 = new HashMap();
-                map4.put(key4, models);
-
-                Map map3 = new HashMap();
-                map3.put(key3, map4);
-
-                collection.get(key1).put(key2, map3);
-            }
-
-
-        }
-        else{
-
-            Set<Long> models = new HashSet<>(Arrays.asList(modelId));
-
-            Map<String, Set<Long>> map4 = new HashMap();
-            map4.put(key4, models);
-
-            Map map3 = new HashMap();
-            map3.put(key3, map4);
-
-            Map map2 = new HashMap();
-            map2.put(key2, map3);
-
             collection.put(key1, map2);
         }
 
@@ -914,30 +699,6 @@ public class CreateDataProjections implements ApplicationContextAware{
                 }
 
             }
-
-
-            /*
-            if (!mutationPlatformsByModel.containsKey(mc.getId())) {
-                mutationPlatformsByModel.put(mc.getId(), new ArrayList<>());
-            }
-            // Are there any molecular characterizations associated to this model?
-            if (mc.getRelatedSamples().stream().map(Sample::getMolecularCharacterizations).mapToLong(Collection::size).sum() > 0) {
-                // Get all molecular characterizations platforms into a list
-                mutationPlatformsByModel.get(mc.getId()).addAll(
-                        mc.getRelatedSamples().stream()
-                                .map(Sample::getMolecularCharacterizations)
-                                .flatMap(Collection::stream)
-                                .map(x ->  {
-                                    if (dataImportService.countMarkerAssociationBySourcePdxId(mc.getSourcePdxId(), x.getPlatform().getName()) != 0) {
-                                        return x.getPlatform().getName();
-                                    } else {
-                                        return " ";
-                                    }
-                                })
-                                .distinct()
-                                .collect(Collectors.toList()));
-            }
-            */
 
         }
 
@@ -1407,115 +1168,32 @@ public class CreateDataProjections implements ApplicationContextAware{
 
         log.info("Saving DataProjections");
 
-        DataProjection pmvmDP = dataImportService.findDataProjectionByLabel("PlatformMarkerVariantModel");
+        saveDP("PlatformMarkerVariantModel", mutatedPlatformMarkerVariantModelDP);
+        saveDP("MarkerVariant", mutatedMarkerVariantDP);
+        saveDP("ModelDrugData", modelDrugResponseDP);
+        saveDP("breast cancer markers", immunoHistoChemistryDP);
+        saveDP("cytogenetics", cytogeneticsDP);
+        saveDP("copy number alteration", copyNumberAlterationDP);
+        saveDP("expression", expressionDP);
+        saveDP("data available", dataAvailableDP);
+        saveDP("frequently mutated genes", frequentlyMutatedMarkersDP);
+        saveDP("patient treatment", patientTreatmentDP);
+        saveDP("drug dosing counter", drugDosingDP);
 
-        if (pmvmDP == null){
-
-            pmvmDP = new DataProjection();
-            pmvmDP.setLabel("PlatformMarkerVariantModel");
-        }
-
-        DataProjection mvDP = dataImportService.findDataProjectionByLabel("MarkerVariant");
-
-        if(mvDP == null){
-
-            mvDP = new DataProjection();
-            mvDP.setLabel("MarkerVariant");
-        }
-
-        DataProjection drugDP = dataImportService.findDataProjectionByLabel("ModelDrugData");
-
-        if(drugDP == null){
-
-            drugDP = new DataProjection();
-            drugDP.setLabel("ModelDrugData");
-        }
-
-        DataProjection ihcDP = dataImportService.findDataProjectionByLabel("breast cancer markers");
-
-        if(ihcDP == null){
-            ihcDP = new DataProjection();
-            ihcDP.setLabel("breast cancer markers");
-        }
-
-        DataProjection cytoDP = dataImportService.findDataProjectionByLabel("cytogenetics");
-
-        if(cytoDP == null){
-            cytoDP = new DataProjection();
-            cytoDP.setLabel("cytogenetics");
-        }
-
-        DataProjection cnaDP = dataImportService.findDataProjectionByLabel("copy number alteration");
-
-
-        if(cnaDP == null){
-            cnaDP = new DataProjection();
-            cnaDP.setLabel("copy number alteration");
-        }
-
-
-        DataProjection expDP = dataImportService.findDataProjectionByLabel("expression");
-
-
-        if(expDP == null){
-            expDP = new DataProjection();
-            expDP.setLabel("expression");
-        }
-
-
-        DataProjection daDP = dataImportService.findDataProjectionByLabel("data available");
-
-        if(daDP == null){
-            daDP = new DataProjection();
-            daDP.setLabel("data available");
-        }
-
-        DataProjection fmgDP = dataImportService.findDataProjectionByLabel("frequently mutated genes");
-
-        if(fmgDP == null){
-            fmgDP = new DataProjection();
-            fmgDP.setLabel("frequently mutated genes");
-        }
-
-        DataProjection ptDP = dataImportService.findDataProjectionByLabel("patient treatment");
-
-        if(ptDP == null){
-            ptDP = new DataProjection();
-            ptDP.setLabel("patient treatment");
-        }
-
-        DataProjection ddDP = dataImportService.findDataProjectionByLabel("drug dosing counter");
-
-        if(ddDP == null){
-            ddDP = new DataProjection();
-            ddDP.setLabel("drug dosing counter");
-        }
-
-        pmvmDP.setValue(createJsonString(mutatedPlatformMarkerVariantModelDP));
-        mvDP.setValue(createJsonString(mutatedMarkerVariantDP));
-        drugDP.setValue(createJsonString(modelDrugResponseDP));
-        ihcDP.setValue(createJsonString(immunoHistoChemistryDP));
-        cnaDP.setValue(createJsonString(copyNumberAlterationDP));
-        daDP.setValue(createJsonString(dataAvailableDP));
-        ptDP.setValue(createJsonString(patientTreatmentDP));
-        fmgDP.setValue(createJsonString(frequentlyMutatedMarkersDP));
-        cytoDP.setValue(createJsonString(cytogeneticsDP));
-        expDP.setValue(createJsonString(expressionDP));
-        ddDP.setValue(createJsonString(drugDosingDP));
-
-        dataImportService.saveDataProjection(pmvmDP);
-        dataImportService.saveDataProjection(mvDP);
-        dataImportService.saveDataProjection(drugDP);
-        dataImportService.saveDataProjection(ihcDP);
-        dataImportService.saveDataProjection(cnaDP);
-        dataImportService.saveDataProjection(daDP);
-        dataImportService.saveDataProjection(fmgDP);
-        dataImportService.saveDataProjection(ptDP);
-        dataImportService.saveDataProjection(cytoDP);
-        dataImportService.saveDataProjection(expDP);
-        dataImportService.saveDataProjection(ddDP);
     }
 
+    private void saveDP(String dpName, Object values){
+
+        DataProjection dataProjection = dataImportService.findDataProjectionByLabel(dpName);
+
+        if(dataProjection== null){
+            dataProjection = new DataProjection();
+            dataProjection.setLabel(dpName);
+        }
+
+        dataProjection.setValue(createJsonString(values));
+        dataImportService.saveDataProjection(dataProjection);
+    }
 
     private String createJsonString(Object jstring){
         try {
