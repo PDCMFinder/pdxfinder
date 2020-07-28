@@ -1,17 +1,13 @@
 package org.pdxfinder.postload;
 
 import com.github.openjson.*;
-import org.pdxfinder.dataloaders.UniversalLoader;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.reportmanager.ReportManager;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.DrugService;
-import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.dto.DataAvailableDTO;
-import org.pdxfinder.services.dto.NodeSuggestionDTO;
-import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -23,7 +19,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -40,8 +35,6 @@ public class CreateDataProjections implements ApplicationContextAware{
     private DataImportService dataImportService;
     private DrugService drugService;
 
-    private UtilityService utilityService;
-
     @Value("${user.home}")
     String homeDir;
 
@@ -57,9 +50,6 @@ public class CreateDataProjections implements ApplicationContextAware{
     private Map<String, Set<String>> mutatedMarkerVariantDP = new HashMap<>();
 
     private List<ModelForQuery> modelForQueryDP = new ArrayList<>();
-
-    //"platform"=>"marker"=>"set of model ids"
-    private Map<String, Map<String, Set<Long>>> wtMarkersDataProjection = new HashMap<>();
 
     //"drugname"=>"response"=>"set of model ids"
     private Map<String, Map<String, Set<Long>>> modelDrugResponseDP = new HashMap<>();
@@ -90,11 +80,10 @@ public class CreateDataProjections implements ApplicationContextAware{
     protected static ApplicationContext context;
 
     @Autowired
-    public CreateDataProjections(DataImportService dataImportService, DrugService drugService, UtilityService utilityService) {
+    public CreateDataProjections(DataImportService dataImportService, DrugService drugService) {
 
         this.dataImportService = dataImportService;
         this.drugService = drugService;
-        this.utilityService = utilityService;
     }
 
     public void run() {
@@ -1223,5 +1212,54 @@ public class CreateDataProjections implements ApplicationContextAware{
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
+    }
+
+
+    public void setMutatedPlatformMarkerVariantModelDP(Map<String, Map<String, Map<String, Set<Long>>>> mutatedPlatformMarkerVariantModelDP) {
+        this.mutatedPlatformMarkerVariantModelDP = mutatedPlatformMarkerVariantModelDP;
+    }
+
+    public void setMutatedMarkerVariantDP(Map<String, Set<String>> mutatedMarkerVariantDP) {
+        this.mutatedMarkerVariantDP = mutatedMarkerVariantDP;
+    }
+
+    public void setModelForQueryDP(List<ModelForQuery> modelForQueryDP) {
+        this.modelForQueryDP = modelForQueryDP;
+    }
+
+    public void setModelDrugResponseDP(Map<String, Map<String, Set<Long>>> modelDrugResponseDP) {
+        this.modelDrugResponseDP = modelDrugResponseDP;
+    }
+
+    public void setImmunoHistoChemistryDP(Map<String, Map<String, Set<Long>>> immunoHistoChemistryDP) {
+        this.immunoHistoChemistryDP = immunoHistoChemistryDP;
+    }
+
+    public void setCytogeneticsDP(Map<String, Map<String, Set<Long>>> cytogeneticsDP) {
+        this.cytogeneticsDP = cytogeneticsDP;
+    }
+
+    public void setCopyNumberAlterationDP(Map<String, Set<Long>> copyNumberAlterationDP) {
+        this.copyNumberAlterationDP = copyNumberAlterationDP;
+    }
+
+    public void setExpressionDP(Map<String, Map<String, Set<Long>>> expressionDP) {
+        this.expressionDP = expressionDP;
+    }
+
+    public void setDataAvailableDP(Map<String, List<DataAvailableDTO>> dataAvailableDP) {
+        this.dataAvailableDP = dataAvailableDP;
+    }
+
+    public void setFrequentlyMutatedMarkersDP(List<MutatedMarkerData> frequentlyMutatedMarkersDP) {
+        this.frequentlyMutatedMarkersDP = frequentlyMutatedMarkersDP;
+    }
+
+    public void setDrugDosingDP(Map<String, Set<Long>> drugDosingDP) {
+        this.drugDosingDP = drugDosingDP;
+    }
+
+    public void setPatientTreatmentDP(Map<String, Set<Long>> patientTreatmentDP) {
+        this.patientTreatmentDP = patientTreatmentDP;
     }
 }
