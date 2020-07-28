@@ -93,7 +93,7 @@ public class PatientSnapshot {
             if (ageInteger <= 23) {
                 return "0-23 months";
             } else {
-                return getAgeBin(ageInteger / 24);
+                return getAgeBin(ageInteger / 12);
             }
         }
         catch (Exception e){

@@ -12,10 +12,13 @@ public class PatientSnapshotTest {
         Patient patient = new Patient("test1", new Group());
         PatientSnapshot patientSnapshot1 = new PatientSnapshot(patient, "1", "", "", "");
         PatientSnapshot patientSnapshot2 = new PatientSnapshot(patient, "17mo", "", "", "");
-        PatientSnapshot patientSnapshot3 = new PatientSnapshot(patient, "25", "", "", "");
+        PatientSnapshot patientSnapshot3 = new PatientSnapshot(patient, "26mo", "", "", "");
+        PatientSnapshot patientSnapshot4 = new PatientSnapshot(patient, "25", "", "", "");
+
         Assert.assertEquals(patientSnapshot1.getAgeBin(), "0-23 months");
         Assert.assertEquals(patientSnapshot2.getAgeBin(), "0-23 months");
-        Assert.assertEquals(patientSnapshot3.getAgeBin(), "20-29");
+        Assert.assertEquals(patientSnapshot3.getAgeBin(), "2-9");
+        Assert.assertEquals(patientSnapshot4.getAgeBin(), "20-29");
     }
 
 }
