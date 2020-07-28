@@ -14,7 +14,7 @@ public class PatientSnapshotTest {
         Patient patient = new Patient("test1", new Group());
 
         PatientSnapshot patientSnapshot1 = new PatientSnapshot(patient, "1", new HashSet<>(), new TreatmentSummary());
-        PatientSnapshot patientSnapshot2 = new PatientSnapshot(patient, "17mo", new HashSet<>());
+        PatientSnapshot patientSnapshot2 = new PatientSnapshot(patient, "12mo", new HashSet<>());
         patientSnapshot2.addSample(new Sample("sample123"));
         PatientSnapshot patientSnapshot3 = new PatientSnapshot(patient, "26mo", "", "", "");
         PatientSnapshot patientSnapshot4 = new PatientSnapshot(patient, "5", "", "", "");
@@ -42,6 +42,7 @@ public class PatientSnapshotTest {
         Assert.assertEquals(patientSnapshot11.getAgeBin(), "70-79");
         Assert.assertEquals(patientSnapshot12.getAgeBin(), "80-89");
         Assert.assertEquals(patientSnapshot13.getAgeBin(), "90+");
+        Assert.assertEquals(false, patientSnapshot2.equals(patientSnapshot3));
     }
 
 }
