@@ -17,10 +17,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1153,7 +1149,7 @@ public class CreateDataProjections implements ApplicationContextAware{
         drugDosingDP.get(drug).add(modelId);
     }
 
-    private void saveDataProjections(){
+    public void saveDataProjections(){
 
         log.info("Saving DataProjections");
 
