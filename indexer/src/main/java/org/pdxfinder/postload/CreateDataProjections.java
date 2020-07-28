@@ -1184,30 +1184,16 @@ public class CreateDataProjections implements ApplicationContextAware{
         return dataImportService.saveDataProjection(dataProjection);
     }
 
-    private String createJsonString(Object jstring){
+    public String createJsonString(Object jstring){
         try {
             return JSONObject.wrap(jstring).toString();
         }
         catch(Exception e){
-            log.error("There was an error serializing the map object to JSON - {}...", jstring.toString().substring(0, 200));
+            log.error("There was an error serializing the map object to JSON");
         }
         return "";
     }
 
-    private void dumpDataToFile(){
-        log.info("Dumping data to file");
-        String fileName = "/Users/csaba/Documents/pdxFinderDump.txt";
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
-
-            writer.append(immunoHistoChemistryDP.toString());
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
