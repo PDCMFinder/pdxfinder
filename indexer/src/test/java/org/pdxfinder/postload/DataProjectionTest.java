@@ -11,10 +11,7 @@ import org.pdxfinder.services.DrugService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import static org.mockito.Mockito.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class DataProjectionTest extends BaseTest {
@@ -47,14 +44,22 @@ public class DataProjectionTest extends BaseTest {
         createDataProjections.setExpressionDP(getTwoKeyData());
         createDataProjections.setDrugDosingDP(getOneKeyData());
         createDataProjections.setPatientTreatmentDP(getOneKeyData());
-
+        createDataProjections.setFrequentlyMutatedMarkersDP(new ArrayList<>());
+        createDataProjections.setExpressionDP(getTwoKeyData());
+        createDataProjections.setDataAvailableDP(new HashedMap<>());
+        createDataProjections.setFrequentlyMutatedMarkersDP(new ArrayList<>());
 
         when(dataImportService.saveDataProjection(any())).thenAnswer(i -> i.getArguments()[0]);
         when(dataImportService.findDataProjectionByLabel(any())).thenReturn(null);
+
+        createDataProjections.saveDataProjections();
+
         Assert.assertEquals("cytogenetics", createDataProjections.saveDP("cytogenetics",
                 createDataProjections.getCytogeneticsDP()).getLabel());
         Assert.assertEquals("copy number alteration", createDataProjections.saveDP("copy number alteration",
                 createDataProjections.getCopyNumberAlterationDP()).getLabel());
+        Assert.assertEquals("expression", createDataProjections.saveDP("expression",
+                createDataProjections.getExpressionDP()).getLabel());
         Assert.assertEquals("PlatformMarkerVariantModel", createDataProjections.saveDP("PlatformMarkerVariantModel",
                 createDataProjections.getMutatedPlatformMarkerVariantModelDP()).getLabel());
         Assert.assertEquals("ModelDrugData", createDataProjections.saveDP("ModelDrugData",
@@ -65,7 +70,12 @@ public class DataProjectionTest extends BaseTest {
                 createDataProjections.getDrugDosingDP()).getLabel());
         Assert.assertEquals("patient treatment", createDataProjections.saveDP("patient treatment",
                 createDataProjections.getPatientTreatmentDP()).getLabel());
-
+        Assert.assertEquals("MarkerVariant", createDataProjections.saveDP("MarkerVariant",
+                createDataProjections.getMutatedMarkerVariantDP()).getLabel());
+        Assert.assertEquals("data available", createDataProjections.saveDP("data available",
+                createDataProjections.getDataAvailableDP()).getLabel());
+        Assert.assertEquals("frequently mutated genes", createDataProjections.saveDP("frequently mutated genes",
+                createDataProjections.getFrequentlyMutatedMarkersDP()).getLabel());
     }
 
     @Test
