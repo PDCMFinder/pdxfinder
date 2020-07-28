@@ -1,5 +1,6 @@
 package org.pdxfinder;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
@@ -8,6 +9,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.graph.dao.Patient;
 import org.pdxfinder.graph.dao.PatientSnapshot;
@@ -156,6 +158,15 @@ public class DataImportServiceTests extends BaseTest {
         actualSnapshot = dataImportService.getPatientSnapshot(null, SEX, RACE,ETHNICITY,
                 AGE_AT_COLLECTION, GROUP);
 
+    }
+
+    @Test
+    public void Given_DataProjection_When_Save_Then_Saved(){
+
+        DataProjection dataProjection = new DataProjection();
+        dataProjection.setLabel("test");
+        when(dataProjectionRepository.save(any())).thenReturn(dataProjection);
+        Assert.assertEquals("test", dataImportService.saveDataProjection(dataProjection).getLabel());
     }
 
 
