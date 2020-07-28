@@ -1098,9 +1098,9 @@ public class DataImportService {
         platformAssociationRepository.save(pa);
     }
 
-    public void saveDataProjection(DataProjection dp){
+    public DataProjection saveDataProjection(DataProjection dp){
 
-        dataProjectionRepository.save(dp);
+        return dataProjectionRepository.save(dp);
     }
 
     public DataProjection findDataProjectionByLabel(String label){
