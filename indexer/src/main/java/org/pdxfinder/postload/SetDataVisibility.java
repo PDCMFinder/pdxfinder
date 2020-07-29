@@ -42,7 +42,7 @@ public class SetDataVisibility {
     }
 
 
-    private void applyDataVisibilityRules(String datasourceAbbrev){
+    public void applyDataVisibilityRules(String datasourceAbbrev){
 
         log.info("Disabling data visibility for "+datasourceAbbrev);
 
@@ -56,7 +56,7 @@ public class SetDataVisibility {
     }
 
 
-    private void disableVisibility(List<MolecularCharacterization> molChars){
+    public void disableVisibility(List<MolecularCharacterization> molChars){
         for(MolecularCharacterization mc:molChars){
             mc.setVisible(false);
         }
