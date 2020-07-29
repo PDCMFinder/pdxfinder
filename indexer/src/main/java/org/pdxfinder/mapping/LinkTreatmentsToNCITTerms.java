@@ -108,7 +108,7 @@ public class LinkTreatmentsToNCITTerms {
     }
 
 
-    private void addRelationshipToTreatments(Collection<Treatment> treatments, String dataSource){
+    public void addRelationshipToTreatments(Collection<Treatment> treatments, String dataSource){
 
         List<String> missingOntologyTerms = new ArrayList<>();
         for(Treatment treatment : treatments){
