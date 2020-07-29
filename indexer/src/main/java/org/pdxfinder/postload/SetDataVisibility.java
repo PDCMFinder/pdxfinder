@@ -51,7 +51,7 @@ public class SetDataVisibility {
         for(int i=0; i < molcharCounter; i+=50){
             List<MolecularCharacterization> molChars = dataImportService.findMolcharByDataSourceSkipLimit(datasourceAbbrev, i, 50);
             disableVisibility(molChars);
-            dataImportService.saveMolecularCharacterization(molChars);
+            dataImportService.saveMolecularCharacterizations(molChars);
         }
     }
 
