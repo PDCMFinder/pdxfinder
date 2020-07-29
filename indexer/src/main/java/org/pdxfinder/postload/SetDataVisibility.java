@@ -49,19 +49,17 @@ public class SetDataVisibility {
         int molcharCounter = dataImportService.findMolcharNumberByDataSource(datasourceAbbrev);
 
         for(int i=0; i < molcharCounter; i+=50){
-
             List<MolecularCharacterization> molChars = dataImportService.findMolcharByDataSourceSkipLimit(datasourceAbbrev, i, 50);
-
-            for(MolecularCharacterization mc:molChars){
-
-                mc.setVisible(false);
-                dataImportService.saveMolecularCharacterization(mc);
-            }
-
+            disableVisibility(molChars);
+            dataImportService.saveMolecularCharacterization(molChars);
         }
-
-
     }
 
+
+    private void disableVisibility(List<MolecularCharacterization> molChars){
+        for(MolecularCharacterization mc:molChars){
+            mc.setVisible(false);
+        }
+    }
 
 }

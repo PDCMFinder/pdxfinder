@@ -836,6 +836,10 @@ public class DataImportService {
         return molecularCharacterizationRepository.save(mc);
     }
 
+    public void saveMolecularCharacterization(List<MolecularCharacterization> mc){
+        molecularCharacterizationRepository.saveAll(mc);
+    }
+
     public void saveQualityAssurance(QualityAssurance qa) {
         if (qa != null) {
             if (null == qualityAssuranceRepository.findFirstByTechnologyAndDescription(qa.getTechnology(), qa.getDescription())) {
