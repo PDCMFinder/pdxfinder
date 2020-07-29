@@ -836,7 +836,7 @@ public class DataImportService {
         return molecularCharacterizationRepository.save(mc);
     }
 
-    public void saveMolecularCharacterization(List<MolecularCharacterization> mc){
+    public void saveMolecularCharacterizations(List<MolecularCharacterization> mc){
         molecularCharacterizationRepository.saveAll(mc);
     }
 
