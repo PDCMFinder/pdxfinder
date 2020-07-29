@@ -960,37 +960,43 @@ public class CreateDataProjections implements ApplicationContextAware{
             //check if treatment is linked to a model
             if(model != null){
                 Long modelId = model.getId();
-                for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
-                    //this bit adds the drugA + drugB + drugC etc to the options
-                    String drugName = tp.getTreatmentString(true);
-                    String response = tp.getResponse().getDescription();
-                    addToModelDrugResponseDP(modelId, drugName, response);
+                processModelDrugs(modelId, ts);
+            }
+        }
+    }
 
-                    //we also need to deal with regimens
-                    List<String> regimenDrugs = new ArrayList<>();
-                    for(TreatmentComponent tc: tp.getComponents()){
-                        Treatment t = tc.getTreatment();
-                        OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
-                        if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
-                            for(OntologyTerm ot2: ot.getSubclassOf()){
-                                regimenDrugs.add(ot2.getLabel());
-                            }
-                        }
-                    }
+    public void processModelDrugs(Long modelId, TreatmentSummary ts){
 
-                    //sort them alphabetically
-                    if(regimenDrugs.size() != 0){
-                        Collections.sort(regimenDrugs);
-                        drugName = String.join(" and ", regimenDrugs);
-                        addToModelDrugResponseDP(modelId, drugName, response);
-                    }
+        for(TreatmentProtocol tp : ts.getTreatmentProtocols()){
+            //this bit adds the drugA + drugB + drugC etc to the options
+            String drugName = tp.getTreatmentString(true);
+            String response = tp.getResponse().getDescription();
+            addToModelDrugResponseDP(modelId, drugName, response);
 
+            processModelRegimens(modelId, tp, response);
+        }
+    }
+
+    public void processModelRegimens(Long modelId, TreatmentProtocol tp, String response){
+
+        List<String> regimenDrugs = new ArrayList<>();
+        for(TreatmentComponent tc: tp.getComponents()){
+            Treatment t = tc.getTreatment();
+            OntologyTerm ot = t.getTreatmentToOntologyRelationship().getOntologyTerm();
+            if(ot.getType().equals("treatment regimen") && ot.getSubclassOf() != null && !ot.getSubclassOf().isEmpty()){
+                for(OntologyTerm ot2: ot.getSubclassOf()){
+                    regimenDrugs.add(ot2.getLabel());
                 }
             }
         }
 
+        //sort them alphabetically
+        if(regimenDrugs.size() != 0){
+            Collections.sort(regimenDrugs);
+            String drugName = String.join(" and ", regimenDrugs);
+            addToModelDrugResponseDP(modelId, drugName, response);
+        }
     }
-
 
     private void createPatientTreatmentDataProjection(){
 
