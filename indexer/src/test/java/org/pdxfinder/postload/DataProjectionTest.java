@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.pdxfinder.BaseTest;
+import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.DrugService;
 
@@ -86,6 +87,13 @@ public class DataProjectionTest extends BaseTest {
 
     }
 
+    @Test
+    public void given_TreatmentSummary_when_Process_then_MapIsPopulated(){
+        TreatmentSummary ts = getTreatmentSummary();
+        createDataProjections.processModelDrugs(new Long(1), ts);
+        Assert.assertEquals(true,createDataProjections.getModelDrugResponseDP().containsKey("label5regimen"));
+        Assert.assertEquals(true,createDataProjections.getModelDrugResponseDP().containsKey("label1 and label2"));
+    }
 
     private Map<String, Set<Long>> getOneKeyData(){
 
@@ -118,6 +126,53 @@ public class DataProjectionTest extends BaseTest {
         map2.put("key2", map3);
         map1.put("key1", map2);
         return map1;
+    }
+
+
+    private TreatmentSummary getTreatmentSummary(){
+        TreatmentSummary ts = new TreatmentSummary();
+        TreatmentProtocol tp1 = new TreatmentProtocol();
+        TreatmentProtocol tp2 = new TreatmentProtocol();
+        Response response = new Response();
+        response.setDescription("description");
+        tp1.setResponse(response);
+        tp2.setResponse(response);
+        TreatmentComponent tc1 = new TreatmentComponent();
+        TreatmentComponent tc2 = new TreatmentComponent();
+        TreatmentComponent tc3 = new TreatmentComponent();
+        Treatment t1 = new Treatment("regimendrug1");
+        Treatment t2 = new Treatment("drug2");
+        Treatment t3 = new Treatment("drug3");
+        TreatmentToOntologyRelationship ttor1 = new TreatmentToOntologyRelationship();
+        TreatmentToOntologyRelationship ttor2 = new TreatmentToOntologyRelationship();
+        TreatmentToOntologyRelationship ttor3 = new TreatmentToOntologyRelationship();
+        OntologyTerm ot1 = new OntologyTerm("url1", "label1");
+        OntologyTerm ot2 = new OntologyTerm("url2", "label2");
+        OntologyTerm ot3 = new OntologyTerm("url3", "label3");
+        OntologyTerm ot4 = new OntologyTerm("url4", "label4");
+        ot1.setType("Drug");
+        ot2.setType("Drug");
+        ot3.setType("Drug");
+        ot4.setType("Drug");
+        OntologyTerm regimen = new OntologyTerm("url5", "label5regimen");
+        regimen.setType("treatment regimen");
+        regimen.addSubclass(ot3);
+        regimen.addSubclass(ot4);
+        t1.setTreatmentToOntologyRelationship(ttor1);
+        ttor1.setOntologyTerm(regimen);
+        tc1.setTreatment(t1);
+        tp1.addTreatmentComponent(tc1);
+        ts.addTreatmentProtocol(tp1);
+        tc2.setTreatment(t2);
+        tc3.setTreatment(t3);
+        t2.setTreatmentToOntologyRelationship(ttor2);
+        t3.setTreatmentToOntologyRelationship(ttor3);
+        ttor2.setOntologyTerm(ot1);
+        ttor3.setOntologyTerm(ot2);
+        tp2.addTreatmentComponent(tc2);
+        tp2.addTreatmentComponent(tc3);
+        ts.addTreatmentProtocol(tp2);
+        return ts;
     }
 
 }
