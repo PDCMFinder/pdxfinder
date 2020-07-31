@@ -151,11 +151,15 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Override
         public String toString() {
-            return new StringJoiner("\n", Load.class.getSimpleName() + "[\n", "\n]")
-                    .add("dataDirectory=" + dataDirectory)
-                    .add("clearCacheRequested=" + loadCacheRequested)
-                    .add("datasetRequested=" + getListOfRequestedProviders())
-                    .toString();
+            return new StringJoiner(", ", Load.class.getSimpleName() + "[", "]")
+                .add("dataDirectory=" + dataDirectory)
+                .add("initializeMappingDB=" + initializeMappingDB)
+                .add("validateOnlyRequested=" + validateOnlyRequested)
+                .add("postLoadRequested=" + postLoadRequested)
+                .add("springDataNeo4jUri='" + springDataNeo4jUri + "'")
+                .add("debReload='" + debReload + "'")
+                .add("springDatasourceUrl='" + springDatasourceUrl + "'")
+                .toString();
         }
     }
 

@@ -42,26 +42,24 @@ public class SetDataVisibility {
     }
 
 
-    private void applyDataVisibilityRules(String datasourceAbbrev){
+    public void applyDataVisibilityRules(String datasourceAbbrev){
 
         log.info("Disabling data visibility for "+datasourceAbbrev);
 
         int molcharCounter = dataImportService.findMolcharNumberByDataSource(datasourceAbbrev);
 
         for(int i=0; i < molcharCounter; i+=50){
-
             List<MolecularCharacterization> molChars = dataImportService.findMolcharByDataSourceSkipLimit(datasourceAbbrev, i, 50);
-
-            for(MolecularCharacterization mc:molChars){
-
-                mc.setVisible(false);
-                dataImportService.saveMolecularCharacterization(mc);
-            }
-
+            disableVisibility(molChars);
+            dataImportService.saveMolecularCharacterizations(molChars);
         }
-
-
     }
 
+
+    public void disableVisibility(List<MolecularCharacterization> molChars){
+        for(MolecularCharacterization mc:molChars){
+            mc.setVisible(false);
+        }
+    }
 
 }

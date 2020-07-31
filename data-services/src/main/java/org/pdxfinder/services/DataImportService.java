@@ -1,8 +1,8 @@
 package org.pdxfinder.services;
 
 import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.graph.queryresults.TreatmentMappingData;
@@ -836,6 +836,10 @@ public class DataImportService {
         return molecularCharacterizationRepository.save(mc);
     }
 
+    public void saveMolecularCharacterizations(List<MolecularCharacterization> mc){
+        molecularCharacterizationRepository.saveAll(mc);
+    }
+
     public void saveQualityAssurance(QualityAssurance qa) {
         if (qa != null) {
             if (null == qualityAssuranceRepository.findFirstByTechnologyAndDescription(qa.getTechnology(), qa.getDescription())) {
@@ -1002,7 +1006,7 @@ public class DataImportService {
     }
 
     public void saveAllMarkers(Collection<Marker> markers) {
-        markerRepository.save(markers);
+        markerRepository.saveAll(markers);
     }
 
     public Collection<Marker> getAllMarkers() {
@@ -1098,9 +1102,9 @@ public class DataImportService {
         platformAssociationRepository.save(pa);
     }
 
-    public void saveDataProjection(DataProjection dp){
+    public DataProjection saveDataProjection(DataProjection dp){
 
-        dataProjectionRepository.save(dp);
+        return dataProjectionRepository.save(dp);
     }
 
     public DataProjection findDataProjectionByLabel(String label){

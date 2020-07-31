@@ -11,8 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /*
  * Created by csaba on 05/06/2019.
@@ -109,43 +108,32 @@ public class LinkTreatmentsToNCITTerms {
     }
 
 
-    private void addRelationshipToTreatments(Collection<Treatment> treatments, String dataSource){
+    public void addRelationshipToTreatments(Collection<Treatment> treatments, String dataSource){
 
+        List<String> missingOntologyTerms = new ArrayList<>();
         for(Treatment treatment : treatments){
-
             MappingEntity me = mappingService.getTreatmentMapping(dataSource, treatment.getName());
-
             if(me == null){
-
                 //TODO: deal with missing mapping rules here
                 log.warn("No mapping rule found for "+dataSource+" "+treatment.getName());
-
                 mappingService.saveUnmappedTreatment(dataSource, treatment.getName());
             }
             else{
-
-
-                OntologyTerm ot = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());
-
-                if(ot == null){
-
-
-                    log.error("Ontology term not found "+me.getMappedTermUrl());
-                }
-                else{
-
+                OntologyTerm ontologyTerm = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());
+                if (Objects.isNull(ontologyTerm)) {
+                    missingOntologyTerms.add(me.getMappedTermLabel());
+                } else {
                     TreatmentToOntologyRelationship r = new TreatmentToOntologyRelationship();
                     r.setType(me.getMapType());
                     r.setJustification(me.getJustification());
-                    r.setOntologyTerm(ot);
+                    r.setOntologyTerm(ontologyTerm);
                     r.setTreatment(treatment);
-
-
                     treatment.setTreatmentToOntologyRelationship(r);
                     dataImportService.saveTreatment(treatment);
                 }
             }
         }
+        log.error("Failed to find {} ontology terms: {}", missingOntologyTerms.size(), missingOntologyTerms);
     }
 
 

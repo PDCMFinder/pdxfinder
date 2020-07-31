@@ -14,11 +14,12 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 
 /**
@@ -35,16 +36,11 @@ public class TestConfig {
 
   @Bean
   public org.neo4j.ogm.config.Configuration getConfiguration() {
-    org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
+    org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration.Builder().build();
 
-    // To persist the database, uncomment this section
-    //        String pathToDb = Paths.get(".").toAbsolutePath().normalize().toString() + "/target/test_graph.db";
-    //        config
-    //                .driverConfiguration()
-    //                .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver")
-    //                .setURI("file://" + pathToDb);
-    //
-    //        System.out.println(config);
+    org.neo4j.ogm.config.Configuration configWithPersistance = new org.neo4j.ogm.config.Configuration.Builder()
+        .uri("file://" + Paths.get(".").toAbsolutePath().normalize().toString() + "/target/test_graph.db")
+        .build();
 
     return config;
   }

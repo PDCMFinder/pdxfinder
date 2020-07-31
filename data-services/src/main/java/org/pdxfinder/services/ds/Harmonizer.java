@@ -1,17 +1,8 @@
 package org.pdxfinder.services.ds;
 
-import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.graph.dao.QualityAssurance;
+import com.github.openjson.*;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Harmonizer {
 

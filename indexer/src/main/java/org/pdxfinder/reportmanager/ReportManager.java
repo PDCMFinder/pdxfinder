@@ -6,6 +6,8 @@ package org.pdxfinder.reportmanager;
 
 import org.pdxfinder.services.reporting.LogEntity;
 import org.pdxfinder.services.reporting.MarkerLogEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import java.util.List;
 @Component("ReportManager")
 @Order(value = -80)
 public class ReportManager {
+
+    private final static Logger log = LoggerFactory.getLogger(ReportManager.class);
 
     private List<LogEntity> messages;
 
@@ -32,18 +36,14 @@ public class ReportManager {
 
     public void printMessages(String level){
 
-        if(messages.size() == 0){
-            System.out.println("There are no message entries in the Report Manager.");
+        if (messages.size() == 0) {
+            log.info("There are no message entries in the Report Manager.");
         }
-        else{
-
+        else {
             for(LogEntity le: messages){
-
                 if(le.getType().equals(level) || level.equals("ALL")){
-                    System.out.println(le);
+                    log.info(le.toString());
                 }
-
-
             }
         }
     }
