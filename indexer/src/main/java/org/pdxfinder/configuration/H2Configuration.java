@@ -30,18 +30,7 @@ public class H2Configuration {
   @Bean
   @ConfigurationProperties("h2.datasource")
   public DataSource dataSource() {
-      String url = String.format(
-          "jdbc:h2:%s/h2-db/data;" +
-          "AUTO_SERVER=true;" +
-          "DB_CLOSE_ON_EXIT=FALSE",
-          dataDir
-      );
-      return DataSourceBuilder.create()
-          .driverClassName("org.h2.Driver")
-          .url(url)
-          .username("neo4j")
-          .password("neo5j")
-          .build();
+      return DataSourceBuilder.create().build();
   }
 
   @Bean
