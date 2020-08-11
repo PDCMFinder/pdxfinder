@@ -842,7 +842,7 @@ public class DataImportService {
 
     public void saveQualityAssurance(QualityAssurance qa) {
         if (qa != null) {
-            if (null == qualityAssuranceRepository.findFirstByTechnologyAndDescription(qa.getTechnology(), qa.getDescription())) {
+            if (null == qualityAssuranceRepository.findByTechnologyAndDescriptionAndPassage(qa.getTechnology(), qa.getDescription(), qa.getPassages())) {
                 qualityAssuranceRepository.save(qa);
             }
         }
