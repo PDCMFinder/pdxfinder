@@ -44,7 +44,6 @@ public class FinderLoader {
     private Updog updog;
 
     // PostLoad Components
-    private LoadAdditionalDatasets loadAdditionalDatasets;
     private LinkSamplesToNCITTerms linkSamplesToNCITTerms;
     private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
     private CreateDataProjections createDataProjections;
@@ -67,7 +66,6 @@ public class FinderLoader {
                         LoadWUSTL loadWUSTL,
                         Updog updog,
 
-                        LoadAdditionalDatasets loadAdditionalDatasets,
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
                         LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms,
                         CreateDataProjections createDataProjections,
@@ -87,7 +85,6 @@ public class FinderLoader {
         this.loadWUSTL = loadWUSTL;
         this.updog = updog;
 
-        this.loadAdditionalDatasets = loadAdditionalDatasets;
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
         this.linkTreatmentsToNCITTerms = linkTreatmentsToNCITTerms;
         this.createDataProjections = createDataProjections;
