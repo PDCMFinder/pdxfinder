@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.graph.queryresults.MutatedMarkerData;
 import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.pdxfinder.graph.repositories.*;
 import org.pdxfinder.services.ds.Standardizer;
@@ -13,7 +12,6 @@ import org.pdxfinder.services.reporting.LogEntity;
 import org.pdxfinder.services.reporting.MarkerLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
