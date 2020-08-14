@@ -50,7 +50,6 @@ public class DataImportService {
     private TreatmentProtocolRepository treatmentProtocolRepository;
     private CurrentTreatmentRepository currentTreatmentRepository;
     private ExternalUrlRepository externalUrlRepository;
-    private DrugRepository drugRepository;
     private TreatmentRepository treatmentRepository;
 
     private final static Logger log = LoggerFactory.getLogger(DataImportService.class);
@@ -85,7 +84,6 @@ public class DataImportService {
                              TreatmentProtocolRepository treatmentProtocolRepository,
                              CurrentTreatmentRepository currentTreatmentRepository,
                              ExternalUrlRepository externalUrlRepository,
-                             DrugRepository drugRepository,
                              TreatmentRepository treatmentRepository) {
 
         Assert.notNull(tumorTypeRepository, "tumorTypeRepository cannot be null");
@@ -128,7 +126,6 @@ public class DataImportService {
         this.treatmentProtocolRepository = treatmentProtocolRepository;
         this.currentTreatmentRepository = currentTreatmentRepository;
         this.externalUrlRepository = externalUrlRepository;
-        this.drugRepository = drugRepository;
         this.treatmentRepository = treatmentRepository;
 
 
