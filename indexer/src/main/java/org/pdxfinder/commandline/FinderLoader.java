@@ -8,7 +8,6 @@ import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SetDataVisibility;
-import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataProviderGroup;
@@ -45,12 +44,10 @@ public class FinderLoader {
     private Updog updog;
 
     // PostLoad Components
-    private LoadAdditionalDatasets loadAdditionalDatasets;
     private LinkSamplesToNCITTerms linkSamplesToNCITTerms;
     private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
     private CreateDataProjections createDataProjections;
     private SetDataVisibility setDataVisibility;
-    private ValidateDB validateDB;
 
     private InitMappingDatabase initMappingDatabase;
 
@@ -69,12 +66,10 @@ public class FinderLoader {
                         LoadWUSTL loadWUSTL,
                         Updog updog,
 
-                        LoadAdditionalDatasets loadAdditionalDatasets,
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
                         LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms,
                         CreateDataProjections createDataProjections,
                         SetDataVisibility setDataVisibility,
-                        ValidateDB validateDB,
                         DataImportService dataImportService,
                         ApplicationContext applicationContext,
                         InitMappingDatabase initMappingDatabase) {
@@ -90,12 +85,10 @@ public class FinderLoader {
         this.loadWUSTL = loadWUSTL;
         this.updog = updog;
 
-        this.loadAdditionalDatasets = loadAdditionalDatasets;
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
         this.linkTreatmentsToNCITTerms = linkTreatmentsToNCITTerms;
         this.createDataProjections = createDataProjections;
         this.setDataVisibility = setDataVisibility;
-        this.validateDB = validateDB;
 
         this.initMappingDatabase = initMappingDatabase;
 
@@ -222,7 +215,6 @@ public class FinderLoader {
             linkTreatmentsToNCITTerms.run();
             createDataProjections.run();
             setDataVisibility.run();
-            validateDB.run();
         }
     }
     

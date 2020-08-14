@@ -128,56 +128,6 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     Collection<ModelCreation> findAllModelsPlatforms();
 
 
-
-    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-            "            WHERE  mc.dataSource = {dataSource}  " +
-            "            AND    mc.sourcePdxId = {modelId}  " +
-            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
-            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
-
-            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
-
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search}) " +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
-            "            RETURN count(*) ")
-    Integer variationCountByDataSourceAndPdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                          @Param("modelId") String modelId,
-                                                          @Param("tech") String tech,
-                                                          @Param("search") String search);
-
-
-    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-
-            "            WHERE  mc.dataSource = {dataSource}  " +
-            "            AND    mc.sourcePdxId = {modelId}  " +
-            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
-            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
-
-            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
-
-
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
-
-            "            RETURN mc,psamp,char,molch,mAss,m, pu, pl SKIP {skip} LIMIT {lim} ")
-    ModelCreation findVariationBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                        @Param("modelId") String modelId,
-                                                        @Param("tech") String tech,
-                                                        @Param("search") String search,
-                                                        @Param("skip") int skip,
-                                                        @Param("lim") int lim);
-
-    @Query("MATCH (mc)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)-[pur:PLATFORM_USED]-(p:Platform) " +
-            "WHERE mc.sourcePdxId={sourcePdxId}  AND p.name={platform} AND mc.dataSource = {dataSource} " +
-            "WITH mc, msr, s, cbr, molChar, pur, p " +
-
-            "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
-            "RETURN count(mAss) ")
-    Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
-                                                @Param("dataSource") String dataSource,
-                                                @Param("platform") String platform);
-
-
     @Query("MATCH (model:ModelCreation)--(s:Sample)--(molch:MolecularCharacterization) " +
             "WHERE id(molch) = {mc} " +
             "RETURN model")
@@ -260,10 +210,6 @@ List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSo
             "OPTIONAL MATCH (psamp)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
             "RETURN model, spr, sp, hsr, hs, sfr, s, psamp, ir, cbr, mc, pur, pl, cbr2, mc2, pur2, pl2")
     ModelCreation findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
-
-    @Query("CREATE INDEX ON :ModelCreation(dataSource, sourcePdxId)")
-    void createIndex();
-
 
     @Query("MATCH (model:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(samp:Sample)-[cby:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[asw:ASSOCIATED_WITH]-(massoc:MarkerAssociation)-[mark:MARKER]-(marker:Marker) WHERE molchar.type={molcharType} " +
             "RETURN model, msr, samp, cby, molchar, asw, massoc, mark, marker")

@@ -45,7 +45,6 @@ public class DataImportServiceTests extends BaseTest {
     @Mock private TreatmentProtocolRepository treatmentProtocolRepository;
     @Mock private CurrentTreatmentRepository currentTreatmentRepository;
     @Mock private ExternalUrlRepository externalUrlRepository;
-    @Mock private DrugRepository drugRepository;
     @Mock private TreatmentRepository treatmentRepository;
 
     @Spy

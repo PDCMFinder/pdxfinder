@@ -31,16 +31,6 @@ public interface MolecularCharacterizationRepository extends PagingAndSortingRep
 
     @Query("MATCH (molch:MolecularCharacterization) " +
             "WHERE molch.type = {type} " +
-            "WITH molch " +
-            "MATCH (molch)-[awr:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
-            "WHERE exists(mAss.aminoAcidChange) " +
-            "WITH molch, awr, mAss " +
-            "MATCH (mAss)-[mr:MARKER]-(m:Marker) " +
-            "RETURN distinct molch, awr, mAss, mr, m")
-    Collection<MolecularCharacterization> getAllDistinctByType(@Param("type") String type);
-
-    @Query("MATCH (molch:MolecularCharacterization) " +
-            "WHERE molch.type = {type} " +
             "OPTIONAL MATCH (molch)-[plr:PLATFORM_USED]-(pl:Platform) " +
             "RETURN molch, plr, pl")
     Collection<MolecularCharacterization> findAllByType(@Param("type") String type);

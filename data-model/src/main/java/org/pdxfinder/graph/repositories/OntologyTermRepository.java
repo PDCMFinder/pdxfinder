@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by csaba on 07/06/2017.
@@ -40,24 +39,11 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
     @Query("MATCH (ot:OntologyTerm) RETURN ot")
     Collection<OntologyTerm> findAll();
 
-    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm) " +
-            "WHERE st.label = {label} " +
-            "RETURN sum(term.indirectMappedSamplesNumber)")
-    int getIndirectMappingNumber(@Param("label") String label);
-
-    @Query("MATCH (st:OntologyTerm)<-[*]-(term:OntologyTerm) " +
-            "WHERE st.label = {label} " +
-            "RETURN term, st")
-    Set<OntologyTerm> getDistinctSubTreeNodes(@Param("label") String label);
-
     @Query("MATCH (o:OntologyTerm) RETURN count(o)")
     int getOntologyTermNumber();
 
     @Query("MATCH (o:OntologyTerm) WHERE o.type = {type} RETURN count(o)")
     int getOntologyTermNumberByType(@Param("type") String type);
-
-    @Query("match (o:OntologyTerm) RETURN o SKIP {from} LIMIT {to}")
-    Collection<OntologyTerm> findAllFromTo(@Param("from") int from, @Param("to") int to);
 
     @Query("match (o:OntologyTerm) WHERE o.type = {type} RETURN o SKIP {from} LIMIT {to}")
     Collection<OntologyTerm> findAllByTypeFromTo(@Param("type") String type, @Param("from") int from, @Param("to") int to);
@@ -66,7 +52,6 @@ public interface OntologyTermRepository extends PagingAndSortingRepository<Ontol
             "WHERE child.url = {url} " +
             "RETURN parent")
     Collection<OntologyTerm> findAllDirectParents(@Param("url") String url);
-
 
     @Query("MATCH (o:OntologyTerm) WHERE o.directMappedSamplesNumber > 0 RETURN o")
     Collection<OntologyTerm> findAllWithNotZeroDirectMappingNumber();

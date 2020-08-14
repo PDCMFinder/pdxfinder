@@ -10,9 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface QualityAssuranceRepository extends Neo4jRepository<QualityAssurance, Long> {
 
-    @Query("MATCH (qa:QualityAssurance) WHERE qa.technology = {technology} AND qa.description = {description} RETURN qa")
-    QualityAssurance findFirstByTechnologyAndDescription(@Param("technology") String technology, @Param("description") String description);
-
     @Query("MATCH (qa:QualityAssurance) WHERE qa.technology = {technology} AND qa.description = {description} AND qa.passage = {passage} RETURN qa")
     QualityAssurance findByTechnologyAndDescriptionAndPassage(@Param("technology") String technology, @Param("description") String description, @Param("passage") String passage);
 
