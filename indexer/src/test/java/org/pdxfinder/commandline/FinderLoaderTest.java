@@ -15,7 +15,6 @@ import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SetDataVisibility;
-import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataUrl;
@@ -50,7 +49,6 @@ public class FinderLoaderTest extends BaseTest {
     @Mock private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
     @Mock private CreateDataProjections createDataProjections;
     @Mock private SetDataVisibility setDataVisibility;
-    @Mock private ValidateDB validateDB;
     @Mock private File dataDirectory;
 
     @Spy
@@ -72,7 +70,6 @@ public class FinderLoaderTest extends BaseTest {
         doNothing().when(this.linkTreatmentsToNCITTerms).run();
         doNothing().when(this.createDataProjections).run();
         doNothing().when(this.setDataVisibility).run();
-        doNothing().when(this.validateDB).run();
         doNothing().when(this.updog).run(any(Path.class), anyString(), anyBoolean());
 
         this.dataProvider = DataProvider.JAX;
