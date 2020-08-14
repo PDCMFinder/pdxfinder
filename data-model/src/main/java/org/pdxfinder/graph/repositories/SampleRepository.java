@@ -1,16 +1,11 @@
 package org.pdxfinder.graph.repositories;
 
-
-import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.Sample;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Repository for managing creating, finding, and deleting sample objects

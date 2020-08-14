@@ -1,17 +1,14 @@
 package org.pdxfinder.graph.repositories;
 
-import org.neo4j.ogm.model.Result;
 import org.pdxfinder.graph.dao.Marker;
-import org.pdxfinder.graph.dao.MarkerAssociation;
-import org.pdxfinder.graph.queryresults.MutatedMarkerData;
+
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+
 
 /**
  * Interface for Markers
