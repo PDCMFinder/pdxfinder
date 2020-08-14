@@ -14,11 +14,4 @@ import java.util.List;
 public interface TreatmentProtocolRepository extends Neo4jRepository<TreatmentProtocol, Long> {
 
 
-
-    @Query("MATCH (tp:TreatmentProtocol) RETURN DISTINCT tp.drug")
-    List<List<String>> findDrugNames();
-
-
-
-
 }

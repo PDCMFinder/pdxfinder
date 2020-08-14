@@ -18,7 +18,4 @@ public interface HostStrainRepository extends PagingAndSortingRepository<HostStr
     @Query("MATCH (t:HostStrain) WHERE t.name = {name} RETURN t")
     HostStrain findByName(@Param("name") String name);
 
-    @Query("MATCH (t:HostStrain) WHERE t.name = {name} AND t.symbol = {symbol} RETURN t")
-    HostStrain findByNameAndSymbol(@Param("name") String name, @Param("symbol") String symbol);
-
 }

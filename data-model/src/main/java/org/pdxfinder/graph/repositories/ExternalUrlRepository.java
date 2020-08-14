@@ -13,10 +13,4 @@ public interface ExternalUrlRepository extends PagingAndSortingRepository<Extern
     @Query("MATCH (u:ExternalUrl) WHERE u.type = {type} AND u.url = {url} RETURN u")
     ExternalUrl findByTypeAndUrl(@Param("type") String type, @Param("url") String url);
 
-    @Query("MATCH (exturl:ExternalUrl) RETURN DISTINCT exturl.type ORDER BY exturl.type")
-    List<String> findAllTypes();
-
-    @Query("MATCH (exturl:ExternalUrl) RETURN DISTINCT exturl.url ORDER BY exturl.url")
-    List<String> findAllUrls();
-
 }

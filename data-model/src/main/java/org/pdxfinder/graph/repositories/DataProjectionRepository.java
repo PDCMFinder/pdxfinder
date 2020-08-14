@@ -18,33 +18,4 @@ public interface DataProjectionRepository extends Neo4jRepository<DataProjection
 
     @Query("MATCH (dp:DataProjection) WHERE dp.label = {label} return dp ")
     DataProjection findByLabel(@Param("label") String label);
-
-
-
-
-
-
-    //VALIDATION QUERIES
-
-    //find nodes that are not linked to anything
-    @Query("MATCH (n) WHERE NOT (n)--() RETURN n")
-    Set<Object> findUnlinkedNodes();
-
-
-    //find patients that have multiple treatment summaries
-    @Query("MATCH (p:Patient)--(ps:PatientSnapshot)--(ts1:TreatmentSummary) " +
-            "WITH p, ps, ts1 " +
-            "MATCH (ps)--(ts2:TreatmentSummary) " +
-            "WHERE ts1 <> ts2 " +
-            "RETURN p")
-    Set<Object> findPatientsWithMultipleTreatmentSummaries();
-
-
-    @Query("MATCH (pl:Platform) " +
-            "WHERE NOT exists(pl.url) " +
-            "OR pl.url = \"\" " +
-            "RETURN pl")
-    Set<Object> findPlatformsWithoutUrl();
-
-
 }

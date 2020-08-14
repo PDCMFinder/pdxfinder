@@ -32,22 +32,6 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
             "RETURN p, patRel, ps, sf, s, ii, mod, o, t, ot, tt, ssr, ss ORDER BY p.externalId")
     List<Patient> findPatientTumorAtCollectionDataByDS(@Param("g") Group g);
 
-
-
-    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
-            "MATCH (s:Sample)-[sf:SAMPLED_FROM]-(ps:PatientSnapshot)-[pt:PATIENT]-(p:Patient) " +
-            "WHERE mod.sourcePdxId = {modelId} " +
-            "RETURN mod, ii, s, ps, p, sf, pt")
-    Patient findByModelId(@Param("modelId") String modelId);
-
-
-    @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
-            "MATCH (s:Sample)--(ps:PatientSnapshot)--(p:Patient) " +
-            "WHERE s.sourceSampleId = {sampleId} " +
-            "RETURN mod, ii, s, ps, p")
-    Patient findBySampleId(@Param("sampleId") String sampleId);
-
-
     @Query("MATCH (mod:ModelCreation)-[ii:IMPLANTED_IN]-(s:Sample) " +
             "WHERE mod.sourcePdxId = {modelId} " +
             "AND toLower(mod.dataSource) = toLower({dataSource}) "+
@@ -56,44 +40,6 @@ public interface PatientRepository extends Neo4jRepository<Patient, Long> {
 
             "RETURN s, ps, p, sf, pt, ext, extdsos")
     Patient findByDataSourceAndModelId(@Param("dataSource") String dataSource, @Param("modelId") String modelId);
-
-
-    @Query("MATCH(pat:Patient)-[patRel:COLLECTION_EVENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-            "WITH pat,patRel,ps,sfrm,psamp,char,molch,mAss,m " +
-            "Match (psamp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
-            "            WHERE  psamp.dataSource = {dataSource}  " +
-            "            AND    mc.sourcePdxId = {modelId}  " +
-            "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
-
-
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
-            "            OR toLower(mc.technology) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
-
-            "            RETURN pat,patRel,ps,sfrm,psamp,char,molch,mAss,m SKIP {skip} LIMIT {lim} ")
-    Set<Patient> findSpecimenBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                       @Param("modelId") String modelId,
-                                                       @Param("tech") String tech,
-                                                       @Param("search") String search,
-                                                       @Param("skip") int skip,
-                                                       @Param("lim") int lim);
-
-
-    @Query("MATCH(pat:Patient)-[patRel:PATIENT]-(ps:PatientSnapshot)-[sfrm:SAMPLED_FROM]-(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-            "WITH pat,patRel,ps,sfrm,psamp,char,molch,mAss,m " +
-            "Match (psamp)-[imp:IMPLANTED_IN]-(mc:ModelCreation) " +
-            "            WHERE  psamp.dataSource = {dataSource}  " +
-            "            AND    mc.sourcePdxId = {modelId}  " +
-            "            AND    (mc.technology = {tech}  OR {tech} = '' ) " +
-
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search}) " +
-            "            OR toLower(mc.technology) CONTAINS toLower({search}) " +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
-            "            RETURN count(*) ")
-    Integer countByBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                      @Param("modelId") String modelId,
-                                                      @Param("tech") String tech,
-                                                      @Param("search") String search);
 
 
     @Query("MATCH (p:Patient)--(ps:PatientSnapshot)--(s:Sample)--(mod:ModelCreation) " +
