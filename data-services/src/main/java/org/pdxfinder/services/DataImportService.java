@@ -140,20 +140,6 @@ public class DataImportService {
 
     }
 
-    public Group getGroup(String name, String abbrev, String type){
-
-        Group g = groupRepository.findByNameAndType(name, type);
-
-        if(g == null){
-            log.info("Group not found. Creating {}", name);
-
-            g = new Group(name, abbrev, type);
-            groupRepository.save(g);
-
-        }
-
-        return g;
-    }
 
     public Group getProviderGroup(String name, String abbrev, String description, String providerType, String contact, String url){
 
@@ -298,10 +284,6 @@ public class DataImportService {
         return modelCreationRepository.findAllModelsPlatforms();
     }
 
-    public int countMarkerAssociationBySourcePdxId(String modelId, String dataSource,  String platformName){
-
-        return modelCreationRepository.countMarkerAssociationBySourcePdxId(modelId, dataSource, platformName);
-    }
 
     public Collection<ModelCreation> findModelsWithPatientData(){
 
@@ -362,10 +344,6 @@ public class DataImportService {
         return modelCreationRepository.findModelWithSampleByMolChar(mc);
     }
 
-    public int getModelCount(){
-
-        return modelCreationRepository.countAllModels();
-    }
 
     public int getModelCountByDataSource(String dataSource){
 
@@ -517,24 +495,6 @@ public class DataImportService {
         return ps;
     }
 
-
-
-    public Patient getPatient(String externalId, String sex, String race, String ethnicity, Group group) {
-
-        Patient patient = patientRepository.findByExternalIdAndGroup(externalId, group);
-
-        if (patient == null) {
-            log.info("Patient '{}' not found. Creating", externalId);
-
-            patient = new Patient(externalId, sex, race, ethnicity, group);
-
-            patientRepository.save(patient);
-        }
-
-        return patient;
-    }
-
-
     public Sample getSample(String sourceSampleId, String typeStr, String diagnosis, String originStr, String sampleSiteStr, String extractionMethod, String classification, Boolean normalTissue, String dataSource) {
 
         TumorType type = this.getTumorType(typeStr);
@@ -596,44 +556,6 @@ public class DataImportService {
 
     }
 
-
-    public Sample findSampleByDataSourceAndSourceSampleId(String dataSource, String sampleId){
-
-        return sampleRepository.findBySourceSampleIdAndDataSource(sampleId, dataSource);
-    }
-
-    public Collection<Sample> findSamplesWithoutOntologyMapping(){
-
-        return sampleRepository.findSamplesWithoutOntologyMapping();
-    }
-
-    public Sample getMouseSample(ModelCreation model, String specimenId, String dataSource, String passage, String sampleId){
-
-        Specimen specimen = this.getSpecimen(model, specimenId, dataSource, passage);
-        Sample sample;
-
-        if(specimen.getSample() == null){
-            sample = new Sample();
-            sample.setSourceSampleId(sampleId);
-            sample.setDataSource(dataSource);
-            sampleRepository.save(sample);
-        }
-        else{
-
-            sample = specimen.getSample();
-        }
-
-        return sample;
-    }
-
-    //public findSampleWithMolcharBySpecimen
-
-
-    public Sample findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(String modelId, String dataSource, String sampleId){
-
-        return sampleRepository.findMouseSampleWithMolcharByModelIdAndDataSourceAndSampleId(modelId, dataSource, sampleId);
-    }
-
     public Sample findHumanSampleWithMolcharByModelIdAndDataSource(String modelId, String dataSource){
 
         return sampleRepository.findHumanSampleWithMolcharByModelIdAndDataSource(modelId, dataSource);
@@ -657,29 +579,11 @@ public class DataImportService {
         return molecularCharacterizationRepository.findByIds(ids);
     }
 
-    public Sample getHumanSample(String sampleId, String dataSource){
-
-
-        return sampleRepository.findHumanSampleBySampleIdAndDataSource(sampleId, dataSource);
-    }
-
     public Sample findHumanSample(String modelId, String dsAbbrev){
 
         return sampleRepository.findHumanSampleByModelIdAndDS(modelId, dsAbbrev);
 
     }
-
-    public Sample findXenograftSample(String modelId, String dataSource, String specimenId){
-
-        return sampleRepository.findMouseSampleByModelIdAndDataSourceAndSpecimenId(modelId, dataSource, specimenId);
-    }
-
-    public Sample findXenograftSample(String modelId, String dataSource, String passage, String nomenclature){
-
-
-        return sampleRepository.findMouseSampleByModelIdAndDataSourceAndPassageAndNomenclature(modelId, dataSource, passage, nomenclature);
-    }
-
 
     public int getHumanSamplesNumber(){
 
@@ -788,12 +692,6 @@ public class DataImportService {
         return hostStrain;
     }
 
-    public HostStrain findHostStrain(String symbol){
-
-        return hostStrainRepository.findBySymbol(symbol);
-    }
-
-
     // is this bad? ... probably..
     public Marker getMarker(String symbol) {
         log.error("MARKER METHOD WAS CALLED!");
@@ -812,11 +710,6 @@ public class DataImportService {
             marker = markerRepository.save(marker);
         }
         return marker;
-    }
-
-    public List<MutatedMarkerData> getFrequentlyMutatedGenes(){
-
-        return markerRepository.countModelsByMarker();
     }
 
     public Set<MarkerAssociation> findMarkerAssocsByMolChar(MolecularCharacterization mc){
@@ -853,12 +746,6 @@ public class DataImportService {
         return molecularCharacterizationRepository.findAllByType(type);
     }
 
-
-    public List<Specimen> findSpecimenByPassage(ModelCreation model, String passage){
-
-        return specimenRepository.findByModelIdAndDataSourceAndAndPassage(model.getSourcePdxId(), model.getDataSource(), passage);
-    }
-
     public Specimen getSpecimen(ModelCreation model, String specimenId, String dataSource, String passage){
 
         Specimen specimen = specimenRepository.findByModelIdAndDataSourceAndSpecimenIdAndPassage(model.getSourcePdxId(), dataSource, specimenId, passage);
@@ -879,13 +766,6 @@ public class DataImportService {
 
         return specimenRepository.findByModelAndPassageAndNomenClature(modelCreation, passage, nomenclature);
     }
-
-
-    public List<Specimen> getAllSpecimenByModel(String modelId, String dataSource){
-
-        return specimenRepository.findByModelIdAndDataSource(modelId, dataSource);
-    }
-
 
     public Specimen findSpecimenByMolChar(MolecularCharacterization mc){
 
@@ -913,10 +793,6 @@ public class DataImportService {
         return ontologyTermRepository.findByUrl(url);
     }
 
-    public OntologyTerm findOntologyTermByLabel(String label){
-        return ontologyTermRepository.findByLabel(label);
-    }
-
     public OntologyTerm findOntologyTermByLabelAndType(String label, String type){
         return ontologyTermRepository.findByLabelAndType(label, type);
     }
@@ -924,12 +800,6 @@ public class DataImportService {
     public OntologyTerm findOntologyTermByUrl(String url){
 
         return ontologyTermRepository.findByUrl(url);
-    }
-
-    public Collection<OntologyTerm> getAllOntologyTerms() {
-
-        return ontologyTermRepository.findAll();
-
     }
 
     public Collection<OntologyTerm> getAllOntologyTermsWithNotZeroDirectMapping(){
@@ -940,28 +810,6 @@ public class DataImportService {
     public Collection<OntologyTerm> getAllDirectParents(String termUrl){
 
         return ontologyTermRepository.findAllDirectParents(termUrl);
-    }
-
-    public int getIndirectMappingNumber(String label) {
-
-        return ontologyTermRepository.getIndirectMappingNumber(label);
-    }
-
-    public int findDirectMappingNumber(String label) {
-
-
-        Set<OntologyTerm> otset = ontologyTermRepository.getDistinctSubTreeNodes(label);
-        int mapNum = 0;
-        for (OntologyTerm ot : otset) {
-            mapNum += ot.getDirectMappedSamplesNumber();
-        }
-        return mapNum;
-    }
-
-    public Collection<OntologyTerm> getAllOntologyTermsFromTo(int from, int to) {
-
-        return ontologyTermRepository.findAllFromTo(from, to);
-
     }
 
     public Collection<OntologyTerm> getAllOntologyTermsByTypeFromTo(String type, int from, int to) {
@@ -1009,10 +857,6 @@ public class DataImportService {
         markerRepository.saveAll(markers);
     }
 
-    public Collection<Marker> getAllMarkers() {
-        return markerRepository.findAllMarkers();
-    }
-
     public Integer countAllMarkers() {
         return markerRepository.countAllMarkers();
     }
@@ -1023,11 +867,6 @@ public class DataImportService {
 
     public Collection<Marker> getAllHumanMarkers() {
         return markerRepository.findAllHumanMarkers();
-    }
-
-    public Set<Marker> findAllDistinctMarkersByMolCharId(Long id){
-
-        return markerRepository.findDistinctByMolCharId(id);
     }
 
     public Platform getPlatform(String name, String type, Group group) {
@@ -1098,10 +937,6 @@ public class DataImportService {
         return pa;
     }
 
-    public void savePlatformAssociation(PlatformAssociation pa){
-        platformAssociationRepository.save(pa);
-    }
-
     public DataProjection saveDataProjection(DataProjection dp){
 
         return dataProjectionRepository.save(dp);
@@ -1141,21 +976,6 @@ public class DataImportService {
 
     }
 
-    public int findModelTreatmentNumber(String dataSource){
-
-        if(dataSource == null || dataSource.isEmpty()){
-
-            return treatmentRepository.findModelTreatmentNumber();
-        }
-        else{
-
-            return treatmentRepository.findModelTreatmentNumberByDS(dataSource);
-        }
-
-
-    }
-
-
     public Collection<Treatment> getPatientTreatmentFrom(int from, int batch, String dataSource){
 
         if(dataSource == null || dataSource.isEmpty()){
@@ -1166,8 +986,6 @@ public class DataImportService {
 
             return treatmentRepository.getPatientTreatmentFromByDS(from, batch, dataSource);
         }
-
-
     }
 
 
@@ -1181,7 +999,6 @@ public class DataImportService {
 
             return treatmentRepository.getModelTreatmentFromByDS(from, batch, dataSource);
         }
-
     }
 
 
@@ -1233,12 +1050,6 @@ public class DataImportService {
 
         return ct;
     }
-
-
-    public void createDrug(Drug d){
-        drugRepository.save(d);
-    }
-
 
     /**
      *
@@ -1393,36 +1204,10 @@ public class DataImportService {
 
     }
 
-
-
-
-
     public TreatmentSummary findTreatmentSummaryByPatientSnapshot(PatientSnapshot ps){
 
         return treatmentSummaryRepository.findByPatientSnapshot(ps);
-
     }
-
-
-
-
-
-    public Set<Object> findUnlinkedNodes(){
-
-        return dataProjectionRepository.findUnlinkedNodes();
-    }
-
-    public Set<Object> findPatientsWithMultipleSummaries(){
-
-        return dataProjectionRepository.findPatientsWithMultipleTreatmentSummaries();
-    }
-
-    public Set<Object> findPlatformsWithoutUrl(){
-
-        return dataProjectionRepository.findPlatformsWithoutUrl();
-    }
-
-
 
     public QualityAssurance getQualityAssurance(JSONObject data, String ds)  throws Exception{
 
@@ -1513,24 +1298,6 @@ public class DataImportService {
 
 
         return qa;
-    }
-
-    @Cacheable
-    public Marker getMarkerBySymbol(String symbol){
-
-        return markerRepository.findBySymbol(symbol);
-    }
-
-    @Cacheable
-    public List<Marker> getMarkerByPrevSymbol(String symbol){
-
-        return markerRepository.findByPrevSymbol(symbol);
-    }
-
-    @Cacheable
-    public List<Marker> getMarkerBySynonym(String symbol){
-
-        return markerRepository.findBySynonym(symbol);
     }
 
     private void initializeMarkers(){
