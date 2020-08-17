@@ -851,7 +851,9 @@ public class MappingService {
         // requested page is either +ve or forced to default page
         int start = (page > 0) ? page - 1 : 0;
 
-        pageable = new PageRequest(start, size, direction, sortColumn);
+        Sort sort = Sort.by(direction, sortColumn);
+
+        pageable = PageRequest.of(start, size, sort);
 
         Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, mappedTermLabel, mapType, mappedTermsOnly, status, pageable);
 
