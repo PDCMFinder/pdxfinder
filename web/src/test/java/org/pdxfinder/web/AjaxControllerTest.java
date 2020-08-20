@@ -47,7 +47,7 @@ public class AjaxControllerTest extends BaseTests {
     public void getMolecularDataStatAPIOK() throws Exception {
         String urlTemplate = "/statistics/molecular-data";
         this.mockMvc.perform(get(urlTemplate)).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.title").exists())
                 .andExpect(jsonPath("$.title.text", is("")))
                 .andExpect(jsonPath("$.xAxis").exists())
@@ -71,7 +71,7 @@ public class AjaxControllerTest extends BaseTests {
     public void getTreatmentStatAPIOK() throws Exception {
         String urlTemplate = "/statistics/patient-treatment/patients";
         this.mockMvc.perform(get(urlTemplate)).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.title").exists())
                 .andExpect(jsonPath("$.title.text").value("PDX Models Treatment Data"))
                 .andExpect(jsonPath("$.xAxis").exists())
