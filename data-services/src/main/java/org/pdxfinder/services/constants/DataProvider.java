@@ -27,7 +27,8 @@ public enum DataProvider {
     SJCRH("SJCRH"),
     UMCG("UMCG"),
     VHIO_PC("VHIO-PC"),
-    LIH("LIH");
+    LIH("LIH"),
+    PPTC("PPTC");
 
     private String name;
     DataProvider(String name) {
