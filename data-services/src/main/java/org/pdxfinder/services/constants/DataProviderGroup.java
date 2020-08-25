@@ -29,7 +29,8 @@ public enum DataProviderGroup {
                 DataProvider.NKI,
                 DataProvider.UMCG,
                 DataProvider.VHIO_PC,
-                DataProvider.LIH
+                DataProvider.LIH,
+                DataProvider.PPTC
         ));
 
         map.put(DataProviderGroup.UPDOG, Arrays.asList(
@@ -52,7 +53,8 @@ public enum DataProviderGroup {
                 DataProvider.SJCRH,
                 DataProvider.UMCG,
                 DataProvider.VHIO_PC,
-                DataProvider.LIH
+                DataProvider.LIH,
+                DataProvider.PPTC
         ));
 
         map.put(DataProviderGroup.CustomLoaders, Arrays.asList(
