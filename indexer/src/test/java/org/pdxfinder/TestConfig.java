@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableNeo4jRepositories(value = "org.pdxfinder.graph.repositories", sessionFactoryRef = "mySessionFactory")
+@EnableNeo4jRepositories(value = "org.pdxfinder.graph.repositories")
 public class TestConfig {
 /*
     @Bean
@@ -25,7 +25,7 @@ public class TestConfig {
 
     @Bean
     public SessionFactory sessionFactory() {
-        return new SessionFactory(getConfiguration(), "org.pdxfinder");
+        return new SessionFactory(getConfiguration(), "org.pdxfinder.*");
     }
 
     @Bean

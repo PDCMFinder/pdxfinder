@@ -2,9 +2,11 @@ package org.pdxfinder;
 
 
 import org.neo4j.ogm.session.SessionFactory;
+import org.pdxfinder.configurations.DataServicesConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
@@ -28,7 +30,7 @@ import java.nio.file.Paths;
  */
 @Configuration
 @EnableTransactionManagement
-@ComponentScan(value = "org.pdxfinder")
+@ComponentScan(value = "org.pdxfinder", excludeFilters = @ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, classes = DataServicesConfig.class))
 @EnableNeo4jRepositories("org.pdxfinder.graph.repositories")
 @EnableJpaRepositories(basePackages = "org.pdxfinder.rdbms.repositories")
 public class TestConfig {
