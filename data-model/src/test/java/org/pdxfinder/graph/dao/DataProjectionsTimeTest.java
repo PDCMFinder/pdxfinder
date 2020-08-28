@@ -3,7 +3,7 @@ package org.pdxfinder.graph.dao;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.pdxfinder.BaseTestWithPersistence;
+import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.repositories.DataProjectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class DataProjectionsTimeTest extends BaseTestWithPersistence {
+public class DataProjectionsTimeTest extends BaseTest {
 
     private static final String LABEL = "TEST";
 

@@ -49,6 +49,12 @@
             <version>LATEST</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-ogm-embedded-driver</artifactId>
+            <version>3.1.20</version>
+        </dependency>
+
     </dependencies>
 
     <build>

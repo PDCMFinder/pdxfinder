@@ -752,7 +752,7 @@
                                                         <a th:if="${dataRow.platformUsedUrl != null or dataRow.platformUsedLabel == ''}" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
                                                            th:text="${#strings.replace(dataRow.platformUsedLabel,'_',' ')}"
-                                                           th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
+                                                           th:data-onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
                                                             ...
                                                         </a>
                                                         <span th:if="${dataRow.platformUsedUrl == null}" th:text="${dataRow.platformUsedLabel}"></span>
@@ -760,7 +760,7 @@
                                                     <td>
                                                         <a th:text="${dataRow.rawDataLabel}"
                                                            style="color: #06369d; text-decoration: none;"
-                                                           th:onclick="'window.open(\' '+${dataRow.rawDataLink}+'\')'">
+                                                           th:data-onclick="'window.open(\' '+${dataRow.rawDataLink}+'\')'">
                                                             ...
                                                         </a>
                                                         <span th:if="${dataRow.rawDataLink == ''} " th:text="'Not Available'" ></span>

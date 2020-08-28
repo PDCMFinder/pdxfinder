@@ -109,7 +109,7 @@ public class MappingEntity {
      * The unique String that identifies a Mapping
      */
     @JsonIgnore
-    @Column(unique = true, nullable = false, columnDefinition="Text")
+    @Column(nullable = false, columnDefinition="Text")
     private String mappingKey;
 
 
