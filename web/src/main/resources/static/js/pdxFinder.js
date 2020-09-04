@@ -597,3 +597,7 @@ function customizeDatatable(dTable, presentData) {
     })
 
 }
+
+function openNewWindow(url){
+    window.open(url,'_blank');
+}
