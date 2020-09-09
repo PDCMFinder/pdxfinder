@@ -32,12 +32,6 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
 
-        <dependency>
-            <!-- WARNING, do not update db engine (stable: 1.4.197) cause compatibility issues, see https://github.com/h2database/h2database/issues/2078 -->
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.197</version>
-        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
