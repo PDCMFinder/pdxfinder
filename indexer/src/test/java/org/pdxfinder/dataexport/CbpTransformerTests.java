@@ -2,10 +2,13 @@ package org.pdxfinder.dataexport;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
@@ -20,10 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
@@ -41,6 +41,8 @@ public class CbpTransformerTests extends BaseTest {
     private OmicTransformationService omicTransformationService;
     @Mock
     private UniversalDataWriterServices universalDataWriterUtilities;
+    @Captor
+    private ArgumentCaptor<ArrayList<List<String>>> captor;
 
     @InjectMocks
     private CbpTransformer cbpTransformer;
@@ -49,7 +51,7 @@ public class CbpTransformerTests extends BaseTest {
     private File exportFolder;
     private cbioType mutDataType;
     private cbioType gisticDataType;
-private String templatesFolder;
+    private String templatesFolder;
 
     @Before
     public void init() throws IOException {
@@ -98,7 +100,7 @@ private String templatesFolder;
         String mutFileId = TSV.molecular_characterisation_type.mut.name();
         String ns = "Not Specified";
 
-        List<Map<String, Object>> dummyListMap = new ArrayList<Map<String,Object >>();
+        List<Map<String, Object>> dummyListMap = new ArrayList<>();
         Map<String, Object> dummyMap= new HashMap<>();
         dummyMap.put("patientId","1");
         dummyMap.put("sampleId","2");
@@ -118,6 +120,42 @@ private String templatesFolder;
         String filename = Paths.get(jsonDummy.getAbsolutePath()).getFileName().toString();
         String expectedExportURI = String.format("%s/%s/%s/%s_%s",exportFolder, filename,"mut",filename, mutFileId);
         verify(universalDataWriterUtilities).writeSingleOmicFileToTsv(eq(expectedExportURI), any(Sheet.class), anyList());
+    }
+
+    @Test
+    public void Give_nestedGeneInformationInJason_When_cbioportalExporterIsCalled_ThenFileContainsGeneInformation() throws IOException {
+        String cnaFileId = TSV.molecular_characterisation_type.cna.name();
+        String geneSymbol = "CELSR1";
+
+        Map<String, Object> geneMap = new LinkedHashMap<>();
+        geneMap.put("entrezGeneId",9620);
+        geneMap.put("hugoGeneSymbol", geneSymbol);
+        geneMap.put("type", "protien_coding");
+
+        List<Map<String, Object>> dummyListMap = new ArrayList<>();
+        Map<String, Object> dummyMap= new HashMap<>();
+        dummyMap.put("patientId","1");
+        dummyMap.put("sampleId","2");
+        dummyMap.put("entrezGeneId","00001");
+        dummyMap.put("chr","3");
+        dummyMap.put("gene", geneMap);
+        dummyMap.put("startPosition","4");
+        dummyMap.put("referenceAllele","5");
+        dummyMap.put("alteration","2");
+        dummyMap.put("ncbiBuild","7");
+        dummyListMap.add(dummyMap);
+
+        when(utilityService.serializeJSONToMaps(jsonDummy.getAbsolutePath()))
+                .thenReturn(dummyListMap);
+
+        cbpTransformer.exportCBP(exportFolder, new File(templatesFolder), jsonDummy, gisticDataType);
+
+        String filename = Paths.get(jsonDummy.getAbsolutePath()).getFileName().toString();
+        String expectedExportURI = String.format("%s/%s/%s/%s_%s",exportFolder, filename,"cna",filename, cnaFileId);
+        verify(universalDataWriterUtilities).writeSingleOmicFileToTsv(eq(expectedExportURI), any(Sheet.class), captor.capture());
+
+        String geneName = captor.getValue().get(0).get(8);
+        Assert.assertEquals(geneName, geneSymbol);
     }
 }
 
