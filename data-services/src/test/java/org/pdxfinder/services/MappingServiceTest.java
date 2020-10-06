@@ -46,7 +46,7 @@ public class MappingServiceTest extends BaseTest {
     @Test
     public void given_AplhaNumericAndHyphenatedDir_when_entityIsWrittenToFile_Then_doNotThrowArgumentException() {
         mappingService.setRootDir("/tmp");
-        String normalEntity= "TReatment-9090-HELLO--";
+        String normalEntity= "TReatment-90_90-HELLO--";
         mappingService.writeMappingsToFile(normalEntity);
     }
 

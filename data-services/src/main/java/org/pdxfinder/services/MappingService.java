@@ -842,7 +842,7 @@ public class MappingService {
     }
 
     private boolean containsSpecialCharacters(String input){
-        return input.matches("^[A-Za-z0-9-]*$");
+        return input.matches("^[A-Za-z0-9-_]*$");
     }
 
 
