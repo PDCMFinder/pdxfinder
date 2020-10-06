@@ -975,7 +975,7 @@ public class MappingService {
 
 
     // Update Bulk List of Mapping Entity Records
-    public List<MappingEntity> updateRecords(List<MappingEntity> submittedEntities) throws IOException {
+    public List<MappingEntity> updateRecords(List<MappingEntity> submittedEntities) {
 
         List<MappingEntity> savedEntities = new ArrayList<>();
 
