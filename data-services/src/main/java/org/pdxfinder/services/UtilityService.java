@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -324,27 +323,28 @@ public class UtilityService {
      ************************************************************************************************************/
 
     public List<Map<String, String>> serializeMultipartFile(MultipartFile multipartFile) {
-
-        String[] stringArr = multipartFile.getOriginalFilename().split("\\.");
-        String type = stringArr[stringArr.length - 1];
-        InputStream inputStream = null;
         List<Map<String, String>> dataList = new ArrayList<>();
+        if(multipartFile.getOriginalFilename() != null) {
+            String[] stringArr = multipartFile.getOriginalFilename().split("\\.");
+            String type = stringArr[stringArr.length - 1];
+            InputStream inputStream = null;
 
-        try {
-            inputStream = multipartFile.getInputStream();
-        } catch (IOException e) {
-            log.warn(e.getMessage());
-        }
+            try {
+                inputStream = multipartFile.getInputStream();
+            } catch (IOException e) {
+                log.warn(e.getMessage());
+            }
 
-        if (type.equals("xlsx")) {
+            if (type.equals("xlsx")) {
 
-            dataList = serializeExcelDataNoIterator(inputStream, 0, 1);
+                dataList = serializeExcelDataNoIterator(inputStream, 0, 1);
 
-        } else if (type.equals("csv")) {
+            } else if (type.equals("csv")) {
 
-            assert inputStream != null;
-            DataInputStream csvData = new DataInputStream(inputStream);
-            dataList = serializeCSVToMaps(csvData);
+                assert inputStream != null;
+                DataInputStream csvData = new DataInputStream(inputStream);
+                dataList = serializeCSVToMaps(csvData);
+            }
         }
 
         return dataList;
