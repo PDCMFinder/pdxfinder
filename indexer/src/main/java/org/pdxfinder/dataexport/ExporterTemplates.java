@@ -54,7 +54,7 @@ public class ExporterTemplates {
     }
 
     private XSSFWorkbook getWorkbookFromFS(String templatePath) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFWorkbook workbook;
         File file = new File(templatePath);
         if (!file.exists()) throw new IOException(String.format("Template %s was not found", templatePath));
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
