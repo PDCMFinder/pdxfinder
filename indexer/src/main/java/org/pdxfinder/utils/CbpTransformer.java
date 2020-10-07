@@ -16,10 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -40,7 +37,7 @@ public class CbpTransformer {
     private static String notSpecified = "Not Specified";
     private static String patientId = "patientId";
     private static String sampleId = "sampleId";
-    private static String entrezGeneId = "EntrezGeneId";
+    private static String entrezGeneId = "entrezGeneId";
     private static String mutFileId = TSV.molecular_characterisation_type.mut.name();
     private static String cnaFileId = TSV.molecular_characterisation_type.cna.name();
     public enum cbioType {
@@ -94,15 +91,16 @@ public class CbpTransformer {
                 row.add(notSpecified);
                 row.add(notSpecified);
                 row.add(notSpecified);
-                row.add(omicTransformationService.ncbiGeneIdToHgncSymbol(String.valueOf(f.get(entrezGeneId))));
-                addBlanksToList(row, 9);
+                row.add(parseHugoGeneDetails((LinkedHashMap<Object, Object>) f.get("gene")));
+                addBlanksToList(row, 7);
+                row.add(String.valueOf(f.getOrDefault("tumorAltCount", "")));
+                row.add("");
                 row.add(f.get("chr").toString());
                 row.add(f.get("startPosition").toString());
                 row.add(f.get("referenceAllele").toString());
                 row.add(f.get("variantAllele").toString());
                 addBlanksToList(row, 6);
                 row.add(f.get("ncbiBuild").toString());
-                row.add("");
                 cbioData.add(row);
             }catch(NullPointerException e){
                 log.error(String.format("Missing value in Json Mut map. Skipping Json Map %d", rowCount.get()));
@@ -113,10 +111,10 @@ public class CbpTransformer {
     }
 
     private List<List<String>> cbpGisticsonMapsToSheet(List<Map<String,Object>> jsonMap){
-        AtomicInteger rowCount = new AtomicInteger();
         List<List<String>> cbioData = new ArrayList<>();
-        try {
+
         jsonMap.forEach(f -> {
+            try {
             List<String> row = new LinkedList<>();
             row.add(f.get(patientId).toString());
             row.add(f.get(sampleId).toString());
@@ -124,16 +122,27 @@ public class CbpTransformer {
             row.add(notSpecified);
             row.add(notSpecified);
             addBlanksToList(row,3);
-            row.add(omicTransformationService.ncbiGeneIdToHgncSymbol(String.valueOf(f.get(entrezGeneId))));
-            row.add(f.get(entrezGeneId).toString());
-            addBlanksToList(row, 6);
+            row.add(parseHugoGeneDetails((LinkedHashMap<Object, Object>) f.get("gene")));
+            row.add("");
+            row.add(f.getOrDefault(entrezGeneId, "").toString());
+            addBlanksToList(row, 5);
             row.add(f.get("alteration").toString());
             addBlanksToList(row, 3);
-            cbioData.add(row);   });
-        }catch(NullPointerException e){
-                log.error(String.format("Missing value in Json gistic map. Skipping Json Map %d", rowCount.get()));
-            }
+            cbioData.add(row);
+             }catch(NullPointerException e){
+                log.error("Missing value in Json gistic map. Skipping Json Map row");
+                }
+        });
         return cbioData;
+    }
+
+    private String parseHugoGeneDetails(LinkedHashMap<Object, Object> geneDetails){
+        String hugoGene = (String) geneDetails.getOrDefault("hugoGeneSymbol", "");
+        if (hugoGene.isEmpty())  {
+                hugoGene = omicTransformationService
+                        .ncbiGeneIdToHgncSymbol((String) geneDetails.getOrDefault(entrezGeneId,""));
+        }
+        return hugoGene;
     }
 
     private Group createGroupWithJsonsFilename(String pathToJson) {

@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.rdbms.dao.MappingEntity;
-import org.pdxfinder.services.zooma.ZoomaEntity;
 import org.pdxfinder.services.MappingService;
 import org.pdxfinder.services.UtilityService;
 import org.pdxfinder.services.dto.PaginationDTO;
 import org.pdxfinder.services.mapping.CSVHandler;
+import org.pdxfinder.services.zooma.ZoomaEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -127,7 +128,7 @@ public class AjaxController {
      * Bulk update of Records
      */
     @PutMapping("/mappings")
-    public ResponseEntity<?> editListOfEntityMappings(@RequestBody List<MappingEntity> submittedEntities) {
+    public ResponseEntity<?> editListOfEntityMappings(@RequestBody List<MappingEntity> submittedEntities) throws IOException {
 
         List data = mapper.convertValue(submittedEntities, List.class);
         log.info(data.toString());
