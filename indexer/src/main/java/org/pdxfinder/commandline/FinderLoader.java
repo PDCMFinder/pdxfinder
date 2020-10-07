@@ -61,7 +61,6 @@ public class FinderLoader {
                         LoadHCI loadHCI,
                         LoadJAXData loadJAXData,
                         LoadMDAnderson loadMDAnderson,
-                        LoadPDMRData loadPDMRData,
                         LoadWISTAR loadWISTAR,
                         LoadWUSTL loadWUSTL,
                         Updog updog,

@@ -172,7 +172,12 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
             "RETURN mod, iir, psamp, samp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
-List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
+    List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
+
+    @Query("MATCH (mod:ModelCreation)--(ps:TreatmentSummary) WHERE toLower(mod.dataSource) = toLower({dataSource})" +
+            "RETURN mod" )
+    List<ModelCreation> findModelsWithTreatmentSummaryByDataSource(@Param("dataSource") String dataSourc);
+
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
             "WITH mod SKIP {from} LIMIT {to}" +
@@ -220,6 +225,10 @@ List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSo
             "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d, mt, ot")
     Set<ModelCreation> getModelsTreatmentsAndDrugs(@Param("type") String type);
 
+    @Query("MATCH (mod:ModelCreation)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment)-[mt:MAPPED_TO]-(ot:OntologyTerm) " +
+            "WHERE model.dataSource = {dataSource} " +
+            "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d, mt, ot")
+    List<ModelCreation> findModelFromPatienSnapshotWithTreatmentSummaryByDataSource(@Param("dataSource")String dataSource);
 }
 
 

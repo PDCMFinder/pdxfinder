@@ -131,7 +131,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         when(dataImportService.findModelXenograftPlatformSampleByDS(providerGroup.getAbbreviation()))
           .thenReturn(getModelListForTest());
 
-        List<List<String>> samplePlatformDescription = extractor.extractSamplePlatformDescription(providerGroup);
+        List<List<String>> samplePlatformDescription = extractor.extractSamplePlatform(providerGroup);
 
         Assert.assertEquals(patientSampleId, samplePlatformDescription.get(0).get(1));
         Assert.assertEquals(xenoSampleId, samplePlatformDescription.get(2).get(1));

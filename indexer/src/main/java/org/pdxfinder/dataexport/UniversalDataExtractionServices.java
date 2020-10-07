@@ -62,17 +62,6 @@ public class UniversalDataExtractionServices {
         return checklist;
     }
 
-    public List<List<String>> extractSamplePlatform(Group group){
-        return extractSamplePlatformDescription(group);
-    }
-
-    public List<ModelCreation> getAllModelsByGroupAndMoleculartype(Group group, String molcharType){
-        return dataImportService.findModelsWithMolecularDataByDSAndMolcharType(
-                        group.getAbbreviation(),
-                        molcharType);
-        }
-
-
     public List<List<String>> extractPatientSheet(Group group) {
         List<Patient> patients = dataImportService.findPatientsByGroup(group);
         List<List<String>> patientSheetDataExport = new ArrayList<>();
@@ -339,7 +328,7 @@ public class UniversalDataExtractionServices {
         return loaderRelatedDataSheetDataExport;
     }
 
-    public List<List<String>> extractSamplePlatformDescription(Group group){
+    public List<List<String>> extractSamplePlatform(Group group){
         List<List<String>> samplePlatformDescriptionSheetDataExport = new ArrayList<>();
         List<ModelCreation> models = dataImportService.findModelXenograftPlatformSampleByDS(group.getAbbreviation());
         for(ModelCreation model : models){
@@ -714,4 +703,5 @@ public class UniversalDataExtractionServices {
     private String getHostStrainNomenclature(Specimen sp){
         return sp.getHostStrain().getSymbol() == null? "" :sp.getHostStrain().getSymbol();
     }
+
 }
