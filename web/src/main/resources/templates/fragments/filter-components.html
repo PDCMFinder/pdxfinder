@@ -119,13 +119,13 @@
 
         <button th:unless="${filterComponent.active}"
                 href="#" class="icoButn columns large-2 ORButton"
-                th:data-onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
+                th:attr="onclick=|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
             OR
         </button>
 
         <button th:if="${filterComponent.active}"
                 href="#" class="icoButn columns large-2 ORButton"
-                th:data-onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">
+                th:attr="onclick=|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">
             OR
         </button>
     </div>
@@ -239,13 +239,13 @@
 
         <button th:unless="${filterComponent.active}"
                 href="#" class="icoButn columns large-2 ORButton"
-                th:data-onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
+                th:attr="onclick=|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
             OR
         </button>
 
         <button th:if="${filterComponent.active}"
                 href="#" class="icoButn columns large-2 ORButton"
-                th:data-onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">
+                th:attr="onclick=|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#maps.size(filterComponent.selected)}')|">
             OR
         </button>
     </div>
@@ -326,13 +326,13 @@
 
         <button th:unless="${filterComponent.active}"
                 href="#" class="icoButn columns large-2 ORButton"
-                th:data-onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
+                th:attr="onclick=|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','1')|">
             OR
         </button>
 
         <button th:if="${filterComponent.active}"
                 href="#" class="icoButn columns large-2 ORButton"
-                th:data-onclick="|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#lists.size(filterComponent.selected)}')|">
+                th:attr="onclick=|displayMore('${filterComponent.urlParam+ '_'+ #strings.toLowerCase(filterComponent.param1Name)}','${#lists.size(filterComponent.selected)}')|">
             OR
         </button>
     </div>
