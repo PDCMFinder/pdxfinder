@@ -977,12 +977,6 @@ public class DomainObjectCreator {
             log.error("Exception with key "+sampleKey);
         }
     }
-    private void encodeMolecularDataFor(MolecularCharacterization mc) {
-        if (mc.hasMarkerAssociations()) {
-            mc.setMarkers(getMarkers(mc.getFirstMarkerAssociation()));
-            mc.getFirstMarkerAssociation().encodeMolecularData();
-        }
-    }
 
     private void encodeMolecularDataFor(MolecularCharacterization mc, String sampleKey) {
         if (mc.hasMarkerAssociations()) {
