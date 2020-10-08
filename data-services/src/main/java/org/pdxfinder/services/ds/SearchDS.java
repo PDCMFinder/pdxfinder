@@ -245,6 +245,9 @@ public class SearchDS {
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
 
+        OneParamTextFilter modelId = new OneParamTextFilter("MODEL ID", "model_id", false,
+                FilterType.OneParamTextFilter.get(), "MODEL", getUniqueModelIds(), new ArrayList<>());
+        pdxModelSection.addComponent(modelId);
 
         //project filter def
         Set<String> projectsSet = new HashSet<>();
@@ -688,6 +691,9 @@ public class SearchDS {
                     result = cytogeneticsSearch.search(filters.get(SearchFacetName.cytogenetics), result, ModelForQuery::addCytogenetics);
                     break;
 
+                case model_id:
+                    result = oneParamCheckboxSearch.searchOnString(null, filters.get(SearchFacetName.model_id), result, ModelForQuery::getExternalId);
+
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -721,8 +727,15 @@ public class SearchDS {
         this.models = models;
     }
 
+    public List<String> getModelIds(){
 
+        return models.stream().distinct().map(s->s.getExternalId()).collect(Collectors.toList());
+    }
 
+    public List<String> getUniqueModelIds(){
+
+        return getModelIds().stream().distinct().collect(Collectors.toList());
+    }
 
     /**
      * This method loads the ModelForQuery Data Projection object and initializes the models

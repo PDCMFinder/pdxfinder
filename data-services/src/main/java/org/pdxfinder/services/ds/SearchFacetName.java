@@ -25,7 +25,8 @@ public enum SearchFacetName {
     copy_number_alteration,
     patient_treatment,
     gene_expression,
-    cytogenetics;
+    cytogenetics,
+    model_id;
 
     public String getName() {
         return name();

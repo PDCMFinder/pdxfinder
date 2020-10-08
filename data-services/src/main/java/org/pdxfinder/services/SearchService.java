@@ -96,6 +96,7 @@ public class SearchService {
                                   Optional<List<String>> copy_number_alteration,
                                   Optional<List<String>> gene_expression,
                                   Optional<List<String>> cytogenetics,
+                                  Optional<List<String>> model_id,
                                   Integer page,
                                   Integer size){
 
@@ -118,7 +119,8 @@ public class SearchService {
                 breast_cancer_markers,
                 copy_number_alteration,
                 gene_expression,
-                cytogenetics
+                cytogenetics,
+                model_id
         );
 
         WebSearchDTO wsDTO = new WebSearchDTO();
@@ -170,7 +172,6 @@ public class SearchService {
         wsDTO.setTotalResults(searchDS.getModels().size());
 
         wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
-
         List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
 
         wsDTO.setResults(resultSet);
@@ -201,7 +202,8 @@ public class SearchService {
                             Optional<List<String>> breast_cancer_markers,
                             Optional<List<String>> copy_number_alteration,
                             Optional<List<String>> gene_expression,
-                            Optional<List<String>> cytogenetics){
+                            Optional<List<String>> cytogenetics,
+                            Optional<List<String>> model_id){
 
         Map<SearchFacetName, List<String>> configuredFacets = getFacetMap(
                 query,
@@ -221,7 +223,8 @@ public class SearchService {
                 breast_cancer_markers,
                 copy_number_alteration,
                 gene_expression,
-                cytogenetics
+                cytogenetics,
+                model_id
 
         );
 
@@ -252,7 +255,8 @@ public class SearchService {
             Optional<List<String>> breast_cancer_markers,
             Optional<List<String>> copy_number_alteration,
             Optional<List<String>> gene_expression,
-            Optional<List<String>> cytogenetics
+            Optional<List<String>> cytogenetics,
+            Optional<List<String>> model_id
 
 
             ) {
@@ -380,6 +384,13 @@ public class SearchService {
             configuredFacets.put(SearchFacetName.cytogenetics, new ArrayList<>());
             for (String s : cytogenetics.get()) {
                 configuredFacets.get(SearchFacetName.cytogenetics).add(s);
+            }
+        }
+
+        if (model_id.isPresent() && !model_id.get().isEmpty()) {
+            configuredFacets.put(SearchFacetName.model_id, new ArrayList<>());
+            for (String s : model_id.get()) {
+                configuredFacets.get(SearchFacetName.model_id).add(s);
             }
         }
 
