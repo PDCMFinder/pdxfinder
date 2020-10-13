@@ -487,7 +487,9 @@
         removeItemButton: true,
         // placeholder: false,
         // placeholderValue: 'This is a placeholder',
-        maxItemCount: 1,
+        shouldSort: false,
+        shouldSortItems: false,
+        maxItemCount: -1, // -1 = infinity
         searchFloor: 0,
         searchResultLimit: 10,
         noResultsText: 'No results found',
@@ -499,6 +501,7 @@
             distance: 1000
         }
     });
+
 
 
     function conditionallyShowDropdown(str) {

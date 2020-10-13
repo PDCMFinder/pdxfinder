@@ -598,7 +598,10 @@ public class SearchDS {
 
                 case query:
                     //List<String> searchParams, Set<ModelForQuery> mfqSet, Function<ModelForQuery, List<String>> searchFunc
+                    Set<ModelForQuery> result_2 = oneParamCheckboxSearch.searchOnCollection_model(filters.get(SearchFacetName.query), result);
                     result = oneParamCheckboxSearch.searchOnCollection(facetOptionMap.get("query"), filters.get(SearchFacetName.query), result, ModelForQuery::getAllOntologyTermAncestors);
+
+                    result.addAll(result_2);
                     break;
 
                 //We don't need to provide a replacement string list for datasource, since it is already using the datasource abbrev as key!

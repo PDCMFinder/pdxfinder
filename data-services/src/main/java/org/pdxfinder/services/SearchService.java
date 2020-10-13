@@ -45,7 +45,7 @@ public class SearchService {
     List<String> sampleTumorTypeOptions = new ArrayList<>();
     List<String> dataAvailableOptions = new ArrayList<>();
 
-
+    private static List<String> modelsIDsForAutoSuggest;
 
 
     public SearchService(ModelCreationRepository modelCreationRepository,
@@ -71,6 +71,12 @@ public class SearchService {
         facets.put("cancer_system_options", cancerBySystemOptions);
         facets.put("data_available_options", dataAvailableOptions);
         facets.put("sample_tumor_type_options", sampleTumorTypeOptions);
+
+        Set<ModelForQuery> modelsForAutoSuggest = searchDS.search(getFacetMap(Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),
+                Optional.empty(),Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(),Optional.empty(),
+                Optional.empty(),Optional.empty(),Optional.empty()));
+
+        modelsIDsForAutoSuggest = modelsForAutoSuggest.stream().map(ModelForQuery::getExternalId).collect(Collectors.toList());
 
     }
 
@@ -169,7 +175,7 @@ public class SearchService {
         wsDTO.setTextSearchDescription(textSearchDescription);
         wsDTO.setTotalResults(searchDS.getModels().size());
 
-        wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions());
+        wsDTO.setMainSearchFieldOptions(autoCompleteService.getAutoSuggestions(modelsIDsForAutoSuggest));
 
         List<ModelForQuery> resultSet = new ArrayList<>(results).subList((page - 1) * size, Math.min(((page - 1) * size) + size, results.size()));
 
@@ -234,7 +240,7 @@ public class SearchService {
 
 
 
-    private Map<SearchFacetName, List<String>> getFacetMap(
+    public Map<SearchFacetName, List<String>> getFacetMap(
             Optional<String> query,
             Optional<List<String>> datasource,
             Optional<List<String>> diagnosis,

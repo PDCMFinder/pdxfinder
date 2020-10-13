@@ -58,6 +58,22 @@ public class OneParamCheckboxSearch extends GeneralSearch{
     }
 
 
+    public Set<ModelForQuery> searchOnCollection_model(List<String> searchParams, Set<ModelForQuery> mfqSet){
+
+        Set<ModelForQuery> results = new HashSet<>();
+
+        List<String> queryItems = Arrays.asList(searchParams.get(0).split(","));
+
+        for(ModelForQuery mfq: mfqSet) {
+
+            if (queryItems.contains(mfq.getExternalId())) {
+                results.add(mfq);
+            }
+
+        }
+        return results;
+    }
+
 
     /**
      * Performs a search on a selected ModelForQuery field that's type is List of Strings
