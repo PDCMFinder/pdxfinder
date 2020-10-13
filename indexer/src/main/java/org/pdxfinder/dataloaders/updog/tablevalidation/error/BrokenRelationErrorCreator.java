@@ -113,20 +113,20 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
     private boolean missingLeftColumn(Map<String, Table> tableSet, Relation relation) {
         return tableMissingColumn(
             tableSet.get(relation.leftTable()),
-            relation.leftColumn());
+            relation.leftColumn(), relation.leftTable());
     }
 
     private boolean missingRightColumn(Map<String, Table> tableSet, Relation relation) {
         return tableMissingColumn(
             tableSet.get(relation.rightTable()),
-            relation.rightColumn());
+            relation.rightColumn(), relation.rightTable());
     }
 
-    private boolean tableMissingColumn(Table table, String columnName) {
+    private boolean tableMissingColumn(Table table, String columnName, String tableName) {
         try {
             return !table.columnNames().contains(columnName);
         } catch (NullPointerException e) {
-            log.error("Couldn't access table {} {}", e, table);
+            log.error("Couldn't access table {} because of {}",tableName, e.toString());
             return true;
         }
     }
