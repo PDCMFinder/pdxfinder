@@ -56,7 +56,7 @@ public class UniversalDataWriterServices {
     }
 
     public void createExportDirectories(String exportFileLocation) throws IOException {
-        Path directory = Paths.get(exportFileLocation).getParent();
+        Path directory = Paths.get(exportFileLocation);
         Files.createDirectories(directory);
         if(!directory.toFile().exists()) {
             throw new IOException(String.format("Failed to create file directory at %s",

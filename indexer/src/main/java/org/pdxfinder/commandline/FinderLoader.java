@@ -174,23 +174,10 @@ public class FinderLoader {
     ) {
         List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
-            switch (dataProvider) {
-                case PDXNet_HCI_BCM:
-                    loadHCI.run();
-                    break;
-                case JAX:
-                    loadJAXData.run();
-                    break;
-                case PDXNet_MDAnderson:
-                    loadMDAnderson.run();
-                    break;
-                case PDXNet_Wistar_MDAnderson_Penn:
-                    loadWISTAR.run();
-                    break;
-                case PDXNet_WUSTL:
-                    loadWUSTL.run();
-                    break;
-                default:
+            if (dataProvider.equals(DataProvider.JAX)) {
+                loadJAXData.run();
+            }
+            else{
                     if (updogProviders.contains(dataProvider)) {
                         Path updogDirectory = Paths.get(
                             dataDirectory.toString(),
