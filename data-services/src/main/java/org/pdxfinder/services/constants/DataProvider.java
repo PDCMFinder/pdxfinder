@@ -3,13 +3,13 @@ package org.pdxfinder.services.constants;
 public enum DataProvider {
 
     Test_Minimal("Test-Minimal"),
-    PDXNet_HCI_BCM("PDXNet-HCI-BCM"),
+    HCI_BCM("HCI-BCM"),
     IRCC_CRC("IRCC-CRC"),
     JAX("JAX"),
-    PDXNet_MDAnderson("PDXNet-MDAnderson"),
+    MDAnderson("MDAnderson"),
     PDMR("PDMR"),
-    PDXNet_Wistar_MDAnderson_Penn("PDXNet-Wistar-MDAnderson-Penn"),
-    PDXNet_WUSTL("PDXNet-WUSTL"),
+    Wistar_MDAnderson_Penn("Wistar-MDAnderson-Penn"),
+    WUSTL("WUSTL"),
     CRL("CRL"),
     Curie_BC("Curie-BC"),
     Curie_LC("Curie-LC"),
