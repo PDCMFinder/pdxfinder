@@ -111,7 +111,7 @@ public class UniversalDataExportTests extends BaseTest {
     public void Given_NoModels_When_callToExtractAndSaveOmicsByBatch_Then_doNotRun() throws IOException {
         String molecularType = "Mutation";
         Path testExportURI = Paths.get("/path/to/export");
-        when(extractionUtilities.getAllModelsByGroupAndMoleculartype(group, molecularType))
+        when(universalDataExporter.getModelsByMolecularTypeAndDataSource(molecularType, group))
                 .thenReturn(new ArrayList<>());
 
         universalDataExporter.extractAndSaveOmicByBatch(molecularType,
@@ -126,7 +126,7 @@ public class UniversalDataExportTests extends BaseTest {
         String molecularType = "Mutation";
         Path testExportURI = Paths.get("/path/to/export");
         ModelCreation testModel = new ModelCreation();
-        when(extractionUtilities.getAllModelsByGroupAndMoleculartype(group,molecularType))
+        when(universalDataExporter.getModelsByMolecularTypeAndDataSource(molecularType, group))
                 .thenReturn(Collections.singletonList(testModel));
 
         universalDataExporter.extractAndSaveOmicByBatch(molecularType,
@@ -146,7 +146,7 @@ public class UniversalDataExportTests extends BaseTest {
             testModelList[i] = new ModelCreation();
         }
 
-        when(extractionUtilities.getAllModelsByGroupAndMoleculartype(group,molecularType))
+        when(universalDataExporter.getModelsByMolecularTypeAndDataSource(molecularType, group))
                 .thenReturn(Arrays.asList(testModelList));
 
         universalDataExporter.extractAndSaveOmicByBatch(molecularType,

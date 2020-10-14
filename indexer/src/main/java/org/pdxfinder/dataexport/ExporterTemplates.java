@@ -21,6 +21,7 @@ public class ExporterTemplates {
     private XSSFWorkbook cytoTemplate;
     private XSSFWorkbook exprTemplate;
     private XSSFWorkbook drugTemplate;
+    private XSSFWorkbook patientTreatmentTemplate;
 
     private Map<String, XSSFWorkbook> templatesMap;
     private String templateDir;
@@ -73,7 +74,8 @@ public class ExporterTemplates {
         cnaTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.cna_template.fileName);
         cytoTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.cytogenetics_template.fileName);
         exprTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.expression_template.fileName);
-        drugTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.drugdosing_template);
+        drugTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.drugdosing_template.fileName);
+        patientTreatmentTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.patienttreatment_template.fileName);
     }
 
     private void addAllSheetsToMap() {
@@ -84,6 +86,7 @@ public class ExporterTemplates {
         templatesMap.put(TSV.templateNames.cytogenetics_template.name() ,cytoTemplate);
         templatesMap.put(TSV.templateNames.expression_template.name() ,exprTemplate);
         templatesMap.put(TSV.templateNames.drugdosing_template.name(), drugTemplate);
+        templatesMap.put(TSV.templateNames.patienttreatment_template.name(), patientTreatmentTemplate);
     }
 
     public XSSFWorkbook getTemplate(String template){

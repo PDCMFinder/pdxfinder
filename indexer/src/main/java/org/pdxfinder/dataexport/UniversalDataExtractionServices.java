@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /*
  * Created by csaba on 02/10/2019.
@@ -37,6 +38,8 @@ public class UniversalDataExtractionServices {
     private static final String PATIENT_ORIGIN = "patient";
     private static final String MODEL_ORIGIN = "xenograft";
 
+    final String EMPTY = "";
+    
     @Autowired
     public UniversalDataExtractionServices(DataImportService dataImportService, UtilityService utilityService) {
         this.dataImportService = dataImportService;
@@ -57,7 +60,7 @@ public class UniversalDataExtractionServices {
     public List<List<String>> extractChecklist(){
         List<List<String>> checklist = new ArrayList<>();
         List<String> deprecatedMessageRow = new ArrayList<>();
-        deprecatedMessageRow.add("");
+        deprecatedMessageRow.add(EMPTY);
         checklist.add(deprecatedMessageRow);
         return checklist;
     }
@@ -113,10 +116,10 @@ public class UniversalDataExtractionServices {
                     String grade = sample.getGrade();
                     String gradeClassification = sample.getGradeClassification();
                     String virologyStatus = patientSnapshot.getVirologyStatus();
-                    String isPatientTreatmentInfoAvailable = "";
+                    String isPatientTreatmentInfoAvailable = EMPTY;
                     String treatmentNaive = patientSnapshot.getTreatmentNaive();
-                    String isPatientTreated = "";
-                    String wasPatientTreated = "";
+                    String isPatientTreated = EMPTY;
+                    String wasPatientTreated = EMPTY;
                     String modelId = getModelIdBySample(sample);
 
                     dataRow.add(patientId);
@@ -155,7 +158,7 @@ public class UniversalDataExtractionServices {
     }
 
     private String getHarmonizedDiagnosis(Sample sample){
-        String diagnosis = "";
+        String diagnosis = EMPTY;
         try{
             diagnosis = sample.getSampleToOntologyRelationship().getOntologyTerm().getLabel();
         } catch (NullPointerException e){
@@ -169,7 +172,7 @@ public class UniversalDataExtractionServices {
     }
 
     private String getModelIdBySample(Sample sample){
-        String modelId = "";
+        String modelId = EMPTY;
         try {
             modelId = dataImportService.findModelBySample(sample).getSourcePdxId();
         }
@@ -343,12 +346,93 @@ public class UniversalDataExtractionServices {
         if(model != null) {
             String modelId = model.getSourcePdxId();
             log.info("ModelId {}: Starting extraction of omic {} data",modelId, molcharType);
-            modelsOmicExportSheet.addAll(extractPatientSampleOmicData(model, molcharType));
-            modelsOmicExportSheet.addAll(extractXenoSampleOmicDataForEachSpecimen(model, molcharType));
+
+            if(molcharType.equals("drug")){
+                modelsOmicExportSheet.addAll(extractDrugDosing(model));
+            }
+            else if(molcharType.equals("patientTreatment")){
+                modelsOmicExportSheet.addAll(extractPatientTreatment(model));
+            }
+            else {
+                modelsOmicExportSheet.addAll(extractPatientSampleOmicData(model, molcharType));
+                modelsOmicExportSheet.addAll(extractXenoSampleOmicDataForEachSpecimen(model, molcharType));
+            }
         }
         return modelsOmicExportSheet;
     }
 
+    private List<List<String>> extractDrugDosing(ModelCreation model){
+       List<List<String>> drugDosingTable  =new ArrayList<>();
+        if(model.getTreatmentSummary() != null && model.getTreatmentSummary().getTreatmentProtocols() != null) {
+            String modelId = model.getSourcePdxId();
+            List<TreatmentProtocol> treatmentProtocols = model.getTreatmentSummary().getTreatmentProtocols();
+            for(TreatmentProtocol treatmentProtocol: treatmentProtocols){
+                List<String> drugDosingRow = new ArrayList<>();
+                List<TreatmentComponent> treatmentComponents = treatmentProtocol.getComponents();
+                Response response = treatmentProtocol.getResponse();
+                String description = EMPTY;
+                String classification = EMPTY;
+                if(response != null){
+                    description = response.getDescription();
+                    classification = response.getDescriptionClassification();
+                }
+                String treatmentName = treatmentComponents.stream()
+                        .map(x -> x.getTreatment().getName())
+                        .collect(Collectors.joining(" + "));
+                String dose = treatmentComponents.get(0).getDose();
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(modelId);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(treatmentName);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(dose);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(description);
+                drugDosingRow.add(classification);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(EMPTY);
+                drugDosingRow.add(EMPTY);
+                drugDosingTable.add(drugDosingRow);
+            }
+        }
+        return drugDosingTable;
+    }
+
+    private List<List<String>> extractPatientTreatment (ModelCreation model) {
+        List<List<String>> patientTreatmentTable  =new ArrayList<>();
+        if (model.getSample() != null && model.getSample().getPatientSnapshot() != null) {
+            PatientSnapshot patientSnapshot = model.getSample().getPatientSnapshot();
+            if (patientSnapshot.getTreatmentSummary() != null && patientSnapshot.getTreatmentSummary().getTreatmentProtocols() != null) {
+                String patientId = patientSnapshot.getPatient().getExternalId();
+                List<TreatmentProtocol> treatmentProtocols = patientSnapshot.getTreatmentSummary().getTreatmentProtocols();
+                for (TreatmentProtocol treatmentProtocol : treatmentProtocols) {
+                    List<String> patientTreatmentRow = new ArrayList<>();
+                    List<TreatmentComponent> treatmentComponents = treatmentProtocol.getComponents();
+                    Response response = treatmentProtocol.getResponse();
+                    String treatmentName = treatmentComponents.stream()
+                            .map(x -> x.getTreatment().getName())
+                            .collect(Collectors.joining(" + "));
+                    String dose = treatmentComponents.get(0).getDose();
+                    patientTreatmentRow.add(patientId);
+                    patientTreatmentRow.add(treatmentName);
+                    patientTreatmentRow.add(dose);
+                    patientTreatmentRow.add(EMPTY);
+                    patientTreatmentRow.add(EMPTY);
+                    patientTreatmentRow.add(EMPTY);
+                    patientTreatmentRow.add(EMPTY);
+                    patientTreatmentRow.add(response.getDescription());
+                    patientTreatmentRow.add(response.getDescriptionClassification());
+                    patientTreatmentRow.add(EMPTY);
+                    patientTreatmentTable.add(patientTreatmentRow);
+                }
+            }
+        }
+        return patientTreatmentTable;
+    }
     private List<List<String>> parseOmicDataToSheet(
         ModelCreation model,
         String sampleId,
@@ -417,23 +501,23 @@ public class UniversalDataExtractionServices {
                         rowData.add(mc.getPlatform().getName());
                         break;
                     case "cytogenetics":
-                        rowData.add("");
+                        rowData.add(EMPTY);
                         rowData.add(md.getMarker());
                         rowData.add(md.getCytogeneticsResult());
                         rowData.add(md.getMarkerStatusComment());
                         rowData.add(mc.getPlatform().getName());
-                        rowData.add("");
-                        rowData.add("");
+                        rowData.add(EMPTY);
+                        rowData.add(EMPTY);
                         break;
                     case "expression":
                         rowData.add(md.getChromosome());
-                        rowData.add("");
+                        rowData.add(EMPTY);
                         rowData.add(md.getSeqStartPosition());
                         rowData.add(md.getSeqEndPosition());
                         rowData.add(md.getMarker());
-                        rowData.add("");
-                        rowData.add("");
-                        rowData.add("");
+                        rowData.add(EMPTY);
+                        rowData.add(EMPTY);
+                        rowData.add(EMPTY);
                         rowData.add(md.getRnaSeqCoverage());
                         rowData.add(md.getRnaSeqFPKM());
                         rowData.add(md.getRnaSeqTPM());
@@ -456,7 +540,7 @@ public class UniversalDataExtractionServices {
     }
 
     private String getHostStrainNameSymbol(Specimen specimen) {
-        String hostStrainSymbol = "";
+        String hostStrainSymbol = EMPTY;
         if (specimen != null && specimen.getHostStrain() != null && specimen.getHostStrain().getSymbol() != null) {
             hostStrainSymbol = specimen.getHostStrain().getSymbol();
            }
@@ -464,7 +548,7 @@ public class UniversalDataExtractionServices {
     }
 
     private String getPassage(String sampleOrigin, Specimen specimen) {
-        return (!sampleOrigin.equals(PATIENT_ORIGIN) && specimen != null) ? specimen.getPassage() : "" ;
+        return (!sampleOrigin.equals(PATIENT_ORIGIN) && specimen != null) ? specimen.getPassage() : EMPTY ;
     }
 
     private String getPubmedIDs(ModelCreation model){
@@ -501,32 +585,32 @@ public class UniversalDataExtractionServices {
             map.put(PROVIDER_ABBREV, providerGroup.getAbbreviation());
         }
         else{
-            map.put(PROVIDER_TYPE, "");
-            map.put(PROVIDER_NAME, "");
-            map.put(PROVIDER_ABBREV, "");
+            map.put(PROVIDER_TYPE, EMPTY);
+            map.put(PROVIDER_NAME, EMPTY);
+            map.put(PROVIDER_ABBREV, EMPTY);
         }
         if(accessGroup != null){
             map.put(MODEL_ACCESSIBILITY, accessGroup.getAccessibility());
             map.put(ACCESS_MODALITIES, accessGroup.getAccessModalities());
         }
         else{
-            map.put(MODEL_ACCESSIBILITY, "");
-            map.put(ACCESS_MODALITIES, "");
+            map.put(MODEL_ACCESSIBILITY, EMPTY);
+            map.put(ACCESS_MODALITIES, EMPTY);
         }
 
         if(projectGroup != null){
             map.put(PROJECT_NAME, projectGroup.getName());
         }
         else {
-            map.put(PROJECT_NAME, "");
+            map.put(PROJECT_NAME, EMPTY);
         }
     }
 
     private void getExternalUrlData(LinkedHashMap<String, String> map, Collection<ExternalUrl> urls){
-        map.put(CONTACT_EMAIL,  "");
-        map.put(CONTACT_NAME,  "");
-        map.put(CONTACT_LINK,  "");
-        map.put(MODEL_LINK,  "");
+        map.put(CONTACT_EMAIL,  EMPTY);
+        map.put(CONTACT_NAME,  EMPTY);
+        map.put(CONTACT_LINK,  EMPTY);
+        map.put(MODEL_LINK,  EMPTY);
 
         if(urls != null){
             for(ExternalUrl ex: urls) {
@@ -582,22 +666,22 @@ public class UniversalDataExtractionServices {
         if(model.getSample() != null && model.getSample().getMolecularCharacterizations() != null){
             for(MolecularCharacterization mc : model.getSample().getMolecularCharacterizations()){
                 List<String> dataRow = new ArrayList<>();
-                dataRow.add("");
+                dataRow.add(EMPTY);
                 dataRow.add(model.getSample().getSourceSampleId());
                 dataRow.add(PATIENT_ORIGIN);
                 dataRow.add("NA");
-                dataRow.add("");
+                dataRow.add(EMPTY);
                 dataRow.add(model.getSourcePdxId());
-                dataRow.add("");
-                dataRow.add("");
+                dataRow.add(EMPTY);
+                dataRow.add(EMPTY);
                 dataRow.add(mc.getType());
                 dataRow.add(mc.getPlatform().getName());
                 dataRow.add(mc.getTechnology());
-                dataRow.add("");
-                dataRow.add("");
-                dataRow.add("");
-                dataRow.add("");
-                dataRow.add("");
+                dataRow.add(EMPTY);
+                dataRow.add(EMPTY);
+                dataRow.add(EMPTY);
+                dataRow.add(EMPTY);
+                dataRow.add(EMPTY);
                 dataRow.add(mc.getPlatform().getUrl());
 
                 samplePlatformPatientSheetDataExport.add(dataRow);
@@ -622,22 +706,22 @@ public class UniversalDataExtractionServices {
 
                         List<String> dataRow = new ArrayList<>();
 
-                        dataRow.add("");
+                        dataRow.add(EMPTY);
                         dataRow.add(sample.getSourceSampleId());
                         dataRow.add(MODEL_ORIGIN);
                         dataRow.add(passage);
-                        dataRow.add("");
+                        dataRow.add(EMPTY);
                         dataRow.add(model.getSourcePdxId());
                         dataRow.add(hostStrainName);
                         dataRow.add(hostStrainNomenclature);
                         dataRow.add(mc.getType());
                         dataRow.add(mc.getPlatform().getName());
                         dataRow.add(mc.getTechnology());
-                        dataRow.add("");
-                        dataRow.add("");
-                        dataRow.add("");
-                        dataRow.add("");
-                        dataRow.add("");
+                        dataRow.add(EMPTY);
+                        dataRow.add(EMPTY);
+                        dataRow.add(EMPTY);
+                        dataRow.add(EMPTY);
+                        dataRow.add(EMPTY);
                         dataRow.add(mc.getPlatform().getUrl());
 
                         samplePlatformXenoDataSheetDataExport.add(dataRow);
@@ -697,11 +781,11 @@ public class UniversalDataExtractionServices {
     }
 
     private String getHostStrainName(Specimen sp){
-        return sp.getHostStrain().getName() == null? ""  :sp.getHostStrain().getName();
+        return sp.getHostStrain().getName() == null? EMPTY  :sp.getHostStrain().getName();
     }
 
     private String getHostStrainNomenclature(Specimen sp){
-        return sp.getHostStrain().getSymbol() == null? "" :sp.getHostStrain().getSymbol();
+        return sp.getHostStrain().getSymbol() == null? EMPTY :sp.getHostStrain().getSymbol();
     }
 
 }
