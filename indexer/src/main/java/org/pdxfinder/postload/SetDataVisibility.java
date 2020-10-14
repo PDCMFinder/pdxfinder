@@ -30,6 +30,8 @@ public class SetDataVisibility {
         log.info("Applying data visibility rules");
 
         applyDataVisibilityRules("CRL");
+        applyDataVisibilityRules("Curie-LC");
+        applyDataVisibilityRules("Curie-BC");
 
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
