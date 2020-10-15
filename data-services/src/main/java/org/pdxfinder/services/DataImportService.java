@@ -564,11 +564,11 @@ public class DataImportService {
     public int findMolcharNumberByDataSource(String ds){
         return molecularCharacterizationRepository.findNumberByDataSource(ds);
     }
-    
+
     public List<MolecularCharacterization> findMolcharByDataSourceSkipLimit(String ds, int skip, int limit){
         return molecularCharacterizationRepository.findByDataSourceSkipLimit(ds, skip, limit);
     }
-    
+
     public Set<MolecularCharacterization> getMolcharsById(Set<Long> ids){
 
         return molecularCharacterizationRepository.findByIds(ids);
@@ -1371,12 +1371,12 @@ public class DataImportService {
             if (markerList.size() == 1) {
                 marker = markerList.get(0);
                 logEntity = logUpdateFromPreviousSymbol(reporter,dataSource, modelId, characterizationType, platform,
-                    symbol, marker.getHgncSymbol(),"Previous symbol");
+                        symbol, marker.getHgncSymbol(),"Previous symbol");
                 nodeSuggestionDTO.setNode(marker);
             }
             else {
                 logEntity = logNoSingleValidSymbol(reporter,dataSource, modelId, characterizationType, platform,
-                    symbol, symbol,"");
+                        symbol, symbol,"");
                 String prevMarkers = markerList.stream().map(Marker::getHgncSymbol).collect(Collectors.joining("; "));
                 logEntity.setMessage("Previous symbol for multiple approved markers: {} "+prevMarkers);
 

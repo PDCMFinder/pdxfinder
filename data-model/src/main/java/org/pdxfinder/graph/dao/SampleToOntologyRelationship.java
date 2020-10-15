@@ -2,8 +2,6 @@ package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 
 /*
  * Created by csaba on 16/11/2017.
@@ -11,9 +9,8 @@ import javax.persistence.Id;
 @RelationshipEntity(type="MAPPED_TO")
 public class SampleToOntologyRelationship {
 
-    @Id
-    @GeneratedValue
-    private Long id;
+    @GraphId
+    private Long relationshipId;
 
     @Property
     private String type;
