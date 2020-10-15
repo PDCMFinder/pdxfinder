@@ -12,7 +12,7 @@ public class TreatmentToOntologyRelationship {
 
     @Id
     @GeneratedValue
-    private Long relationshipId;
+    private Long id;
 
     @Property
     private String type;
