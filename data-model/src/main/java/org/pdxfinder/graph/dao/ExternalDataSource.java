@@ -1,6 +1,7 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.util.Date;
@@ -12,7 +13,7 @@ import java.util.List;
 @NodeEntity
 public class ExternalDataSource {
 
-    @GraphId
+    @Id @GeneratedValue
     private Long id;
 
     private String name;

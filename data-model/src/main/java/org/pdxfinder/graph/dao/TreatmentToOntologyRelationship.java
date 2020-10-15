@@ -2,13 +2,16 @@ package org.pdxfinder.graph.dao;
 
 import org.neo4j.ogm.annotation.*;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 /*
  * Created by csaba on 08/05/2019.
  */
 @RelationshipEntity(type="MAPPED_TO")
 public class TreatmentToOntologyRelationship {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long relationshipId;
 
     @Property
