@@ -3,7 +3,6 @@ package org.pdxfinder.dataexport;
 import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.services.DataImportService;
-import org.pdxfinder.services.UtilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ public class UniversalDataExtractionServices {
 
     private static final Logger log = LoggerFactory.getLogger(UniversalDataExtractionServices.class);
 
-    private UtilityService utilityService;
     private DataImportService dataImportService;
 
     public static final String MODEL_ID = "modelId";
@@ -41,9 +39,8 @@ public class UniversalDataExtractionServices {
     static final String EMPTY = "";
     
     @Autowired
-    public UniversalDataExtractionServices(DataImportService dataImportService, UtilityService utilityService) {
+    public UniversalDataExtractionServices(DataImportService dataImportService) {
         this.dataImportService = dataImportService;
-        this.utilityService = utilityService;
     }
 
     public MetadataSheets extractMetadata(Group group, MetadataSheets sheets, boolean isHarmonized){
