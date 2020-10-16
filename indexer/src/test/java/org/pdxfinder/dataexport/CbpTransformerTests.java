@@ -72,6 +72,8 @@ public class CbpTransformerTests extends BaseTest {
         writeWorkbook(templatesFolder + "/" + TSV.templateNames.cna_template.fileName, 2);
         writeWorkbook(templatesFolder + "/" + TSV.templateNames.cytogenetics_template.fileName, 2);
         writeWorkbook(templatesFolder + "/" + TSV.templateNames.expression_template.fileName, 2);
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.drugdosing_template.fileName, 2);
+        writeWorkbook(templatesFolder + "/" + TSV.templateNames.patienttreatment_template.fileName, 2);
     }
 
     private void writeWorkbook(String directory, int sheetCount) throws IOException {

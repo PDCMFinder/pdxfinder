@@ -12,6 +12,7 @@ import org.pdxfinder.BaseTest;
 import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.graph.dao.ModelCreation;
+import org.pdxfinder.services.DataImportService;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,6 +34,9 @@ public class UniversalDataExportTests extends BaseTest {
     @Mock
     private UniversalDataExtractionServices extractionUtilities;
 
+    @Mock
+    private DataImportService dataImportService;
+
     @InjectMocks
     private UniversalDataExporter universalDataExporter;
 
@@ -53,6 +57,8 @@ public class UniversalDataExportTests extends BaseTest {
         writeWorkbook(templateDir + "/" + TSV.templateNames.cna_template.fileName, 2);
         writeWorkbook(templateDir + "/" + TSV.templateNames.cytogenetics_template.fileName, 2);
         writeWorkbook(templateDir + "/" + TSV.templateNames.expression_template.fileName, 2);
+        writeWorkbook(templateDir + "/" + TSV.templateNames.drugdosing_template.fileName, 2);
+        writeWorkbook(templateDir + "/" + TSV.templateNames.patienttreatment_template.fileName, 2);
 
         templateDir = templateRoot.getRoot().getAbsolutePath();
         templates = new ExporterTemplates(templateDir, false);

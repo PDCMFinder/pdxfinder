@@ -54,6 +54,8 @@ public class ExportTemplatesTest extends BaseTest {
         writeWorkbook(templateDir + "/" + TSV.templateNames.cna_template.fileName, 2);
         writeWorkbook(templateDir + "/" + TSV.templateNames.cytogenetics_template.fileName, 2);
         writeWorkbook(templateDir + "/" + TSV.templateNames.expression_template.fileName, 2);
+        writeWorkbook(templateDir + "/" + TSV.templateNames.drugdosing_template.fileName, 2);
+        writeWorkbook(templateDir + "/" + TSV.templateNames.patienttreatment_template.fileName, 2);
         group = new Group("test", "test", "test");
 
         ExporterTemplates templates = new ExporterTemplates(templateDir, true);
