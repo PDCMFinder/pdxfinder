@@ -1,6 +1,5 @@
 package org.pdxfinder.dataexport;
 
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +37,12 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
     private static final String mutMolType = TSV.molecular_characterisation_type.mut.mcType;
     private static final String cnaMolType = TSV.molecular_characterisation_type.cna.mcType;
 
+    private String TEST_DRUG = "TEST_DRUG";
+    private String TEST_DOSE = "TEST_DOSE";
+    private String TEST_RESPONSE = "TEST_RESPONSE";
+    private String MODEL_ID = "m123";
+    private String PATIENT_ID = "PATIETNID";
+
     @Before
     public void setUp() {
         providerGroup = Group.createProviderGroup("TestGroup", "TG", "", "Academia", "Bob", "Bob's page");
@@ -46,7 +51,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
     @Test
     public void Given_PatientAndProvider_When_GetPatientSheetIsCalled_Then_PatientDataIsInRowOne() {
         when(dataImportService.findPatientsByGroup(providerGroup))
-          .thenReturn(getPatientListForTest());
+                .thenReturn(getPatientListForTest());
 
         List<List<String>> patientData  = extractor.extractPatientSheet(providerGroup);
         Assert.assertEquals("p123", patientData.get(0).get(0));
@@ -75,12 +80,12 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         patientList.add(patient);
 
         ModelCreation modelCreation = new ModelCreation();
-        modelCreation.setSourcePdxId("m123");
+        modelCreation.setSourcePdxId(MODEL_ID);
 
         when(dataImportService.findPatientTumorAtCollectionDataByDS(providerGroup))
-          .thenReturn(patientList);
+                .thenReturn(patientList);
         when(dataImportService.findModelBySample(sample))
-          .thenReturn(modelCreation);
+                .thenReturn(modelCreation);
 
         extractor.extractSampleSheet(providerGroup, false);
 
@@ -92,7 +97,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
     public void Given_ModelWithDetails_When_GetModelDetailsIsCalled_Then_ModelDataIsInRowOne(){
 
         when( dataImportService.findModelsWithSpecimensAndQAByDS(providerGroup.getAbbreviation()))
-          .thenReturn(getModelListForTest());
+                .thenReturn(getModelListForTest());
 
         extractor.extractModelDetails(providerGroup);
         extractor.extractModelValidations(providerGroup);
@@ -100,10 +105,10 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         List<List<String>> pdxModelDetails = extractor.extractModelDetails(providerGroup);
         List<List<String>> pdxModelValidations = extractor.extractModelValidations(providerGroup);
 
-        Assert.assertEquals("m123", pdxModelDetails.get(0).get(0));
+        Assert.assertEquals(MODEL_ID, pdxModelDetails.get(0).get(0));
         Assert.assertEquals("hsname", pdxModelDetails.get(0).get(1));
 
-        Assert.assertEquals("m123", pdxModelValidations.get(0).get(0));
+        Assert.assertEquals(MODEL_ID, pdxModelValidations.get(0).get(0));
         Assert.assertEquals("technology", pdxModelValidations.get(0).get(1));
 
     }
@@ -111,11 +116,11 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
     @Test
     public void Given_Provider_When_GetSharingAndContactSheetIsCalled_Then_SharingAndContactDataIsInRowOne(){
         when(dataImportService.findModelsWithSharingAndContactByDS(providerGroup.getAbbreviation()))
-          .thenReturn(getModelListForTest());
+                .thenReturn(getModelListForTest());
 
         List<List<String>> sharingAndContact = extractor.extractSharingAndContact(providerGroup);
 
-        Assert.assertEquals("m123", sharingAndContact.get(0).get(0));
+        Assert.assertEquals(MODEL_ID, sharingAndContact.get(0).get(0));
         Assert.assertEquals("Academia", sharingAndContact.get(0).get(1));
     }
 
@@ -129,7 +134,7 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
     public void Given_ModelWithMolecularData_When_GetSamplePlatformSheetIsCalled_Then_SamplePlatformDataIsInRowOne(){
 
         when(dataImportService.findModelXenograftPlatformSampleByDS(providerGroup.getAbbreviation()))
-          .thenReturn(getModelListForTest());
+                .thenReturn(getModelListForTest());
 
         List<List<String>> samplePlatformDescription = extractor.extractSamplePlatform(providerGroup);
 
@@ -178,34 +183,52 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         Assert.assertEquals(0, expressionData.size());
     }
 
+    @Test
+    public void Given_ModelwithDosingData_When_extractModelIsCalled_Then_DrugDosingIsRetrieved(){
+        List<ModelCreation> modelList = getModelListForTest();
+        ModelCreation testModel = modelList.get(0);
+        testModel.setTreatmentSummary(buildTreatmentSummaryTreeToModel());
+        List<List<String>> dosingData = extractor.extractModelsOmicData(testModel,"drug");
+        Assert.assertEquals(1, dosingData.size());
+        Assert.assertEquals(MODEL_ID, dosingData.get(0).get(2));
+        Assert.assertEquals(TEST_DRUG, dosingData.get(0).get(4));
+        Assert.assertEquals(TEST_DOSE, dosingData.get(0).get(6));
+        Assert.assertEquals(TEST_RESPONSE, dosingData.get(0).get(10));
+    }
+
+    @Test
+    public void Given_ModelwithPatientData_When_extractModelIsCalled_Then_PatientTreatmentIsRetrieved(){
+        List<ModelCreation> modelList = getModelListForTest();
+        ModelCreation testModel = modelList.get(0);
+        testModel.getSample().getPatientSnapshot().setTreatmentSummary(buildTreatmentSummaryTreeToModel());
+        List<List<String>> dosingData = extractor.extractModelsOmicData(testModel,"patientTreatment");
+        Assert.assertEquals(1, dosingData.size());
+        Assert.assertEquals(PATIENT_ID, dosingData.get(0).get(0));
+        Assert.assertEquals(TEST_DRUG, dosingData.get(0).get(1));
+        Assert.assertEquals(TEST_DOSE, dosingData.get(0).get(2));
+        Assert.assertEquals(TEST_RESPONSE, dosingData.get(0).get(7));
+    }
+
+
+
     private List<ModelCreation> getModelListForTest(){
         List<ModelCreation> modelCreationList = new ArrayList<>();
 
         ModelCreation model = new ModelCreation();
-        model.setSourcePdxId("m123");
+        model.setSourcePdxId(MODEL_ID);
 
-        Group accessGroup = Group.createAccessibilityGroup("Academia", "transnational");
-        Group project = new Group("project1", "p1", "Project");
-
-        Group publicationGroup = new Group();
-        publicationGroup.setType("Publication");
-        publicationGroup.setPubMedId("12345");
-
-        model.addGroup(publicationGroup);
-        model.addGroup(providerGroup);
-        model.addGroup(accessGroup);
-        model.addGroup(project);
-
-        ExternalUrl url = new ExternalUrl(ExternalUrl.Type.CONTACT,"email@address.com");
-        List<ExternalUrl> urlList = new ArrayList<>();
-        urlList.add(url);
-        model.setExternalUrls(urlList);
+        setModelGroups(model);
+        setExternalUrl(model);
 
         QualityAssurance qualityAssurance = new QualityAssurance("technology", "description", "1,2");
         model.addQualityAssurance(qualityAssurance);
 
+        Patient patient = new Patient(PATIENT_ID, new Group());
+        PatientSnapshot patientSnapshot = new PatientSnapshot(patient, "0");
+
         Sample patientSample = new Sample();
         patientSample.setSourceSampleId(patientSampleId);
+        patientSample.setPatientSnapshot(patientSnapshot);
 
         model.setSample(patientSample);
 
@@ -246,6 +269,27 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         return modelCreationList;
     }
 
+    private void setModelGroups(ModelCreation model){
+        Group accessGroup = Group.createAccessibilityGroup("Academia", "transnational");
+        Group project = new Group("project1", "p1", "Project");
+
+        Group publicationGroup = new Group();
+        publicationGroup.setType("Publication");
+        publicationGroup.setPubMedId("12345");
+
+        model.addGroup(publicationGroup);
+        model.addGroup(providerGroup);
+        model.addGroup(accessGroup);
+        model.addGroup(project);
+    }
+
+    private void setExternalUrl(ModelCreation model){
+        ExternalUrl url = new ExternalUrl(ExternalUrl.Type.CONTACT,"email@address.com");
+        List<ExternalUrl> urlList = new ArrayList<>();
+        urlList.add(url);
+        model.setExternalUrls(urlList);
+    }
+
     private List<Patient> getPatientListForTest(){
 
         Patient patient = new Patient("p123", "male", "", "", providerGroup);
@@ -272,5 +316,14 @@ public class UniversalDataExtractorUtilitiesTest extends BaseTest {
         return molecularCharacterization;
     }
 
-
+    private TreatmentSummary buildTreatmentSummaryTreeToModel(){
+        Treatment treatment = new Treatment(TEST_DRUG);
+        TreatmentComponent treatmentComponent = new TreatmentComponent(TEST_DOSE, treatment);
+        TreatmentProtocol treatmentProtocol = new TreatmentProtocol();
+        treatmentProtocol.setComponents(Collections.singletonList(treatmentComponent));
+        treatmentProtocol.setResponse(new Response(TEST_RESPONSE, treatmentProtocol));
+        TreatmentSummary treatmentSummary = new TreatmentSummary();
+        treatmentSummary.setTreatmentProtocols(Collections.singletonList(treatmentProtocol));
+        return treatmentSummary;
+    }
 }
