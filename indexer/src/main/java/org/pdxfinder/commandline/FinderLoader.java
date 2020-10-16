@@ -1,7 +1,7 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.pdxfinder.dataloaders.*;
+import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.InitMappingDatabase;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
@@ -36,11 +36,7 @@ public class FinderLoader {
     private LoadNCIT loadNCIT;
 
     // DataProvider Loading Components
-    private LoadHCI loadHCI;
     private LoadJAXData loadJAXData;
-    private LoadMDAnderson loadMDAnderson;
-    private LoadWISTAR loadWISTAR;
-    private LoadWUSTL loadWUSTL;
     private Updog updog;
 
     // PostLoad Components
@@ -57,12 +53,7 @@ public class FinderLoader {
     public FinderLoader(LoadMarkers loadMarkers,
                         LoadNCITDrugs loadNCITDrugs,
                         LoadNCIT loadNCIT,
-
-                        LoadHCI loadHCI,
                         LoadJAXData loadJAXData,
-                        LoadMDAnderson loadMDAnderson,
-                        LoadWISTAR loadWISTAR,
-                        LoadWUSTL loadWUSTL,
                         Updog updog,
 
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
@@ -77,11 +68,7 @@ public class FinderLoader {
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
 
-        this.loadHCI = loadHCI;
         this.loadJAXData = loadJAXData;
-        this.loadMDAnderson = loadMDAnderson;
-        this.loadWISTAR = loadWISTAR;
-        this.loadWUSTL = loadWUSTL;
         this.updog = updog;
 
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;

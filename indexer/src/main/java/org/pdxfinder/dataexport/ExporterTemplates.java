@@ -42,14 +42,16 @@ public class ExporterTemplates {
         if(isHarmonized){
             XSSFSheet sampleSheet = metadataTemplate.getSheet(TSV.metadataSheetNames.sample.name());
             for (Row row : sampleSheet) {
-                row.createCell(row.getLastCellNum(), CellType.STRING);
-                String nextCellValue = row.getCell(8).getStringCellValue();
-                String harmonizedRowMessage = "PDX Finder Harmonized Diagnosis";
-                row.getCell(8).setCellValue(harmonizedRowMessage);
-                for (int i = 9; i < (row.getLastCellNum()); i++) {
-                    String previousCellValue = nextCellValue;
-                    nextCellValue = row.getCell(i).getStringCellValue();
-                    row.getCell(i).setCellValue(previousCellValue);
+                if (row.getLastCellNum() != -1){
+                    row.createCell(row.getLastCellNum(), CellType.STRING);
+                    String nextCellValue = row.getCell(8).getStringCellValue();
+                    String harmonizedRowMessage = "PDX Finder Harmonized Diagnosis";
+                    row.getCell(8).setCellValue(harmonizedRowMessage);
+                    for (int i = 9; i < (row.getLastCellNum()); i++) {
+                        String previousCellValue = nextCellValue;
+                        nextCellValue = row.getCell(i).getStringCellValue();
+                        row.getCell(i).setCellValue(previousCellValue);
+                    }
                 }
             }
         }
