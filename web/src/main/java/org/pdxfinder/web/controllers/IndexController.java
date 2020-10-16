@@ -23,7 +23,7 @@ public class IndexController {
     }
 
     @RequestMapping("/")
-    String contextRootRedirect(){
+    public String contextRootRedirect(){
         return "redirect:/search";
     }
 
