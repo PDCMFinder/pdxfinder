@@ -38,7 +38,7 @@ public class UniversalDataExtractionServices {
     private static final String PATIENT_ORIGIN = "patient";
     private static final String MODEL_ORIGIN = "xenograft";
 
-    final String EMPTY = "";
+    static final String EMPTY = "";
     
     @Autowired
     public UniversalDataExtractionServices(DataImportService dataImportService, UtilityService utilityService) {
