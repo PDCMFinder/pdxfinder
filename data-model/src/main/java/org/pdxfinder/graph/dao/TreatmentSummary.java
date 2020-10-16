@@ -17,7 +17,7 @@ public class TreatmentSummary {
 
     @Id
     @GeneratedValue
-    private Long id;
+    Long id;
     //url to a page that describes the treatment
     String url;
 

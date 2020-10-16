@@ -1,8 +1,8 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.NodeEntity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /*
  * Created by csaba on 22/05/2018.
@@ -19,8 +19,7 @@ public class Drug {
      * @param synonyms                  Synonyms of the drug
      */
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     private Long id;
 
     private String name;

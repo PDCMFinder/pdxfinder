@@ -12,7 +12,7 @@ public class QualityAssurance {
 
     @Id
     @GeneratedValue
-    private Long id;
+    Long id;
 
     private String technology;
     private String description;

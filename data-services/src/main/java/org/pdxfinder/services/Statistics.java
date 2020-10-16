@@ -438,20 +438,27 @@ public class Statistics {
     public List<StatisticsDTO> pdxCountHavingDrugDataPerDataSource() {
 
         List<CountDTO> count1 = Arrays.asList(
-                new CountDTO("IRCC-GC", 275),
+                new CountDTO("IRCC-CRC", 275),
+                new CountDTO("JAX", 81),
+                new CountDTO("PDXNet-HCI-BCM", 0)
+        );
+
+        List<CountDTO> count2 = Arrays.asList(
+                new CountDTO("IRCC-CRC", 275),
                 new CountDTO("JAX", 90),
                 new CountDTO("PDXNet-HCI-BCM", 6)
         );
 
-        List<CountDTO> count2 = Arrays.asList(
-                new CountDTO("IRCC-GC", 275),
-                new CountDTO("JAX", 90),
+        List<CountDTO> count3 = Arrays.asList(
+                new CountDTO("IRCC-CRC", 275),
+                new CountDTO("JAX", 89),
                 new CountDTO("PDXNet-HCI-BCM", 6)
         );
 
         List<StatisticsDTO> stats = Arrays.asList(
-                new StatisticsDTO("APR 2019", count1),
-                new StatisticsDTO("OCT 2019", count2)
+                new StatisticsDTO("APR 2018", count1),
+                new StatisticsDTO("APR 2019", count2),
+                new StatisticsDTO("OCT 2019", count3)
         );
 
         return stats;
@@ -461,20 +468,27 @@ public class Statistics {
     public List<StatisticsDTO> drugCountPerDataSource() {
 
         List<CountDTO> count1 = Arrays.asList(
-                new CountDTO("IRCC-GC", 1),
+                new CountDTO("IRCC-CRC", 1),
+                new CountDTO("JAX", 20),
+                new CountDTO("PDXNet-HCI-BCM", 0)
+        );
+
+        List<CountDTO> count2 = Arrays.asList(
+                new CountDTO("IRCC-CRC", 1),
                 new CountDTO("JAX", 20),
                 new CountDTO("PDXNet-HCI-BCM", 5)
         );
 
-        List<CountDTO> count2 = Arrays.asList(
-                new CountDTO("IRCC-GC", 2),
+        List<CountDTO> count3 = Arrays.asList(
+                new CountDTO("IRCC-CRC", 2),
                 new CountDTO("JAX", 24),
                 new CountDTO("PDXNet-HCI-BCM", 5)
         );
 
         List<StatisticsDTO> stats = Arrays.asList(
-                new StatisticsDTO("APR 2019", count1),
-                new StatisticsDTO("OCT 2019", count2)
+                new StatisticsDTO("APR 2018", count1),
+                new StatisticsDTO("APR 2019", count2),
+                new StatisticsDTO("OCT 2019", count3)
         );
 
         return stats;
@@ -516,8 +530,7 @@ public class Statistics {
                 new CountDTO("IRCC-GC", 8),
                 new CountDTO("PDMR", 84),
                 new CountDTO("CRL", 41),
-                new CountDTO("TRACE", 24),
-                new CountDTO("UOM-BC", 0)
+                new CountDTO("TRACE", 24)
         );
 
         List<CountDTO> count2 = Arrays.asList(
@@ -541,15 +554,15 @@ public class Statistics {
     public List<StatisticsDTO> mockRepository() {
 
         List<CountDTO> count1 = Arrays.asList(
-                new CountDTO("Mutation", 1270),
-                new CountDTO("Cytogenetics", 48),
-                new CountDTO("Dosing Studies", 371),
-                new CountDTO("CNA", 358),
+                new CountDTO("Mutation", 808),
+                new CountDTO("Cytogenetics", 0),
+                new CountDTO("Dosing Studies", 356),
+                new CountDTO("CNA", 0),
                 new CountDTO("Patient Treatment", 0)
         );
 
         List<CountDTO> count2 = Arrays.asList(
-                new CountDTO("Mutation", 1270),
+                new CountDTO("Mutation", 1472),
                 new CountDTO("Cytogenetics", 81),
                 new CountDTO("Dosing Studies", 371),
                 new CountDTO("CNA", 729),
@@ -559,7 +572,7 @@ public class Statistics {
         List<CountDTO> count3 = Arrays.asList(
                 new CountDTO("Mutation", 1546),
                 new CountDTO("Cytogenetics", 128),
-                new CountDTO("Dosing Studies", 371),
+                new CountDTO("Dosing Studies", 370),
                 new CountDTO("CNA", 1082),
                 new CountDTO("Patient Treatment", 244)
         );
@@ -580,7 +593,7 @@ public class Statistics {
         List<CountDTO> count = Arrays.asList(
                 new CountDTO("APR 2018", 1910),
                 new CountDTO("APR 2019", 2629),
-                new CountDTO("OCT 2019", 2872)
+                new CountDTO("OCT 2019", 2888)
         );
 
         return count;

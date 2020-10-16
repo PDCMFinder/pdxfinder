@@ -164,7 +164,6 @@ public class LinkSamplesToNCITTerms {
         log.info("Found " + remainingTermsToUpdate + " terms with direct number. Updating graph...");
 
         for (OntologyTerm ot : termsWithDirectMappings) {
-            log.info("Updating subgraph for " + ot.getLabel());
 
             ot.setAllowAsSuggestion(true);
             Set<OntologyTerm> discoveredTerms = new HashSet<>();
