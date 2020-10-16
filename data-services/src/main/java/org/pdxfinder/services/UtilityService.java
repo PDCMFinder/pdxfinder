@@ -333,13 +333,9 @@ public class UtilityService {
                 type = stringArr[stringArr.length - 1];
 
                 inputStream = multipartFile.getInputStream();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.warn(e.getMessage());
             }
-            catch(Exception e){
-                log.warn(e.getMessage());
-            }
-
             if (type.equals("xlsx")) {
 
                 dataList = serializeExcelDataNoIterator(inputStream, 0, 1);

@@ -15,6 +15,7 @@ import org.pdxfinder.BaseTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -275,12 +276,13 @@ public class UtilityServiceTest extends BaseTest {
     }
 
     @Test
-    public void given_CSV_When_Serialize_Then_FormatIsCorrect(){
+    public void given_CSV_When_Serialize_Then_FormatIsCorrect() throws Exception{
 
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("user-file","test.csv",
-                "text/plain", "test data".getBytes());
-        List<Map<String, String>> data = utilityService.serializeMultipartFile(mockMultipartFile);
-        Assert.assertEquals("", "");
+        String mails = "test@example.com,test@example.net,john.doe@example.org";
+        MultipartFile mockFile = new MockMultipartFile("mockFile", "test.csv", "text/csv", mails.getBytes("utf-8"));
+
+        List<Map<String, String>> data = utilityService.serializeMultipartFile(mockFile);
+        Assert.assertEquals("text/csv", mockFile.getContentType());
 
 
     }
