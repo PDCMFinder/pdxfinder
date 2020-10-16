@@ -20,6 +20,8 @@ public class ExporterTemplates {
     private XSSFWorkbook cnaTemplate;
     private XSSFWorkbook cytoTemplate;
     private XSSFWorkbook exprTemplate;
+    private XSSFWorkbook drugTemplate;
+    private XSSFWorkbook patientTreatmentTemplate;
 
     private Map<String, XSSFWorkbook> templatesMap;
     private String templateDir;
@@ -40,14 +42,16 @@ public class ExporterTemplates {
         if(isHarmonized){
             XSSFSheet sampleSheet = metadataTemplate.getSheet(TSV.metadataSheetNames.sample.name());
             for (Row row : sampleSheet) {
-                row.createCell(row.getLastCellNum(), CellType.STRING);
-                String nextCellValue = row.getCell(8).getStringCellValue();
-                String harmonizedRowMessage = "PDX Finder Harmonized Diagnosis";
-                row.getCell(8).setCellValue(harmonizedRowMessage);
-                for (int i = 9; i < (row.getLastCellNum()); i++) {
-                    String previousCellValue = nextCellValue;
-                    nextCellValue = row.getCell(i).getStringCellValue();
-                    row.getCell(i).setCellValue(previousCellValue);
+                if (row.getLastCellNum() != -1){
+                    row.createCell(row.getLastCellNum(), CellType.STRING);
+                    String nextCellValue = row.getCell(8).getStringCellValue();
+                    String harmonizedRowMessage = "PDX Finder Harmonized Diagnosis";
+                    row.getCell(8).setCellValue(harmonizedRowMessage);
+                    for (int i = 9; i < (row.getLastCellNum()); i++) {
+                        String previousCellValue = nextCellValue;
+                        nextCellValue = row.getCell(i).getStringCellValue();
+                        row.getCell(i).setCellValue(previousCellValue);
+                    }
                 }
             }
         }
@@ -72,6 +76,8 @@ public class ExporterTemplates {
         cnaTemplate = getWorkbookFromFS(templateDir+"/" + TSV.templateNames.cna_template.fileName);
         cytoTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.cytogenetics_template.fileName);
         exprTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.expression_template.fileName);
+        drugTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.drugdosing_template.fileName);
+        patientTreatmentTemplate = getWorkbookFromFS(templateDir + "/" + TSV.templateNames.patienttreatment_template.fileName);
     }
 
     private void addAllSheetsToMap() {
@@ -81,6 +87,8 @@ public class ExporterTemplates {
         templatesMap.put(TSV.templateNames.cna_template.name() ,cnaTemplate);
         templatesMap.put(TSV.templateNames.cytogenetics_template.name() ,cytoTemplate);
         templatesMap.put(TSV.templateNames.expression_template.name() ,exprTemplate);
+        templatesMap.put(TSV.templateNames.drugdosing_template.name(), drugTemplate);
+        templatesMap.put(TSV.templateNames.patienttreatment_template.name(), patientTreatmentTemplate);
     }
 
     public XSSFWorkbook getTemplate(String template){

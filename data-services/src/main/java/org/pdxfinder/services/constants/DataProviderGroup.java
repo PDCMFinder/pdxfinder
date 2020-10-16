@@ -1,12 +1,14 @@
 package org.pdxfinder.services.constants;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 
 public enum DataProviderGroup {
     All,
     EurOPDX,
+    PDXNet,
     UPDOG,
     CustomLoaders;
 
@@ -54,15 +56,22 @@ public enum DataProviderGroup {
                 DataProvider.UMCG,
                 DataProvider.VHIO_PC,
                 DataProvider.LIH,
-                DataProvider.PPTC
+                DataProvider.PPTC,
+                DataProvider.WUSTL,
+                DataProvider.MDAnderson,
+                DataProvider.Wistar_MDAnderson_Penn,
+                DataProvider.HCI_BCM
         ));
 
-        map.put(DataProviderGroup.CustomLoaders, Arrays.asList(
-                DataProvider.JAX,
-                DataProvider.PDXNet_MDAnderson,
-                DataProvider.PDXNet_HCI_BCM,
-                DataProvider.PDXNet_Wistar_MDAnderson_Penn,
-                DataProvider.PDXNet_WUSTL
+        map.put(DataProviderGroup.PDXNet, Arrays.asList(
+                DataProvider.WUSTL,
+                DataProvider.MDAnderson,
+                DataProvider.Wistar_MDAnderson_Penn,
+                DataProvider.HCI_BCM
+        ));
+
+        map.put(DataProviderGroup.CustomLoaders, Collections.singletonList(
+                DataProvider.JAX
         ));
 
         return map.get(group);

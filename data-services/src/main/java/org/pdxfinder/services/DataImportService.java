@@ -1,8 +1,8 @@
 package org.pdxfinder.services;
 
-import org.apache.commons.lang3.StringUtils;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.pdxfinder.graph.dao.*;
 import org.pdxfinder.graph.queryresults.TreatmentMappingData;
 import org.pdxfinder.graph.repositories.*;
@@ -303,6 +303,14 @@ public class DataImportService {
     public List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(String dataSource, String molcharType){
 
         return modelCreationRepository.findModelsWithMolecularDataByDSAndMolcharType(dataSource, molcharType);
+    }
+
+    public List<ModelCreation> findModelsWithTreatmentSummaryByDS(String datasource){
+        return modelCreationRepository.findModelsWithTreatmentSummaryByDataSource(datasource);
+    }
+
+    public List<ModelCreation> findModelFromPatienSnapshotWithTreatmentSummaryByDS(String datasource){
+        return modelCreationRepository.findModelFromPatienSnapshotWithTreatmentSummaryByDataSource(datasource);
     }
 
     public List<ModelCreation> findModelsWithSharingAndContactByDS(String ds){

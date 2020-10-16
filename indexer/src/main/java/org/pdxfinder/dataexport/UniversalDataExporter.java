@@ -5,6 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.graph.dao.ModelCreation;
+import org.pdxfinder.services.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,14 @@ public class UniversalDataExporter {
 
     private static final Logger log = LoggerFactory.getLogger(UniversalDataExporter.class);
     private UniversalDataWriterServices writerUtilities;
-    private UniversalDataExtractionServices extractionUtilities;
+    private UniversalDataExtractionServices extractionServices;
+    private DataImportService dataImportService;
 
     @Autowired
-    UniversalDataExporter(UniversalDataWriterServices writerUtilities, UniversalDataExtractionServices extractionUtilities){
+    UniversalDataExporter(UniversalDataWriterServices writerUtilities, UniversalDataExtractionServices extractionUtilities, DataImportService dataImportService){
         this.writerUtilities = writerUtilities;
-        this.extractionUtilities = extractionUtilities;
+        this.extractionServices = extractionUtilities;
+        this.dataImportService = dataImportService;
     }
 
     public void exportAllFromGroup(String exportDir, Group dataSource, boolean isHarmonized, String templateDir) throws IOException {
@@ -46,14 +49,14 @@ public class UniversalDataExporter {
     }
 
     public void exportSamplePlatform(ExporterTemplates templates, Group group, String exportProviderDir) throws IOException {
-        List<List<String>> samplePlatform = extractionUtilities.extractSamplePlatform(group);
+        List<List<String>> samplePlatform = extractionServices.extractSamplePlatform(group);
         XSSFWorkbook samplePlatformTemplate = templates.getTemplate(TSV.templateNames.sampleplatform_template.name());
         String samplePlatformURI = String.format("%s/%s_sampleplatform.xlsx", exportProviderDir, group.getAbbreviation());
         saveSamplePlatformToXlsx(samplePlatformTemplate, samplePlatform, samplePlatformURI);
     }
 
     public void exportMetadata(MetadataSheets providerSheets, ExporterTemplates templates, Group dataSource, boolean isHarmonized, String exportProviderDir) throws IOException {
-        extractionUtilities.extractMetadata(dataSource, providerSheets, isHarmonized);
+        extractionServices.extractMetadata(dataSource, providerSheets, isHarmonized);
         saveMetadataToXlsx(providerSheets, templates, exportProviderDir, dataSource);
     }
 
@@ -84,34 +87,41 @@ public class UniversalDataExporter {
         XSSFWorkbook cnaTemplate = templates.getTemplate(TSV.templateNames.cna_template.name());
         XSSFWorkbook cytoTemplate = templates.getTemplate(TSV.templateNames.cytogenetics_template.name());
         XSSFWorkbook exprTemplate = templates.getTemplate(TSV.templateNames.expression_template.name());
+        XSSFWorkbook dosingTemplate = templates.getTemplate(TSV.templateNames.drugdosing_template.name());
+        XSSFWorkbook treatmentTemplate = templates.getTemplate(TSV.templateNames.patienttreatment_template.name());
         String mut = TSV.molecular_characterisation_type.mut.name();
         String cna = TSV.molecular_characterisation_type.cna.name();
         String expression = TSV.molecular_characterisation_type.expression.name();
         String cyto =  TSV.molecular_characterisation_type.cyto.name();
+        String dosing = "drug";
+        String treatment = "patientTreatment";
         Path mutExportURI = Paths.get(String.format("%s/%s/%s_%s.tsv",exportProviderDir, mut, dataSource.getAbbreviation(), mut));
         Path cnaExportURI = Paths.get(String.format( "%s/%s/%s_%s.tsv",exportProviderDir, cna, dataSource.getAbbreviation(), cna));
         Path expressionExportURI = Paths.get(String.format("%s/%s/%s_%s.tsv", exportProviderDir,  expression, dataSource.getAbbreviation() ,expression));
         Path cytoExportURI = Paths.get(String.format("%s/%s/%s_%s.tsv",exportProviderDir,cyto, dataSource.getAbbreviation() , cyto));
+        Path dosingExportURI = Paths.get(String.format("%s/%s/%s_%s.tsv", exportProviderDir, dosing, dataSource.getAbbreviation(), dosing));
+        Path treatmentExportURI = Paths.get(String.format("%s/%s/%s_%s.tsv", exportProviderDir, treatment, dataSource.getAbbreviation(), treatment));
         extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.mut.mcType ,mutationTemplate, mutExportURI,dataSource);
         extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.cna.mcType ,cnaTemplate, cnaExportURI, dataSource);
         extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.cyto.mcType ,cytoTemplate, cytoExportURI, dataSource);
         extractAndSaveOmicByBatch(TSV.molecular_characterisation_type.expression.mcType ,exprTemplate, expressionExportURI,dataSource);
-
+        extractAndSaveOmicByBatch(dosing, dosingTemplate, dosingExportURI, dataSource);
+        extractAndSaveOmicByBatch(treatment, treatmentTemplate, treatmentExportURI, dataSource);
     }
 
     public void extractAndSaveOmicByBatch(String molecularType, XSSFWorkbook template, Path exportURI, Group dataSource) throws IOException {
         String parentDirectory = exportURI.getParent().toString();
         String fileURI = exportURI.toString();
         Sheet templateSheet = template.getSheetAt(0);
-        List<ModelCreation> models = extractionUtilities.getAllModelsByGroupAndMoleculartype(dataSource, molecularType);
+        List<ModelCreation> models;
+        models = getModelsByMolecularTypeAndDataSource(molecularType, dataSource);
         if(!models.isEmpty()) {
             writerUtilities.createExportDirectories(parentDirectory);
             writerUtilities.saveHeadersToTsv(templateSheet, exportURI.toString());
             List<List<String>> modelsOmicData = new ArrayList<>();
-
             int counter = 0;
             for (ModelCreation model : models) {
-                modelsOmicData.addAll(extractionUtilities.extractModelsOmicData(model, molecularType));
+                modelsOmicData.addAll(extractionServices.extractModelsOmicData(model, molecularType));
                 if (counter % 10 == 0) {
                     writerUtilities.appendDataToOmicTsvFile(modelsOmicData, fileURI);
                     modelsOmicData.clear();
@@ -124,6 +134,20 @@ public class UniversalDataExporter {
             }
         }
     }
+
+    List<ModelCreation> getModelsByMolecularTypeAndDataSource(String molecularType, Group dataSource) {
+        List<ModelCreation> models;
+        if (molecularType.equals("drug")) {
+            models = dataImportService.findModelsWithTreatmentSummaryByDS(dataSource.getAbbreviation());
+        } else if(molecularType.equals("patientTreatment")) {
+            models = dataImportService.findModelFromPatienSnapshotWithTreatmentSummaryByDS(dataSource.getAbbreviation());
+        }
+        else {
+            models = dataImportService.findModelsWithMolecularDataByDSAndMolcharType(dataSource.getAbbreviation(), molecularType);
+        }
+        return models;
+    }
+
 
     private boolean allMetadataSheetsHaveData(MetadataSheets providerData){
         for(TSV.metadataSheetNames sheetName: TSV.metadataSheetNames.values()){

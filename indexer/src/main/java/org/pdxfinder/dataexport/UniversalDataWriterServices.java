@@ -56,7 +56,7 @@ public class UniversalDataWriterServices {
     }
 
     public void createExportDirectories(String exportFileLocation) throws IOException {
-        Path directory = Paths.get(exportFileLocation).getParent();
+        Path directory = Paths.get(exportFileLocation);
         Files.createDirectories(directory);
         if(!directory.toFile().exists()) {
             throw new IOException(String.format("Failed to create file directory at %s",
@@ -68,7 +68,7 @@ public class UniversalDataWriterServices {
         try (FileWriter fileWriter = new FileWriter(exportFileLocation)) {
             saveHeadersToTsv(template, fileWriter);
         } catch (IOException e) {
-            log.error("IO Error writiner headers from {} %n {}", template.getSheetName(), e.toString());
+            log.error("IO Error writing headers from {} to {} \n {}", template.getSheetName(), exportFileLocation, e.toString());
         }
     }
 
@@ -87,8 +87,10 @@ public class UniversalDataWriterServices {
             Cell cell;
             try {
                 cell = xlsxTemplate.getRow(0).getCell(j);
-                fileWriter.append(cell.toString());
-                fileWriter.append("\t");
+                if(cell != null) {
+                    fileWriter.append(cell.toString());
+                    fileWriter.append("\t");
+                }
             } catch (IOException e) {
                 log.error("IOException in loading export headers");
             }

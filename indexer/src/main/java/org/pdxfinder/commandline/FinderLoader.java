@@ -1,7 +1,7 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.pdxfinder.dataloaders.*;
+import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.InitMappingDatabase;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
@@ -36,11 +36,7 @@ public class FinderLoader {
     private LoadNCIT loadNCIT;
 
     // DataProvider Loading Components
-    private LoadHCI loadHCI;
     private LoadJAXData loadJAXData;
-    private LoadMDAnderson loadMDAnderson;
-    private LoadWISTAR loadWISTAR;
-    private LoadWUSTL loadWUSTL;
     private Updog updog;
 
     // PostLoad Components
@@ -57,13 +53,7 @@ public class FinderLoader {
     public FinderLoader(LoadMarkers loadMarkers,
                         LoadNCITDrugs loadNCITDrugs,
                         LoadNCIT loadNCIT,
-
-                        LoadHCI loadHCI,
                         LoadJAXData loadJAXData,
-                        LoadMDAnderson loadMDAnderson,
-                        LoadPDMRData loadPDMRData,
-                        LoadWISTAR loadWISTAR,
-                        LoadWUSTL loadWUSTL,
                         Updog updog,
 
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
@@ -78,11 +68,7 @@ public class FinderLoader {
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
 
-        this.loadHCI = loadHCI;
         this.loadJAXData = loadJAXData;
-        this.loadMDAnderson = loadMDAnderson;
-        this.loadWISTAR = loadWISTAR;
-        this.loadWUSTL = loadWUSTL;
         this.updog = updog;
 
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
@@ -174,23 +160,10 @@ public class FinderLoader {
     ) {
         List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
-            switch (dataProvider) {
-                case PDXNet_HCI_BCM:
-                    loadHCI.run();
-                    break;
-                case JAX:
-                    loadJAXData.run();
-                    break;
-                case PDXNet_MDAnderson:
-                    loadMDAnderson.run();
-                    break;
-                case PDXNet_Wistar_MDAnderson_Penn:
-                    loadWISTAR.run();
-                    break;
-                case PDXNet_WUSTL:
-                    loadWUSTL.run();
-                    break;
-                default:
+            if (dataProvider.equals(DataProvider.JAX)) {
+                loadJAXData.run();
+            }
+            else{
                     if (updogProviders.contains(dataProvider)) {
                         Path updogDirectory = Paths.get(
                             dataDirectory.toString(),

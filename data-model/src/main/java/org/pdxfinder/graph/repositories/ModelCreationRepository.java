@@ -172,7 +172,7 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
             "RETURN mod, iir, psamp, samp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
-List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
+    List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
             "WITH mod SKIP {from} LIMIT {to}" +
@@ -220,6 +220,19 @@ List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSo
             "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d, mt, ot")
     Set<ModelCreation> getModelsTreatmentsAndDrugs(@Param("type") String type);
 
+    @Query("MATCH (model:ModelCreation)-[ii:IMPLANTED_IN]-(samp:Sample)--(ps:PatientSnapshot)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) " +
+            "WHERE model.dataSource = {dataSource} " +
+            "WITH model, ii, samp, ps, tsr, ts, tpr, tp, tcr, tc, dr, d " +
+            "OPTIONAL MATCH (tp)-[resp:RESPONSE]-(res:Response) " +
+            "RETURN model, ii, samp, ps, tsr, ts, tpr, tp, tcr, tc, dr, d,resp, res")
+    List<ModelCreation> findModelFromPatienSnapshotWithTreatmentSummaryByDataSource(@Param("dataSource")String dataSource);
+
+    @Query("MATCH(model:ModelCreation)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) " +
+            "WHERE toLower(model.dataSource) = toLower({dataSource}) " +
+            "WITH model,tsr, ts, tpr, tp, tcr, tc, dr, d " +
+            "OPTIONAL MATCH (tp)-[resp:RESPONSE]-(res:Response) " +
+            "RETURN model,tsr, ts, tpr, tp, tcr, tc, dr, d, res, resp" )
+    List<ModelCreation> findModelsWithTreatmentSummaryByDataSource(@Param("dataSource") String dataSource);
 }
 
 
