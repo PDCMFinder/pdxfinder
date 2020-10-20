@@ -14,14 +14,13 @@ import org.mockito.InjectMocks;
 import org.pdxfinder.BaseTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -274,5 +273,17 @@ public class UtilityServiceTest extends BaseTest {
 
         // Then
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void given_CSV_When_Serialize_Then_FormatIsCorrect() throws Exception{
+
+        String mails = "test@example.com,test@example.net,john.doe@example.org";
+        MultipartFile mockFile = new MockMultipartFile("mockFile", "test.csv", "text/csv", mails.getBytes("utf-8"));
+
+        List<Map<String, String>> data = utilityService.serializeMultipartFile(mockFile);
+        Assert.assertEquals("text/csv", mockFile.getContentType());
+
+
     }
 }

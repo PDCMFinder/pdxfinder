@@ -325,16 +325,17 @@ public class UtilityService {
     public List<Map<String, String>> serializeMultipartFile(MultipartFile multipartFile) {
         List<Map<String, String>> dataList = new ArrayList<>();
         if(multipartFile.getOriginalFilename() != null) {
-            String[] stringArr = multipartFile.getOriginalFilename().split("\\.");
-            String type = stringArr[stringArr.length - 1];
-            InputStream inputStream = null;
 
+            InputStream inputStream = null;
+            String type = "";
             try {
+                String[] stringArr = multipartFile.getOriginalFilename().split("\\.");
+                type = stringArr[stringArr.length - 1];
+
                 inputStream = multipartFile.getInputStream();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.warn(e.getMessage());
             }
-
             if (type.equals("xlsx")) {
 
                 dataList = serializeExcelDataNoIterator(inputStream, 0, 1);
