@@ -177,7 +177,7 @@ public class AjaxController {
     @GetMapping("/getmoleculardata/{molcharId}")
     public MolecularDataTableDTO getMolecularTableData(@PathVariable String molcharId){
 
-        return detailsService.getMolecularDataTable(molcharId);
+        return detailsService.getMolecularDataTable(molcharId, false);
 
     }
 
