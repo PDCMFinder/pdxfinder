@@ -497,7 +497,7 @@ function displayMolecularDataTable(tableData, clickedData) {
     var theadRow = jQuery('<tr>');
     var tbody = jQuery('<tbody />');
 
-    if (dataVisibility === true) {
+    if (dataVisibility === true && fullData.length > 1) {
 
         let oneData = fullData[0];
         let tableHeaders = Object.keys(oneData);
@@ -528,12 +528,15 @@ function displayMolecularDataTable(tableData, clickedData) {
         table.append(tbody);
         targetDiv.append(table);
         customizeDatatable('molcharDataTable', clickedData[4]);
-    } else {
-
+    }
+    else {
         let report = `<b style="margin-top: 15px; font-size: 13px; color: #06369d;"> ${tableData.reports[0]} </b> `
         targetDiv.append(report);
-        $('#download-data').hide();
+        if(dataVisibility === false){
+            $('#download-data').hide();
+        }
     }
+
 
     $("#omicDataCount").html(rowCount);
     $("#clickedSampleId").html(clickedData[0]);

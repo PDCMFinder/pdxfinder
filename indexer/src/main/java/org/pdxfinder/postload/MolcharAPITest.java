@@ -67,7 +67,7 @@ public class MolcharAPITest implements CommandLineRunner{
 
                 long startTime = System.currentTimeMillis();
 
-                MolecularDataTableDTO dto = detailsService.getMolecularDataTable(id.toString());
+                MolecularDataTableDTO dto = detailsService.getMolecularDataTable(id.toString(), false);
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;

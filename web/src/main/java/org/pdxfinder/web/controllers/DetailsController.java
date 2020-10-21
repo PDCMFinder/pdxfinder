@@ -55,7 +55,7 @@ public class DetailsController {
                            @PathVariable String molcharType,
                            @PathVariable String molcharId) throws IOException {
 
-        List<Map<String, Object>> molecularDataRowDTOS = detailsService.getMolecularDataTable(molcharId).getMolecularDataCsv();
+        List<Map<String, Object>> molecularDataRowDTOS = detailsService.getMolecularDataTable(molcharId, true).getMolecularDataCsv();
         String output = utilityService.serializeToCsvWithIncludeNonEmpty(molecularDataRowDTOS);
 
         response.setContentType("application/octet-stream");

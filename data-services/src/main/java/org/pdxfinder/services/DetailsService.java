@@ -7,6 +7,7 @@ import org.pdxfinder.services.dto.*;
 import org.pdxfinder.services.dto.pdxgun.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,17 +25,14 @@ public class DetailsService {
     private SampleRepository sampleRepository;
 
     private PatientRepository patientRepository;
-    private PatientSnapshotRepository patientSnapshotRepository;
+
     private ModelCreationRepository modelCreationRepository;
     private SpecimenRepository specimenRepository;
     private MolecularCharacterizationRepository molecularCharacterizationRepository;
     private PlatformRepository platformRepository;
     private TreatmentSummaryRepository treatmentSummaryRepository;
-    private MarkerAssociationRepository markerAssociationRepository;
 
-    private GraphService graphService;
-    private Map<String, List<String>> facets = new HashMap<>();
-    private PlatformService platformService;
+
     private DrugService drugService;
     private PatientService patientService;
     private PublicationService publicationService;
@@ -42,36 +40,30 @@ public class DetailsService {
     private final static Logger log = LoggerFactory.getLogger(DetailsService.class);
     private ReferenceDbService referenceDbService;
 
-
+    @Autowired
     public DetailsService(SampleRepository sampleRepository,
                           PatientRepository patientRepository,
-                          PatientSnapshotRepository patientSnapshotRepository,
+
                           ModelCreationRepository modelCreationRepository,
                           SpecimenRepository specimenRepository,
                           MolecularCharacterizationRepository molecularCharacterizationRepository,
                           PlatformRepository platformRepository,
                           TreatmentSummaryRepository treatmentSummaryRepository,
-                          GraphService graphService,
-                          PlatformService platformService,
                           DrugService drugService,
                           PatientService patientService,
-                          MarkerAssociationRepository markerAssociationRepository,
                           PublicationService publicationService,
                           ReferenceDbService referenceDbService) {
 
         this.sampleRepository = sampleRepository;
         this.patientRepository = patientRepository;
-        this.patientSnapshotRepository = patientSnapshotRepository;
+
         this.modelCreationRepository = modelCreationRepository;
         this.molecularCharacterizationRepository = molecularCharacterizationRepository;
         this.specimenRepository = specimenRepository;
         this.platformRepository = platformRepository;
         this.treatmentSummaryRepository = treatmentSummaryRepository;
-        this.graphService = graphService;
-        this.platformService = platformService;
         this.drugService = drugService;
         this.patientService = patientService;
-        this.markerAssociationRepository = markerAssociationRepository;
         this.publicationService = publicationService;
         this.referenceDbService = referenceDbService;
 
@@ -406,10 +398,14 @@ public class DetailsService {
     }
 
 
-    public MolecularDataTableDTO getMolecularDataTable(String id){
+    public MolecularCharacterization getMolcharData(String id){
+        return molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
+    }
+
+    public MolecularDataTableDTO getMolecularDataTable(String id, boolean forceReturn){
 
         MolecularDataTableDTO dto = new MolecularDataTableDTO();
-        MolecularCharacterization mc = molecularCharacterizationRepository.getMolecularDataById(Long.valueOf(id));
+        MolecularCharacterization mc = getMolcharData(id);
 
         if(mc == null){
 
@@ -423,6 +419,15 @@ public class DetailsService {
             notVisibleDataRow.add("This data is only accessible through the provider website - please click on 'CONTACT PROVIDER' button above to request access.");
             dto.setVisible(false);
             dto.setReports(notVisibleDataRow);
+            dto.setMolecularDataRows(new ArrayList<>());
+            return dto;
+        }
+        else if(mc.getFirstMarkerAssociation() != null && mc.getFirstMarkerAssociation().getDataPoints() > 300 && !forceReturn){
+
+            List<String> dataRow = new ArrayList<>();
+            dataRow.add("This dataset is too big to display, please click on the download results button to view data.");
+            dto.setVisible(true);
+            dto.setReports(dataRow);
             dto.setMolecularDataRows(new ArrayList<>());
             return dto;
         }
