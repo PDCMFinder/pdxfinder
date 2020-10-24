@@ -762,7 +762,7 @@
                                                     <td>
                                                         <a th:text="${dataRow.rawDataLabel}"
                                                            style="color: #06369d; text-decoration: none;"
-                                                           th:data-onclick="'window.open(\' '+${dataRow.rawDataLink}+'\')'">
+                                                           th:attr="onclick=|window.open('${dataRow.rawDataLink}')|">
                                                             ...
                                                         </a>
                                                         <span th:if="${dataRow.rawDataLink == ''} " th:text="'Not Available'" ></span>
