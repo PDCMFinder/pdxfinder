@@ -1,10 +1,12 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.cypher.internal.frontend.v2_3.SemanticDirection;
-import org.neo4j.ogm.annotation.GraphId;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +16,8 @@ import java.util.Set;
 @NodeEntity
 public class PatientSnapshot {
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String ageAtCollection;
@@ -90,7 +93,7 @@ public class PatientSnapshot {
             if (ageInteger <= 23) {
                 return "0-23 months";
             } else {
-                return getAgeBin(ageInteger / 24);
+                return getAgeBin(ageInteger / 12);
             }
         }
         catch (Exception e){
@@ -246,4 +249,31 @@ public class PatientSnapshot {
         return String.format("[%s at age %s]", getPatient().getExternalId(), getAgeAtCollection());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PatientSnapshot that = (PatientSnapshot) o;
+
+        return new EqualsBuilder()
+            .append(getAgeAtCollection(), that.getAgeAtCollection())
+            .append(getDateAtCollection(), that.getDateAtCollection())
+            .append(getCollectionEvent(), that.getCollectionEvent())
+            .append(getElapsedTime(), that.getElapsedTime())
+            .append(getPatient(), that.getPatient())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+            .append(getAgeAtCollection())
+            .append(getDateAtCollection())
+            .append(getCollectionEvent())
+            .append(getElapsedTime())
+            .append(getPatient())
+            .toHashCode();
+    }
 }

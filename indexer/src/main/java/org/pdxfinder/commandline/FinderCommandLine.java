@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ArgGroup;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
     subcommands = {
         FinderCommandLine.Load.class,
         FinderCommandLine.Export.class,
+        FinderCommandLine.ExportMappings.class,
         FinderCommandLine.Transform.class,
         CommandLine.HelpCommand.class
     }
@@ -150,14 +151,90 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Override
         public String toString() {
-            return new StringJoiner("\n", Load.class.getSimpleName() + "[\n", "\n]")
-                    .add("dataDirectory=" + dataDirectory)
-                    .add("clearCacheRequested=" + loadCacheRequested)
-                    .add("datasetRequested=" + getListOfRequestedProviders())
-                    .toString();
+            return new StringJoiner(", ", Load.class.getSimpleName() + "[", "]")
+                .add("dataDirectory=" + dataDirectory)
+                .add("initializeMappingDB=" + initializeMappingDB)
+                .add("validateOnlyRequested=" + validateOnlyRequested)
+                .add("postLoadRequested=" + postLoadRequested)
+                .add("springDataNeo4jUri='" + springDataNeo4jUri + "'")
+                .add("debReload='" + debReload + "'")
+                .add("springDatasourceUrl='" + springDatasourceUrl + "'")
+                .toString();
         }
     }
 
+    @Component
+    @Order(value = -100)
+    @Command(name = "exportMapping",
+            description = "Exports a subset of mappings defined by a group",
+            mixinStandardHelpOptions = true,
+            exitCodeOnExecutionException = 34)
+    static class ExportMappings implements Callable<Integer>{
+
+        @Option(
+                names = {"-d", "--data-dir"},
+                required = true,
+                description = "Path of the PDX Finder data directory " +
+                        "(default: [${DEFAULT-VALUE}], set in application.properties)")
+        private File dataDirectory;
+
+        @ArgGroup(multiplicity = "0..1")
+        ExportMappings.Exclusive datasetRequested = new ExportMappings.Exclusive();
+
+        static class Exclusive {
+
+            @Option(names = {"-g", "--group"}, arity = "1",
+                    description = "Load the data for groups of dataProvider (default: [${DEFAULT-VALUE}]). " +
+                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            private DataProviderGroup dataProviderGroup;
+
+            @Option(names = {"-o", "--only"}, arity = "1..*",
+                    description = "Load only the data for the listed dataProvider. " +
+                            "Accepted Values: [@|cyan ${COMPLETION-CANDIDATES} |@]")
+            private DataProvider[] dataProvider;
+
+            public DataProviderGroup getDataProviderGroup() {
+                return dataProviderGroup;
+            }
+
+            public DataProvider[] getDataProvider() {
+                return dataProvider;
+            }
+        }
+
+        @Autowired
+        FinderMappingExporter finderMappingExporter;
+
+        @Override
+        public Integer call() throws Exception {
+
+            List<DataProvider> providersRequested = getListOfRequestedProviders();
+            finderMappingExporter.run(dataDirectory, providersRequested);
+            return 0;
+        }
+
+
+
+        List<DataProvider> getListOfRequestedProviders() {
+
+            Optional<DataProvider[]> dataProviders = Optional.ofNullable(
+                    datasetRequested.getDataProvider()
+            );
+
+            Optional<DataProviderGroup> dataProviderGroup = Optional.ofNullable(
+                    datasetRequested.getDataProviderGroup()
+            );
+
+            if (dataProviders.isPresent()) {
+                return Arrays.asList(dataProviders.get());
+            } else if (dataProviderGroup.isPresent()) {
+                return DataProviderGroup.getProvidersFrom(dataProviderGroup.get());
+            } else {
+                return new ArrayList<>();
+            }
+        }
+
+    }
 
     @Component
     @Order(value = -100)
@@ -169,12 +246,18 @@ public class FinderCommandLine implements Callable<Integer> {
 
         @Autowired
         private FinderExporter finderExporter;
-
         @Option(
                 names = {"-d", "--data-dir"},
                 description = "Path of the PDX Finder data directory " +
                         "(default: [${DEFAULT-VALUE}], set in application.properties)")
         private File dataDirectory;
+
+        @Option(
+                names = {"-o", "--harmonized"},
+                description = "Exports the NCIT ontology information"
+        )
+        private boolean isHarmonized;
+
 
         @ArgGroup(multiplicity = "0..1")
         Export.Exclusive datasetRequested = new Export.Exclusive();
@@ -193,8 +276,8 @@ public class FinderCommandLine implements Callable<Integer> {
 
             private boolean loadAll;
 
-            public DataProvider getProvider() {
-                return provider;
+            public String getProvider() {
+                return Objects.nonNull(provider) ? provider.toString() : "";
             }
 
             public boolean isLoadAll() {
@@ -203,7 +286,7 @@ public class FinderCommandLine implements Callable<Integer> {
         }
         @Override
         public Integer call() throws IOException {
-            finderExporter.run(dataDirectory, datasetRequested.provider.toString(), datasetRequested.isLoadAll());
+            finderExporter.run(dataDirectory, datasetRequested.getProvider(), datasetRequested.isLoadAll(), isHarmonized);
             return 0;
         }
 
@@ -213,6 +296,7 @@ public class FinderCommandLine implements Callable<Integer> {
                     .add("dataDirectory=" + dataDirectory)
                     .add("Export provider" + datasetRequested.getProvider())
                     .add("Load all" + datasetRequested.isLoadAll())
+                    .add("Unharmonized" + isHarmonized)
                     .toString();
         }
     }

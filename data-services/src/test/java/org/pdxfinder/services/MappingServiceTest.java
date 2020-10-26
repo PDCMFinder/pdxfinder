@@ -6,12 +6,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
+
 import static org.mockito.Mockito.*;
 
 public class MappingServiceTest extends BaseTest {
 
     @Mock
     private MappingEntityRepository mappingEntityRepository;
+
+    @Mock
+    private UtilityService utilityService;
 
     @InjectMocks
     private MappingService mappingService;
@@ -31,6 +35,21 @@ public class MappingServiceTest extends BaseTest {
         verify(mappingEntityRepository, atLeast(1)).deleteAll();
 
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void given_directoryAttack_when_entityIsWrittenToFile_Then_throwArgumentException()  {
+        mappingService.setRootDir("/tmp");
+        String attackVector = "../../..";
+        mappingService.writeMappingsToFile(attackVector);
+    }
+
+    @Test
+    public void given_AplhaNumericAndHyphenatedDir_when_entityIsWrittenToFile_Then_doNotThrowArgumentException() {
+        mappingService.setRootDir("/tmp");
+        String normalEntity= "TReatment-90_90-HELLO--";
+        mappingService.writeMappingsToFile(normalEntity);
+    }
+
 
 
 

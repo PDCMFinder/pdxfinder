@@ -1,6 +1,5 @@
 package org.pdxfinder.services;
 
-import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
 import org.pdxfinder.services.email.Mail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -50,7 +49,7 @@ public class EmailService {
 
         mail.setSubject(subject);
 
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put("date", "xxxx");
         model.put("count", missingCount);
         mail.setModel(model);

@@ -9,12 +9,23 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableNeo4jRepositories("org.pdxfinder.graph.repositories")
+@EnableNeo4jRepositories(value = "org.pdxfinder.graph.repositories")
 public class TestConfig {
+/*
+    @Bean
+    public SessionFactory sessionFactory() {
+        return new SessionFactory("org.pdxfinder");
+    }
+
+*/
+    @Bean
+    public org.neo4j.ogm.config.Configuration getConfiguration() {
+        return new org.neo4j.ogm.config.Configuration.Builder().build();
+    }
 
     @Bean
     public SessionFactory sessionFactory() {
-        return new SessionFactory("org.pdxfinder.*");
+        return new SessionFactory(getConfiguration(), "org.pdxfinder.*");
     }
 
     @Bean

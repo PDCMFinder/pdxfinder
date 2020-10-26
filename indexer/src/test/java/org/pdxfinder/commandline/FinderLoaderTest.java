@@ -10,27 +10,24 @@ import org.pdxfinder.BaseTest;
 import org.pdxfinder.LoadDiseaseOntology;
 import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
-import org.pdxfinder.services.constants.DataProvider;
-import org.pdxfinder.dataloaders.LoadAdditionalDatasets;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SetDataVisibility;
-import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
+import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataUrl;
 import org.pdxfinder.services.loader.envload.LoadMarkers;
 import org.pdxfinder.services.loader.envload.LoadNCIT;
 import org.pdxfinder.services.loader.envload.LoadNCITDrugs;
 
-import java.nio.file.Path;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class FinderLoaderTest extends BaseTest {
 
@@ -46,12 +43,10 @@ public class FinderLoaderTest extends BaseTest {
     private DataProvider updogDataProvider;
     private static boolean NO_VALIDATION_ONLY = false;
 
-    @Mock private LoadAdditionalDatasets loadAdditionalDatasets;
     @Mock private LinkSamplesToNCITTerms linkSamplesToNCITTerms;
     @Mock private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
     @Mock private CreateDataProjections createDataProjections;
     @Mock private SetDataVisibility setDataVisibility;
-    @Mock private ValidateDB validateDB;
     @Mock private File dataDirectory;
 
     @Spy
@@ -68,12 +63,10 @@ public class FinderLoaderTest extends BaseTest {
         doNothing().when(this.loadMarkers).loadGenes(anyString());
         doNothing().when(this.loadNCIT).loadOntology(anyString());
         doNothing().when(this.loadNCITDrugs).loadRegimens();
-        doNothing().when(this.loadAdditionalDatasets).run();
         doNothing().when(this.linkSamplesToNCITTerms).run();
         doNothing().when(this.linkTreatmentsToNCITTerms).run();
         doNothing().when(this.createDataProjections).run();
         doNothing().when(this.setDataVisibility).run();
-        doNothing().when(this.validateDB).run();
         doNothing().when(this.updog).run(any(Path.class), anyString(), anyBoolean());
 
         this.dataProvider = DataProvider.JAX;

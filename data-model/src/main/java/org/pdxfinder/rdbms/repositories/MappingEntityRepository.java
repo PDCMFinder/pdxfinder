@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 
@@ -46,19 +45,15 @@ public interface MappingEntityRepository extends JpaRepository<MappingEntity, Lo
 
                                               Pageable pageable);
 
-
     @Query(value = "select me from MappingEntity me JOIN me.mappingValues mv WHERE KEY(mv) = :dataKey AND mv = :dataValue ")
     List<MappingEntity> findByAttributeAndValue(@Param("dataKey") String dataKey,
                                                 @Param("dataValue") String dataValue);
-
 
     List<MappingEntity> findByEntityTypeAndMapTypeIsNotNull(String entityType);
 
     List<MappingEntity> findByEntityTypeAndStatusIsNot(String entityType, String statusIsNot);
 
-
-
-
+    boolean existsByEntityId(Long entityId);
 
     @Query("SELECT distinct lower(mv), " +
             " count(case when me.status = 'unmapped' THEN 1 END) as unmapped, " +

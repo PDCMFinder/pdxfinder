@@ -128,56 +128,6 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     Collection<ModelCreation> findAllModelsPlatforms();
 
 
-
-    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-            "            WHERE  mc.dataSource = {dataSource}  " +
-            "            AND    mc.sourcePdxId = {modelId}  " +
-            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
-            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
-
-            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
-
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search}) " +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
-            "            RETURN count(*) ")
-    Integer variationCountByDataSourceAndPdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                          @Param("modelId") String modelId,
-                                                          @Param("tech") String tech,
-                                                          @Param("search") String search);
-
-
-    @Query("MATCH (mc:ModelCreation)--(psamp:Sample)-[char:CHARACTERIZED_BY]-(molch:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation)-[aw:MARKER]-(m:Marker) " +
-
-            "            WHERE  mc.dataSource = {dataSource}  " +
-            "            AND    mc.sourcePdxId = {modelId}  " +
-            "WITH mc, psamp, char, molch, assoc, mAss, aw, m " +
-            "MATCH (molch)-[pu:PLATFORM_USED]-(pl:Platform) " +
-
-            "            WHERE (pl.name = {tech}  OR {tech} = '' ) " +
-
-
-            "            OR toLower(m.hgncSymbol) CONTAINS toLower({search})" +
-            "            OR any( property in keys(mAss) where toLower(mAss[property]) CONTAINS toLower({search}) )  " +
-
-            "            RETURN mc,psamp,char,molch,mAss,m, pu, pl SKIP {skip} LIMIT {lim} ")
-    ModelCreation findVariationBySourcePdxIdAndPlatform(@Param("dataSource") String dataSource,
-                                                        @Param("modelId") String modelId,
-                                                        @Param("tech") String tech,
-                                                        @Param("search") String search,
-                                                        @Param("skip") int skip,
-                                                        @Param("lim") int lim);
-
-    @Query("MATCH (mc)-[msr:MODEL_SAMPLE_RELATION]-(s:Sample)-[cbr:CHARACTERIZED_BY]-(molChar:MolecularCharacterization)-[pur:PLATFORM_USED]-(p:Platform) " +
-            "WHERE mc.sourcePdxId={sourcePdxId}  AND p.name={platform} AND mc.dataSource = {dataSource} " +
-            "WITH mc, msr, s, cbr, molChar, pur, p " +
-
-            "OPTIONAL MATCH (molChar)-[assW:ASSOCIATED_WITH]-(mAss:MarkerAssociation) " +
-            "RETURN count(mAss) ")
-    Integer countMarkerAssociationBySourcePdxId(@Param("sourcePdxId") String sourcePdxId,
-                                                @Param("dataSource") String dataSource,
-                                                @Param("platform") String platform);
-
-
     @Query("MATCH (model:ModelCreation)--(s:Sample)--(molch:MolecularCharacterization) " +
             "WHERE id(molch) = {mc} " +
             "RETURN model")
@@ -208,19 +158,21 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
     List<ModelCreation> findModelPlatformSampleByDS(@Param("dataSource") String dataSource);
 
 
-    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) and mod.sourcePdxId = {modelId} " +
+    @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource}) " +
             "WITH mod " +
-            "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation) " +
+            "MATCH (mod)--(samp:Sample)-[cbr:CHARACTERIZED_BY]-(mc:MolecularCharacterization)-[assoc:ASSOCIATED_WITH]->(mAss:MarkerAssociation) " +
             "WHERE mc.type = {type}  "+
-            "WITH mod, iir, psamp, cbr, mc, assoc, mAss " +
+            "WITH mod, samp, cbr, mc, assoc, mAss " +
+            "OPTIONAL MATCH (mod)-[iir:IMPLANTED_IN]-(psamp:Sample) " +
+            "WITH iir, psamp, mod, samp, cbr, mc, assoc, mAss " +
             "OPTIONAL MATCH (mod)-[spr:SPECIMENS]-(sp:Specimen)-[sfr:SAMPLED_FROM]-(s:Sample)-[cbr2:CHARACTERIZED_BY]-(mc2:MolecularCharacterization)-[assoc2:ASSOCIATED_WITH]->(mAss2:MarkerAssociation) " +
             "WHERE mc2.type = {type} "+
-            "WITH mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, assoc, mAss, assoc2, mAss2 " +
+            "WITH iir, psamp, mod, samp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, assoc, mAss, assoc2, mAss2 " +
             "OPTIONAL MATCH (sp)-[hsr:HOST_STRAIN]-(hs:HostStrain) " +
             "OPTIONAL MATCH (mc)-[pur:PLATFORM_USED]-(pl:Platform) " +
             "OPTIONAL MATCH (mc2)-[pur2:PLATFORM_USED]-(pl2:Platform) " +
-            "RETURN mod, iir, psamp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
-    ModelCreation findModelWithMolecularDataByDSAndIdAndMolcharType(@Param("dataSource") String dataSource, @Param("modelId") String modelId, @Param("type") String type);
+            "RETURN mod, iir, psamp, samp, spr, sp, sfr, s, cbr, mc, mc2, cbr2, pur, pl, pur2, pl2, assoc, mAss, assoc2, mAss2, hsr, hs ")
+    List<ModelCreation> findModelsWithMolecularDataByDSAndMolcharType(@Param("dataSource") String dataSource, @Param("type") String type);
 
     @Query("MATCH (mod:ModelCreation) WHERE toLower(mod.dataSource) = toLower({dataSource})  " +
             "WITH mod SKIP {from} LIMIT {to}" +
@@ -259,10 +211,6 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN model, spr, sp, hsr, hs, sfr, s, psamp, ir, cbr, mc, pur, pl, cbr2, mc2, pur2, pl2")
     ModelCreation findBySourcePdxIdAndDataSourceWithSamplesAndSpecimensAndHostStrain(@Param("modelId") String modelId, @Param("dataSource") String dataSource);
 
-    @Query("CREATE INDEX ON :ModelCreation(dataSource, sourcePdxId)")
-    void createIndex();
-
-
     @Query("MATCH (model:ModelCreation)-[msr:MODEL_SAMPLE_RELATION]-(samp:Sample)-[cby:CHARACTERIZED_BY]-(molchar:MolecularCharacterization)-[asw:ASSOCIATED_WITH]-(massoc:MarkerAssociation)-[mark:MARKER]-(marker:Marker) WHERE molchar.type={molcharType} " +
             "RETURN model, msr, samp, cby, molchar, asw, massoc, mark, marker")
     List<ModelCreation> findByMolcharType(@Param("molcharType") String molcharType);
@@ -272,6 +220,19 @@ public interface ModelCreationRepository extends Neo4jRepository<ModelCreation, 
             "RETURN mod, tsr, ts, tpr, tp, tcr, tc, dr, d, mt, ot")
     Set<ModelCreation> getModelsTreatmentsAndDrugs(@Param("type") String type);
 
+    @Query("MATCH (model:ModelCreation)-[ii:IMPLANTED_IN]-(samp:Sample)--(ps:PatientSnapshot)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) " +
+            "WHERE model.dataSource = {dataSource} " +
+            "WITH model, ii, samp, ps, tsr, ts, tpr, tp, tcr, tc, dr, d " +
+            "OPTIONAL MATCH (tp)-[resp:RESPONSE]-(res:Response) " +
+            "RETURN model, ii, samp, ps, tsr, ts, tpr, tp, tcr, tc, dr, d,resp, res")
+    List<ModelCreation> findModelFromPatienSnapshotWithTreatmentSummaryByDataSource(@Param("dataSource")String dataSource);
+
+    @Query("MATCH(model:ModelCreation)-[tsr:SUMMARY_OF_TREATMENT]-(ts:TreatmentSummary)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)-[dr:TREATMENT]-(d:Treatment) " +
+            "WHERE toLower(model.dataSource) = toLower({dataSource}) " +
+            "WITH model,tsr, ts, tpr, tp, tcr, tc, dr, d " +
+            "OPTIONAL MATCH (tp)-[resp:RESPONSE]-(res:Response) " +
+            "RETURN model,tsr, ts, tpr, tp, tcr, tc, dr, d, res, resp" )
+    List<ModelCreation> findModelsWithTreatmentSummaryByDataSource(@Param("dataSource") String dataSource);
 }
 
 

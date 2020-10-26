@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <!--include configuration from spring boot's application properties-->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <!--suppress logback config logging-->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <appender name="Validator" class="ch.qos.logback.core.FileAppender">
+        <file>log/validation_errors.html</file>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                <pattern>%level%msg</pattern>
+                <cssBuilder class="ch.qos.logback.classic.html.UrlCssBuilder">
+                    <url>../web/src/main/resources/static/css/validationLog.css</url>
+                </cssBuilder>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="RollingLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/debug.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/archived/log_%d{dd-MM-yyyy}.log</fileNamePattern>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="RollingLog" />
+    </root>
+
+    <logger name="org.pdxfinder.dataloaders.updog.tablevalidation.Validator" level="ERROR">
+        <appender-ref ref="Validator" />
+    </logger>
+
+
+</configuration>

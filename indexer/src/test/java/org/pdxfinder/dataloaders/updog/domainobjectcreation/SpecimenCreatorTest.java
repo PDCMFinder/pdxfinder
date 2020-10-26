@@ -5,19 +5,15 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.pdxfinder.dataloaders.updog.TSV;
-import org.pdxfinder.graph.dao.EngraftmentMaterial;
-import org.pdxfinder.graph.dao.EngraftmentSite;
-import org.pdxfinder.graph.dao.EngraftmentType;
-import org.pdxfinder.graph.dao.HostStrain;
-import org.pdxfinder.graph.dao.Specimen;
+import org.pdxfinder.TSV;
+import org.pdxfinder.graph.dao.*;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class SpecimenCreatorTest {
 

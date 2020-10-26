@@ -1,14 +1,13 @@
 package org.pdxfinder.commandline;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.pdxfinder.dataloaders.*;
+import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.InitMappingDatabase;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
 import org.pdxfinder.postload.CreateDataProjections;
 import org.pdxfinder.postload.SetDataVisibility;
-import org.pdxfinder.postload.ValidateDB;
 import org.pdxfinder.services.DataImportService;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataProviderGroup;
@@ -37,20 +36,14 @@ public class FinderLoader {
     private LoadNCIT loadNCIT;
 
     // DataProvider Loading Components
-    private LoadHCI loadHCI;
     private LoadJAXData loadJAXData;
-    private LoadMDAnderson loadMDAnderson;
-    private LoadWISTAR loadWISTAR;
-    private LoadWUSTL loadWUSTL;
     private Updog updog;
 
     // PostLoad Components
-    private LoadAdditionalDatasets loadAdditionalDatasets;
     private LinkSamplesToNCITTerms linkSamplesToNCITTerms;
     private LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms;
     private CreateDataProjections createDataProjections;
     private SetDataVisibility setDataVisibility;
-    private ValidateDB validateDB;
 
     private InitMappingDatabase initMappingDatabase;
 
@@ -60,21 +53,13 @@ public class FinderLoader {
     public FinderLoader(LoadMarkers loadMarkers,
                         LoadNCITDrugs loadNCITDrugs,
                         LoadNCIT loadNCIT,
-
-                        LoadHCI loadHCI,
                         LoadJAXData loadJAXData,
-                        LoadMDAnderson loadMDAnderson,
-                        LoadPDMRData loadPDMRData,
-                        LoadWISTAR loadWISTAR,
-                        LoadWUSTL loadWUSTL,
                         Updog updog,
 
-                        LoadAdditionalDatasets loadAdditionalDatasets,
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
                         LinkTreatmentsToNCITTerms linkTreatmentsToNCITTerms,
                         CreateDataProjections createDataProjections,
                         SetDataVisibility setDataVisibility,
-                        ValidateDB validateDB,
                         DataImportService dataImportService,
                         ApplicationContext applicationContext,
                         InitMappingDatabase initMappingDatabase) {
@@ -83,19 +68,13 @@ public class FinderLoader {
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
 
-        this.loadHCI = loadHCI;
         this.loadJAXData = loadJAXData;
-        this.loadMDAnderson = loadMDAnderson;
-        this.loadWISTAR = loadWISTAR;
-        this.loadWUSTL = loadWUSTL;
         this.updog = updog;
 
-        this.loadAdditionalDatasets = loadAdditionalDatasets;
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
         this.linkTreatmentsToNCITTerms = linkTreatmentsToNCITTerms;
         this.createDataProjections = createDataProjections;
         this.setDataVisibility = setDataVisibility;
-        this.validateDB = validateDB;
 
         this.initMappingDatabase = initMappingDatabase;
 
@@ -181,23 +160,10 @@ public class FinderLoader {
     ) {
         List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
-            switch (dataProvider) {
-                case PDXNet_HCI_BCM:
-                    loadHCI.run();
-                    break;
-                case JAX:
-                    loadJAXData.run();
-                    break;
-                case PDXNet_MDAnderson:
-                    loadMDAnderson.run();
-                    break;
-                case PDXNet_Wistar_MDAnderson_Penn:
-                    loadWISTAR.run();
-                    break;
-                case PDXNet_WUSTL:
-                    loadWUSTL.run();
-                    break;
-                default:
+            if (dataProvider.equals(DataProvider.JAX)) {
+                loadJAXData.run();
+            }
+            else{
                     if (updogProviders.contains(dataProvider)) {
                         Path updogDirectory = Paths.get(
                             dataDirectory.toString(),
@@ -222,7 +188,6 @@ public class FinderLoader {
             linkTreatmentsToNCITTerms.run();
             createDataProjections.run();
             setDataVisibility.run();
-            validateDB.run();
         }
     }
     

@@ -7,11 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.*;
-import java.util.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class LoadMarkers {
@@ -27,7 +32,7 @@ public class LoadMarkers {
     public void loadGenes(String dataURL) {
         Instant start = Instant.now();
 
-        log.info("Downloading latest marker data from {}...", dataURL);
+        log.info("Downloading latest marker data from {}...", dataURL.substring(0, 50));
         BufferedReader reader = downloadDataFromURL(dataURL);
         List<Marker> markers = parseMarkers(reader);
         dataImportService.saveAllMarkers(markers);

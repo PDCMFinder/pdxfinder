@@ -32,7 +32,7 @@ public enum OmicCSVColumn {
 
     private String value;
 
-    private OmicCSVColumn(String val) {
+    OmicCSVColumn(String val) {
         value = val;
     }
 

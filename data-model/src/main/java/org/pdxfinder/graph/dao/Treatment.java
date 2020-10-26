@@ -1,8 +1,9 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /*
  * Created by csaba on 08/05/2019.
@@ -11,7 +12,8 @@ import org.neo4j.ogm.annotation.Relationship;
 public class Treatment {
 
 
-    @GraphId
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;

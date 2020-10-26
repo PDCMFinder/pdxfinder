@@ -131,10 +131,12 @@ public class Statistics {
 
             // Populate the chartData category List
             categories.add(StatisticsDTO.getCategory());
-
-            StatisticsDTO.getDataCounts().forEach(CountDTO -> {
-                dataMap.get(CountDTO.getKey()).add(CountDTO.getValue());
-            });
+            if(StatisticsDTO.getDataCounts()!= null){
+                StatisticsDTO.getDataCounts().forEach(CountDTO -> {
+                    if(CountDTO != null && CountDTO.getKey() != null && dataMap.containsKey(CountDTO.getKey()))
+                        dataMap.get(CountDTO.getKey()).add(CountDTO.getValue());
+                });
+            }
 
         });
 

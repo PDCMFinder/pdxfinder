@@ -3,14 +3,18 @@ package org.pdxfinder.dataloaders.updog;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
 import org.pdxfinder.dataloaders.updog.tablevalidation.*;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class Updog {
