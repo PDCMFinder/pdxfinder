@@ -17,9 +17,11 @@
 
 
     <dependencies>
+
         <dependency>
-            <groupId>org.pdxfinder</groupId>
-            <artifactId>data-model</artifactId>
+        <groupId>org.pdxfinder</groupId>
+        <artifactId>Data-Model</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
