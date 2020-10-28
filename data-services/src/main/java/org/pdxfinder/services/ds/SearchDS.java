@@ -2,13 +2,9 @@ package org.pdxfinder.services.ds;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
+import com.github.openjson.*;
 import org.pdxfinder.graph.dao.DataProjection;
 import org.pdxfinder.graph.repositories.DataProjectionRepository;
-import org.pdxfinder.services.search.WebFacetSection;
-import org.pdxfinder.services.search.WebFacetContainer;
 import org.pdxfinder.services.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +15,6 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 
 import static java.lang.Long.parseLong;
 
@@ -250,6 +245,9 @@ public class SearchDS {
         pdxModelSection.addComponent(datasource);
         facetOptionMap.put("datasource", datasourceOptions);
 
+        OneParamTextFilter modelId = new OneParamTextFilter("MODEL ID", "model_id", false,
+                FilterType.OneParamTextFilter.get(), "MODEL", getUniqueModelIds(), new ArrayList<>());
+        pdxModelSection.addComponent(modelId);
 
         //project filter def
         Set<String> projectsSet = new HashSet<>();
@@ -693,6 +691,9 @@ public class SearchDS {
                     result = cytogeneticsSearch.search(filters.get(SearchFacetName.cytogenetics), result, ModelForQuery::addCytogenetics);
                     break;
 
+                case model_id:
+                    result = oneParamCheckboxSearch.searchOnString(null, filters.get(SearchFacetName.model_id), result, ModelForQuery::getExternalId);
+
                 default:
                     //undexpected filter option
                     log.warn("Unrecognised facet {} passed to search, skipping", facet.getName());
@@ -726,8 +727,15 @@ public class SearchDS {
         this.models = models;
     }
 
+    public List<String> getModelIds(){
 
+        return models.stream().distinct().map(s->s.getExternalId()).collect(Collectors.toList());
+    }
 
+    public List<String> getUniqueModelIds(){
+
+        return getModelIds().stream().distinct().collect(Collectors.toList());
+    }
 
     /**
      * This method loads the ModelForQuery Data Projection object and initializes the models

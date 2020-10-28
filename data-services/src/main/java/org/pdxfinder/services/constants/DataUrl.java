@@ -16,7 +16,7 @@ public enum DataUrl {
 
     private String value;
 
-    private DataUrl(String val) {
+    DataUrl(String val) {
         value = val;
     }
 

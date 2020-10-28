@@ -1,15 +1,15 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.junit.Test;
-import org.mockito.Mock;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.*;
-import org.slf4j.Logger;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.EmptyValueError;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.EmptyValueErrorCreator;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
 import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ErrorReporterTest {
 

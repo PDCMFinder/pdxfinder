@@ -2,11 +2,14 @@ package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.Table;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class Validator {
@@ -27,14 +30,7 @@ public class Validator {
         TableSetSpecification tableSetSpecification
     ) {
         checkRequiredTablesPresent(tableSet, tableSetSpecification);
-        if (CollectionUtils.isNotEmpty(validationErrors)) {
-            log.error(
-                "Not all required tables where present for {}. Aborting further validation",
-                tableSetSpecification.getProvider());
-            return validationErrors;
-        }
         performColumnValidations(tableSet, tableSetSpecification);
-
         return validationErrors;
     }
 
@@ -42,10 +38,23 @@ public class Validator {
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
+        if (thereAreErrors(validationErrors, tableSetSpecification)) return;
         checkRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
         checkAllUniqueColumnsForDuplicates(tableSet, tableSetSpecification);
         checkRelationsValid(tableSet, tableSetSpecification);
+    }
+
+    private boolean thereAreErrors(
+        List<ValidationError> validationErrors,
+        TableSetSpecification tableSetSpecification
+    ) {
+        if (CollectionUtils.isNotEmpty(validationErrors)) {
+            log.error(
+                "Not all required tables where present for {}. Aborting further validation",
+                tableSetSpecification.getProvider());
+        }
+        return CollectionUtils.isNotEmpty(validationErrors);
     }
 
     private void checkRequiredTablesPresent(
@@ -94,6 +103,15 @@ public class Validator {
 
     List<ValidationError> getValidationErrors() {
         return this.validationErrors;
+    }
+
+    public static void reportAnyErrors(List<ValidationError> validationErrors) {
+        if (CollectionUtils.isNotEmpty(validationErrors))
+            for (ValidationError error : validationErrors) {
+                log.error(error.message());
+            }
+        else
+            log.info("There were no validation errors raised, great!");
     }
 
 }

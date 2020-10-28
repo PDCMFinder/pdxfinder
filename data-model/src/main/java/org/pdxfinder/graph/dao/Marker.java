@@ -3,9 +3,9 @@ package org.pdxfinder.graph.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 

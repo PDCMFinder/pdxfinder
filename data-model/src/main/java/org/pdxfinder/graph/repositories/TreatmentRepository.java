@@ -23,15 +23,6 @@ public interface TreatmentRepository extends Neo4jRepository<Treatment, Long> {
     int findPatientTreatmentNumberByDS(@Param("ds") String ds);
 
 
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) RETURN count(ts) ")
-    int findModelTreatmentNumber();
-
-    @Query("MATCH (mod:ModelCreation)--(ts:TreatmentSummary) " +
-            "WHERE mod.dataSource = {ds} "+
-            "RETURN count(ts) ")
-    int findModelTreatmentNumberByDS(@Param("ds") String ds);
-
-
     @Query("MATCH (ps:PatientSnapshot)--(ts:TreatmentSummary)" +
             "WITH ts  SKIP {from} LIMIT {batch}"+
             "MATCH (ts)-[tpr:TREATMENT_PROTOCOL]-(tp:TreatmentProtocol)-[tcr:TREATMENT_COMPONENT]-(tc:TreatmentComponent)--(tr:Treatment) "+
@@ -62,7 +53,5 @@ public interface TreatmentRepository extends Neo4jRepository<Treatment, Long> {
             "where gr.type='Provider' " +
             "return COLLECT(distinct gr.abbreviation+ '___' + toLower(t.name)) as abbrAndTreatmentName")
     TreatmentMappingData getUnmappedPatientTreatments();
-
-
 
 }

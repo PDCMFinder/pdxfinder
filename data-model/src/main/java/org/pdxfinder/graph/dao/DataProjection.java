@@ -1,6 +1,7 @@
 package org.pdxfinder.graph.dao;
 
-import org.neo4j.ogm.annotation.GraphId;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /*
@@ -9,7 +10,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class DataProjection {
 
-    @GraphId
+    @Id @GeneratedValue
     private Long id;
 
     private String label;

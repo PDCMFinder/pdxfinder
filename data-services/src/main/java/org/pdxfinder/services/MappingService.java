@@ -3,19 +3,18 @@ package org.pdxfinder.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.json.JSONArray;
-import org.neo4j.ogm.json.JSONException;
-import org.neo4j.ogm.json.JSONObject;
-import org.pdxfinder.services.mapping.MappingContainer;
 import org.pdxfinder.graph.dao.OntologyTerm;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
-import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.graph.repositories.SampleRepository;
+import org.pdxfinder.rdbms.dao.MappingEntity;
 import org.pdxfinder.rdbms.repositories.MappingEntityRepository;
 import org.pdxfinder.services.dto.PaginationDTO;
 import org.pdxfinder.services.mapping.CSV;
+import org.pdxfinder.services.mapping.MappingContainer;
 import org.pdxfinder.services.mapping.MappingEntityType;
 import org.pdxfinder.services.mapping.Status;
 import org.pdxfinder.services.zooma.*;
@@ -31,7 +30,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,7 +56,6 @@ public class MappingService {
 
     @Value("${data-dir}")
     private String rootDir;
-
 
     @Value("${mappings.mappedTermUrl}")
     private String knowledgBaseURL;
@@ -122,10 +123,7 @@ public class MappingService {
         Map<String, List<MappingEntity>> mappings = new HashMap<>();
         mappings.put("mappings", maprules);
 
-        Gson gson = new Gson();
-        String json = gson.toJson(mappings);
-
-
+        String json = JSONObject.wrap(mappings).toString();
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
 
@@ -664,7 +662,9 @@ public class MappingService {
             for (String mappingLabel : mappingLabels) {
 
                 /* ZOOMA PROPERTY DATA */
-                Property property = new Property(mappingLabel, StringUtils.upperCase(mappingValues.get(mappingLabel)));
+                Property property = new org.pdxfinder.services.zooma.Property(
+                    mappingLabel,
+                    StringUtils.upperCase(mappingValues.get(mappingLabel)));
 
                 List<String> annotations = new ArrayList<>();
 
@@ -809,34 +809,40 @@ public class MappingService {
 
     public void writeMappingsToFile(String entityType) {
 
+        if (!containsSpecialCharacters(entityType)) throw new IllegalArgumentException("EntityType contains illegal characters");
+        else {
+            String jsonKey = "mappings";
+            String mappingFile = rootDir + "/mapping/" + entityType + "_mappings.json";
 
-        String jsonKey = "mappings";
+            // Generate Unique name to back up previous mapping file
+            String baseDirectory = rootDir + "/mapping/backup/";
+            String backupPreviousMappingFile = baseDirectory + entityType + "/" +
+                    (new Date()).toString().replaceAll(" ", "-") + "-" + entityType + "_mappings.json";
 
-        String mappingFile = rootDir + "/mapping/" + entityType + "_mappings.json";
+            // Back up previous mapping file before replacement
+            utilityService.moveFile(mappingFile, backupPreviousMappingFile);
 
-        // Generate Unique name to back up previous mapping file
-        String backupPreviousMappingFile = rootDir + "/mapping/backup/" + entityType + "/" +
-                (new Date()).toString().replaceAll(" ", "-") + "-" + entityType + "_mappings.json";
 
-        // Back up previous mapping file before replacement
-        utilityService.moveFile(mappingFile, backupPreviousMappingFile);
+            // Get Latest mapped terms from the data base
+            List<MappingEntity> mappingEntities = mappingEntityRepository.findByEntityTypeAndStatusIsNot(entityType, "unmapped");
 
-        // Get Latest mapped terms from the data base
-        List<MappingEntity> mappingEntities = mappingEntityRepository.findByEntityTypeAndStatusIsNot(entityType, "unmapped");
+            Map dataMap = new HashMap();
+            dataMap.put(jsonKey, mappingEntities);
 
-        Map dataMap = new HashMap();
+            // Write latest mapped terms to the file system
+            try {
 
-        dataMap.put(jsonKey, mappingEntities);
+                String newFile = mapper.writeValueAsString(dataMap);
+                utilityService.writeToFile(newFile, mappingFile, false);
 
-        // Write latest mapped terms to the file system
-        try {
-
-            String newFile = mapper.writeValueAsString(dataMap);
-            utilityService.writeToFile(newFile, mappingFile, false);
-
-        } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException e) {
+            }
         }
 
+    }
+
+    private boolean containsSpecialCharacters(String input){
+        return input.matches("^[A-Za-z0-9-_]*$");
     }
 
 
@@ -861,7 +867,9 @@ public class MappingService {
         // requested page is either +ve or forced to default page
         int start = (page > 0) ? page - 1 : 0;
 
-        pageable = new PageRequest(start, size, direction, sortColumn);
+        Sort sort = Sort.by(direction, sortColumn);
+
+        pageable = PageRequest.of(start, size, sort);
 
         Page<MappingEntity> mappingEntityPage = mappingEntityRepository.findByMultipleFilters(entityType, mappingLabel, mappingValue, mappedTermLabel, mapType, mappedTermsOnly, status, pageable);
 
@@ -952,7 +960,7 @@ public class MappingService {
 
     public boolean checkExistence(Long entityId) {
 
-        return mappingEntityRepository.exists(entityId);
+        return mappingEntityRepository.existsByEntityId(entityId);
 
     }
 
@@ -1049,11 +1057,10 @@ public class MappingService {
         });
 
         return savedEntities;
-
     }
 
-
-
-
+    public void setRootDir(String rootDir) {
+        this.rootDir = rootDir;
+    }
 
 }

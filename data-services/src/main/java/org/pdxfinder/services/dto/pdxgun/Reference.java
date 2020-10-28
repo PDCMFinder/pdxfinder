@@ -1,7 +1,5 @@
 package org.pdxfinder.services.dto.pdxgun;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Map;
 
 public class Reference {

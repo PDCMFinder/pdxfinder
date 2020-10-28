@@ -14,8 +14,6 @@ import java.util.Set;
 @Repository
 public interface PlatformAssociationRepository extends PagingAndSortingRepository<PlatformAssociation, Long> {
 
-    Set<PlatformAssociation> findAllByPlatform_Name(@Param("name") String name);
-
     @Query("MATCH (pa:PlatformAssociation), (p:Platform), (ds:Group) WHERE (pa)--(p)--(ds) AND ds.name = {name} AND ds.type='Provider' RETURN pa")
     Set<PlatformAssociation> findByPlatform_ExternalDataSource_Name(@Param("name") String name);
 

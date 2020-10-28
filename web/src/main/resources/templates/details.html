@@ -36,7 +36,6 @@
 
     <link rel="stylesheet" th:href="@{/css/app.min.css}" type="text/css" media="all"/>
     <link rel="stylesheet" th:href="@{/css/customStyles.css}" type="text/css" media="all"/>
-    <link rel="stylesheet" th:href="@{/icons/foundation-icons.css}" type="text/css" media="all"/>
 
     <!-- end CSS-->
 
@@ -752,7 +751,10 @@
                                                         <a th:if="${dataRow.platformUsedUrl != null or dataRow.platformUsedLabel == ''}" target="_blank"
                                                            style="color: #06369d; text-decoration: none;"
                                                            th:text="${#strings.replace(dataRow.platformUsedLabel,'_',' ')}"
-                                                           th:onclick="'window.open(\''+${dataRow.platformUsedUrl}+'\')'">
+                                                           th:data-platformurl="${dataRow.platformUsedUrl}"
+
+
+                                                           onclick="openNewWindow(this.getAttribute('data-platformurl'));">
                                                             ...
                                                         </a>
                                                         <span th:if="${dataRow.platformUsedUrl == null}" th:text="${dataRow.platformUsedLabel}"></span>
@@ -760,7 +762,7 @@
                                                     <td>
                                                         <a th:text="${dataRow.rawDataLabel}"
                                                            style="color: #06369d; text-decoration: none;"
-                                                           th:onclick="'window.open(\' '+${dataRow.rawDataLink}+'\')'">
+                                                           th:attr="onclick=|window.open('${dataRow.rawDataLink}')|">
                                                             ...
                                                         </a>
                                                         <span th:if="${dataRow.rawDataLink == ''} " th:text="'Not Available'" ></span>

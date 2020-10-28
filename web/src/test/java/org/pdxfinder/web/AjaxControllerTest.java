@@ -2,30 +2,23 @@ package org.pdxfinder.web;
 
 import static org.hamcrest.Matchers.*;
 
-import org.apache.http.entity.ContentType;
-import org.hamcrest.Matchers;
+
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-
-import static org.mockito.BDDMockito.given;
 
 /*
  * Created by abayomi on 03/07/2019.
@@ -54,7 +47,7 @@ public class AjaxControllerTest extends BaseTests {
     public void getMolecularDataStatAPIOK() throws Exception {
         String urlTemplate = "/statistics/molecular-data";
         this.mockMvc.perform(get(urlTemplate)).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.title").exists())
                 .andExpect(jsonPath("$.title.text", is("")))
                 .andExpect(jsonPath("$.xAxis").exists())
@@ -78,7 +71,7 @@ public class AjaxControllerTest extends BaseTests {
     public void getTreatmentStatAPIOK() throws Exception {
         String urlTemplate = "/statistics/patient-treatment/patients";
         this.mockMvc.perform(get(urlTemplate)).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.title").exists())
                 .andExpect(jsonPath("$.title.text").value("PDX Models Treatment Data"))
                 .andExpect(jsonPath("$.xAxis").exists())

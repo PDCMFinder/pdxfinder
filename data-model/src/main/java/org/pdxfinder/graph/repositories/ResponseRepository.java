@@ -13,9 +13,6 @@ import java.util.List;
 @Repository
 public interface ResponseRepository extends PagingAndSortingRepository<Response, Long>{
 
-    @Query("MATCH (r:Response) RETURN DISTINCT r.description")
-    List<String> findAllResponses();
-
     @Query("MATCH (m:ModelCreation)--(ts:TreatmentSummary)--(tp:TreatmentProtocol)--(r:Response) RETURN DISTINCT r.description")
     List<String> findAllSpecimenDrugResponses();
 

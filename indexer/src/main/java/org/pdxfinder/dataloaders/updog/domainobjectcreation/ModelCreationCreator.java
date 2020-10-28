@@ -1,6 +1,6 @@
 package org.pdxfinder.dataloaders.updog.domainobjectcreation;
 
-import org.pdxfinder.dataloaders.updog.TSV;
+import org.pdxfinder.TSV;
 import org.pdxfinder.graph.dao.Group;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.Sample;

@@ -63,13 +63,18 @@ public class OmicTransformationService {
     }
 
     public String ncbiGeneIdToHgncSymbol(String ncbiGene) {
-        String hgncSymbol = geneIdCache.get(ncbiGene);
-        if (hgncSymbol == null) {
-            Marker marker = dataImportService.getMarkerbyNcbiGeneId(ncbiGene);
-            if (marker.hasHgncSymbol()) {
-                hgncSymbol = marker.getHgncSymbol();
-                geneIdCache.put(ncbiGene, hgncSymbol);
-            } else { log.warn("No marker found for NCBI gene Id {} Cannot generate Hgnc symbol", ncbiGene); }
+        String hgncSymbol = "";
+        if (!ncbiGene.isEmpty()) {
+            hgncSymbol = geneIdCache.get(ncbiGene);
+            if (hgncSymbol == null) {
+                Marker marker = dataImportService.getMarkerbyNcbiGeneId(ncbiGene);
+                if (marker != null && marker.hasHgncSymbol()) {
+                    hgncSymbol = marker.getHgncSymbol();
+                    geneIdCache.put(ncbiGene, hgncSymbol);
+                } else {
+                    log.warn("No marker found for NCBI gene Id {} Cannot generate Hgnc symbol", ncbiGene);
+                }
+            }
         }
         return hgncSymbol;
     }
