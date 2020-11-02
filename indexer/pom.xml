@@ -17,11 +17,6 @@
     <dependencies>
         <dependency>
             <groupId>org.pdxfinder</groupId>
-            <artifactId>data-model</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.pdxfinder</groupId>
             <artifactId>data-services</artifactId>
         </dependency>
 
