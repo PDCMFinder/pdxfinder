@@ -73,7 +73,7 @@
         </dependency>
         <dependency>
             <groupId>org.pdxfinder</groupId>
-            <artifactId>Data-Model</artifactId>
+            <artifactId>data-model</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
