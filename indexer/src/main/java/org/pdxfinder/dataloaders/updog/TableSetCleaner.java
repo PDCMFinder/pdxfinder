@@ -18,7 +18,7 @@ public class TableSetCleaner {
         pdxTableSet = TableSetUtilities.removeBlankRows(pdxTableSet);
         List<String> columnsExceptFromDeepCleaning = Arrays.
                 asList("model_id", "sample_id","patient_id", "name", "validation_host_strain_full", "provider_name",
-                        "name", "abbreviation", "internal_url", "internal_dosing_url");
+                        "name", "provider_abbreviation", "project", "internal_url", "internal_dosing_url");
         pdxTableSet = TableSetUtilities.cleanValues(pdxTableSet, columnsExceptFromDeepCleaning);
         return pdxTableSet;
     }
