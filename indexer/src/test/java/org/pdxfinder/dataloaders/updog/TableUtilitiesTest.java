@@ -5,10 +5,10 @@ import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.pdxfinder.dataloaders.updog.TableUtilities.removeHeaderRows;
-import static org.pdxfinder.dataloaders.updog.TableUtilities.removeRowsMissingRequiredColumnValue;
+import static org.pdxfinder.dataloaders.updog.TableUtilities.*;
 
 public class TableUtilitiesTest {
 
@@ -47,6 +47,38 @@ public class TableUtilitiesTest {
             removeHeaderRows(table, 1).toString()
         );
     }
+
+    @Test public void removeSpacesAndLowerCase_GivenAColumnWithPaddingSpacesAndUppercase_returnsCleanedStrings(){
+        Table table = Table.create().addColumns(
+                StringColumn.create("column_1", Arrays.asList(" PADDEDSTRING ", " PADDEDSTRING_1 ")));
+        Table expected = Table.create().addColumns(
+                StringColumn.create("column_1", Arrays.asList("paddedstring", "paddedstring_1")));
+
+        assertEquals(
+               expected.toString(),
+               cleanTableValues(table, table.name(), Collections.singletonList("")).toString()
+        );
+    }
+
+    @Test public void doNotCleanExceptionColumns_GivenATableWithTwoColumns_returnsUncleanedExceptions(){
+        String exceptionColumn = "exception_column";
+        Table table = Table.create().addColumns(
+                StringColumn.create("column_1", Arrays.asList(" PADDEDSTRING ", " PADDEDSTRING_1 ")),
+                StringColumn.create(exceptionColumn, Arrays.asList(" PADDEDSTRING ", " PADDEDSTRING_1 ")
+                ));
+        Table expected = Table.create().addColumns(
+                StringColumn.create("column_1", Arrays.asList("paddedstring", "paddedstring_1")),
+                StringColumn.create(exceptionColumn, Arrays.asList("PADDEDSTRING", "PADDEDSTRING_1")
+                ));
+
+        assertEquals(
+                expected.toString(),
+                cleanTableValues(table, table.name(), Collections.singletonList(exceptionColumn)).toString()
+        );
+    }
+
+
+
 
     @Test public void removeHeaderRows_givenTableWithTypicalHeader_removesHeaderRows() {
         Table expected = Table.create().addColumns(
@@ -143,5 +175,4 @@ public class TableUtilitiesTest {
             table2.toString()
         );
     }
-
 }
