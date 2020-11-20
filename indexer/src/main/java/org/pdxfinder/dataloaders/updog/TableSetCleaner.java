@@ -3,6 +3,8 @@ package org.pdxfinder.dataloaders.updog;
 import org.springframework.stereotype.Service;
 import tech.tablesaw.api.Table;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -14,6 +16,10 @@ public class TableSetCleaner {
         TableSetUtilities.removeDescriptionColumn(pdxTableSet);
         pdxTableSet = TableSetUtilities.removeHeaderRows(pdxTableSet);
         pdxTableSet = TableSetUtilities.removeBlankRows(pdxTableSet);
+        List<String> columnsExceptFromDeepCleaning = Arrays.
+                asList("model_id", "sample_id","patient_id", "name", "validation_host_strain_full", "provider_name",
+                        "name", "abbreviation", "internal_url", "internal_dosing_url");
+        pdxTableSet = TableSetUtilities.cleanValues(pdxTableSet, columnsExceptFromDeepCleaning);
         return pdxTableSet;
     }
 
