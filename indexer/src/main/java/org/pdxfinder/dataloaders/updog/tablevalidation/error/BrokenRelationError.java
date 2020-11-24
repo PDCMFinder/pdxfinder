@@ -36,9 +36,10 @@ public class BrokenRelationError implements ValidationError {
     @Override
     public String message() {
         return String.format(
-            "Error in [%s] for provider [%s]: Broken relation [%s]: %s",
+            "Error in [%s] for provider [%s]: Broken %s relation [%s]: %s",
             tableName,
             provider,
+            relation.getValidity().name(),
             relation,
             description
         );

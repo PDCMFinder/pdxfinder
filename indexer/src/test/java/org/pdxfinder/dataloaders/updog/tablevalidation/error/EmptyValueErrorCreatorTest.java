@@ -23,7 +23,7 @@ public class EmptyValueErrorCreatorTest {
     private final String TABLE_1 = "table_1.tsv";
     private final String LEFT_TABLE = "left_table.tsv";
     private final String RIGHT_TABLE = "right_table.tsv";
-    private final Relation RELATION = Relation.between(
+    private final Relation RELATION = Relation.betweenTableKeys(
         ColumnReference.of(LEFT_TABLE, "id"),
         ColumnReference.of(RIGHT_TABLE, "table_1_id")
     );

@@ -1,5 +1,8 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.lang3.tuple.Pair;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
@@ -9,9 +12,11 @@ import org.springframework.stereotype.Component;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class BrokenRelationErrorCreator extends ErrorCreator {
@@ -44,8 +49,50 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
         TableSetSpecification tableSetSpecification
     ) {
         reportMissingColumnsInRelation(tableSet, relation, tableSetSpecification.getProvider());
-        reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, tableSetSpecification.getProvider());
+
+        Relation.validityType validity = relation.getValidity();
+        if(validity.equals(Relation.validityType.table_key)) {
+            reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, tableSetSpecification.getProvider());
+        }
+        else if(validity.equals(Relation.validityType.one_to_many)){
+            reportBrokenOneToManyRelation(tableSet,relation, tableSetSpecification.getProvider());
+        }
     }
+
+    private void reportBrokenOneToManyRelation(
+            Map<String, Table> tableSet,
+            Relation relation,
+            String provider
+    ){
+        if (bothColumnsPresent(tableSet, relation)) {
+            ColumnReference leftColumn = relation.leftColumnReference();
+            ColumnReference rightColumn = relation.getOtherColumn(leftColumn);
+            StringColumn oneRestrictedColumn = tableSet.get(rightColumn.table()).stringColumn(leftColumn.column());
+            StringColumn manyRestrictedColumn = tableSet.get(leftColumn.table()).stringColumn(rightColumn.column());
+            MultiValuedMap<String, Pair<String, String>> columnPairs = new HashSetValuedHashMap<>();
+            for (int i = 0; i < manyRestrictedColumn.size(); i++) {
+                columnPairs.put(oneRestrictedColumn.get(i), Pair.of(manyRestrictedColumn.get(i), oneRestrictedColumn.get(i)));
+            }
+            List<Pair<String, String>> listOfBrokenPairs = oneRestrictedColumn.asList().stream()
+                    .filter(x -> oneRestrictedColumn.countOccurrences(x) > 1)
+                    .map(columnPairs::get)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+            Table workingTable = tableSet.get(leftColumn.table());
+            int[] invalidRows = oneRestrictedColumn.asList().stream()
+                    .filter(x -> oneRestrictedColumn.countOccurrences(x) > 1)
+                    .map(oneRestrictedColumn::indexOf)
+                    .mapToInt(x -> x)
+                    .toArray();
+            if (listOfBrokenPairs.size() > 0) {
+                String description = String
+                        .format("in [%s] one-to-many found %s relationships with conflicts %s",
+                                leftColumn.table(), listOfBrokenPairs.size(), listOfBrokenPairs.toString());
+                errors.add(create(leftColumn.table(), relation, workingTable.rows(invalidRows), description, provider));
+            }
+        }
+    }
+
 
     private void reportMissingColumnsInRelation(Map<String, Table> tableSet, Relation relation, String provider) {
         if (tableSet.get(relation.leftTable()) == null || tableSet.get(relation.rightTable()) == null) return;
