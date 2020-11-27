@@ -20,14 +20,19 @@ public class BrokenRelationErrorCreatorTest {
 
     private final String LEFT_TABLE = "left_table.tsv";
     private final String RIGHT_TABLE = "right_table.tsv";
-    private final String LEFT_TABLE_COLUMN2 = "table_column2";
     private final Relation INTER_TABLE_RELATION = Relation.betweenTableKeys(
             ColumnReference.of(LEFT_TABLE, "id"),
             ColumnReference.of(RIGHT_TABLE, "table_1_id")
     );
 
-    private final Relation INTRA_TABLE_RELATION = Relation.betweenTableColumns(
+    private final Relation INTRA_TABLE_ONE_TO_MANY = Relation.betweenTableColumns(
             Relation.validityType.one_to_many,
+            ColumnReference.of(LEFT_TABLE, "id"),
+            ColumnReference.of(LEFT_TABLE, "table_1_id")
+    );
+
+    private final Relation INTRA_TABLE_ONE_TO_ONE = Relation.betweenTableColumns(
+            Relation.validityType.one_to_one,
             ColumnReference.of(LEFT_TABLE, "id"),
             ColumnReference.of(LEFT_TABLE, "table_1_id")
     );
@@ -44,33 +49,14 @@ public class BrokenRelationErrorCreatorTest {
         tableSetWithSimpleJoin.put(RIGHT_TABLE, rightTable);
         return tableSetWithSimpleJoin;
     }
-
-    private Map<String, Table> makeTableSetWithIntraTableRelations() {
-        Table leftTable = Table.create(LEFT_TABLE).addColumns(
-                StringColumn.create("id", Arrays.asList("1", "2", "3")),
-                StringColumn.create("table_1_id", Arrays.asList("1","1","1"))
-        );
-        Map<String, Table> tableSetWithManyToOne = new HashMap<>();
-        tableSetWithManyToOne.put(LEFT_TABLE, leftTable);
-        return tableSetWithManyToOne;
-    }
-
-    private Map<String, Table> makeTableSetWithBrokenIntraTableRelations() {
-        Table leftTable = Table.create(LEFT_TABLE).addColumns(
-                StringColumn.create("id", Arrays.asList("1","1","1")),
-                StringColumn.create("table_1_id", Arrays.asList("1", "2", "3"))
-        );
-        Map<String, Table> tableSetWithManyToOne = new HashMap<>();
-        tableSetWithManyToOne.put(LEFT_TABLE, leftTable);
-        return tableSetWithManyToOne;
-    }
-
-
     private final TableSetSpecification SIMPLE_JOIN_SPECIFICATION = TableSetSpecification.create().setProvider(PROVIDER)
             .addRelations(INTER_TABLE_RELATION);
 
     private final TableSetSpecification ONE_TO_MANY_SPECIFICATION = TableSetSpecification.create().setProvider(PROVIDER)
-            .addRelations(INTRA_TABLE_RELATION);
+            .addRelations(INTRA_TABLE_ONE_TO_MANY);
+
+    private final TableSetSpecification ONE_TO_ONE_SPECIFICATION = TableSetSpecification.create().setProvider(PROVIDER)
+            .addRelations(INTRA_TABLE_ONE_TO_ONE);
 
     @Test(expected = Test.None.class)
     public void checkRelationsValid_givenNoRightTable_noExceptionThrown() {
@@ -90,15 +76,50 @@ public class BrokenRelationErrorCreatorTest {
 
     @Test(expected = Test.None.class)
     public void oneToManyNoError_givenValidOneToManyJoin_emptyErrorList() {
-        Map<String, Table> tableSetWithOneToMany = makeTableSetWithIntraTableRelations();
+        Table leftTable = Table.create(LEFT_TABLE).addColumns(
+                StringColumn.create("id", Arrays.asList("1", "2", "3")),
+                StringColumn.create("table_1_id", Arrays.asList("1","1","1"))
+        );
+        Map<String, Table> tableSetWithOneToMany = new HashMap<>();
+        tableSetWithOneToMany.put(LEFT_TABLE, leftTable);
         assertThat(brokenInterTableRelationErrorCreator.generateErrors(tableSetWithOneToMany, ONE_TO_MANY_SPECIFICATION).isEmpty(),
                 is(true));
+
     }
 
     @Test(expected = Test.None.class)
     public void oneToManyError_givenInvalidValidOneToManyJoin_hasErrorEntry() {
-        Map<String, Table> tableSetWithOneToMany = makeTableSetWithBrokenIntraTableRelations();
-        assertThat(brokenInterTableRelationErrorCreator.generateErrors(tableSetWithOneToMany, ONE_TO_MANY_SPECIFICATION).isEmpty(),
+        Table leftTable = Table.create(LEFT_TABLE).addColumns(
+                StringColumn.create("id", Arrays.asList("1","1","1")),
+                StringColumn.create("table_1_id", Arrays.asList("1", "2", "3"))
+        );
+        Map<String, Table> tableSetWithOneToManyWithErrors = new HashMap<>();
+        tableSetWithOneToManyWithErrors.put(LEFT_TABLE, leftTable);
+        assertThat(brokenInterTableRelationErrorCreator.generateErrors(tableSetWithOneToManyWithErrors, ONE_TO_MANY_SPECIFICATION).isEmpty(),
+                is(false));
+    }
+
+    @Test(expected = Test.None.class)
+    public void oneToOne_givenValidPairOfColumns_hasNoErrorEntry() {
+        Table leftTable = Table.create(LEFT_TABLE).addColumns(
+                StringColumn.create("id", Arrays.asList("1","2","3")),
+                StringColumn.create("table_1_id", Arrays.asList("3","2","1"))
+        );
+        Map<String, Table> tableSetWithOneToOne = new HashMap<>();
+        tableSetWithOneToOne.put(LEFT_TABLE,leftTable);
+        assertThat(brokenInterTableRelationErrorCreator.generateErrors(tableSetWithOneToOne, ONE_TO_MANY_SPECIFICATION).isEmpty(),
+                is(true));
+    }
+
+    @Test(expected = Test.None.class)
+    public void oneToOneErro_givenInvalidPairOfColumns_hasErrorEntry() {
+        Table leftTable = Table.create(LEFT_TABLE).addColumns(
+                StringColumn.create("id", Arrays.asList("1","1","2","2","5","6","7","8")),
+                StringColumn.create("table_1_id", Arrays.asList("1","2","3","4","5","5","7","8"))
+        );
+        Map<String, Table> tableSetWithOneToOne = new HashMap<>();
+        tableSetWithOneToOne.put(LEFT_TABLE,leftTable);
+        assertThat(brokenInterTableRelationErrorCreator.generateErrors(tableSetWithOneToOne, ONE_TO_ONE_SPECIFICATION).isEmpty(),
                 is(false));
     }
 

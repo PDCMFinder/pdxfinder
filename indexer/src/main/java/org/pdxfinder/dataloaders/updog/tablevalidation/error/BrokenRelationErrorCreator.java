@@ -12,11 +12,9 @@ import org.springframework.stereotype.Component;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 public class BrokenRelationErrorCreator extends ErrorCreator {
@@ -49,14 +47,73 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
         TableSetSpecification tableSetSpecification
     ) {
         reportMissingColumnsInRelation(tableSet, relation, tableSetSpecification.getProvider());
+        if (bothColumnsPresent(tableSet, relation)) {
+            runAppropriateValidation(tableSet, relation, tableSetSpecification);
+        }
+    }
 
+    private void runAppropriateValidation(Map<String, Table> tableSet, Relation relation, TableSetSpecification tableSetSpecification) {
         Relation.validityType validity = relation.getValidity();
-        if(validity.equals(Relation.validityType.table_key)) {
+        if (validity.equals(Relation.validityType.table_key)) {
             reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, tableSetSpecification.getProvider());
+        } else if (validity.equals(Relation.validityType.one_to_one)) {
+            reportBrokenOneToOneRelation(tableSet, relation, tableSetSpecification.getProvider());
+        } else if (validity.equals(Relation.validityType.one_to_many)) {
+            reportBrokenOneToManyRelation(tableSet, relation, tableSetSpecification.getProvider());
         }
-        else if(validity.equals(Relation.validityType.one_to_many)){
-            reportBrokenOneToManyRelation(tableSet,relation, tableSetSpecification.getProvider());
+    }
+
+    private void reportBrokenOneToOneRelation(
+            Map<String, Table> tableSet,
+            Relation relation,
+            String provider) {
+        ColumnReference leftRefColumn = relation.leftColumnReference();
+        ColumnReference rightRefColumn = relation.getOtherColumn(leftRefColumn);
+        StringColumn leftRestrictedColumn = tableSet.get(rightRefColumn.table()).stringColumn(leftRefColumn.column());
+        StringColumn rightRestrictedColumn = tableSet.get(leftRefColumn.table()).stringColumn(rightRefColumn.column());
+        Table workingTable = tableSet.get(leftRefColumn.table());
+        int[] indexOfDuplicates = getIndexOfDuplicatedForPair(leftRestrictedColumn,rightRestrictedColumn);
+        if(indexOfDuplicates.length > 0){
+            List<Pair<String,String>> brokenPairs = IntStream.of(indexOfDuplicates)
+                    .mapToObj(x -> Pair.of
+                            (leftRestrictedColumn.get(x), rightRestrictedColumn.get(x)))
+                    .collect(Collectors.toList());
+            String description = String
+                    .format("in [%s] one-to-one found %s relationships with conflicts %s",
+                            leftRefColumn.table(), brokenPairs.size(), brokenPairs.toString());
+            errors.add(create(leftRefColumn.table(), relation, workingTable.rows(indexOfDuplicates), description, provider));
         }
+    }
+
+    private int[] getIndexOfDuplicatedForPair(StringColumn leftRestrictedColumn, StringColumn rightRestrictedColumn) {
+        Set<Integer> leftIndexOfDuplicates = getIndexOfDuplicatedColumnValues(leftRestrictedColumn);
+        Set<Integer> rightIndexOfDuplicates = getIndexOfDuplicatedColumnValues(rightRestrictedColumn);
+        Set<Integer> allDuplicates = new HashSet<>();
+        allDuplicates.addAll(leftIndexOfDuplicates);
+        allDuplicates.addAll(rightIndexOfDuplicates);
+        return unboxSet(allDuplicates);
+
+    }
+
+    private Set<Integer> getIndexOfDuplicatedColumnValues(StringColumn column) {
+        return column.asList().stream()
+                .filter(x -> column.countOccurrences(x) > 1)
+                .map(x -> indicesOf(column, x))
+                .flatMapToInt(Arrays::stream)
+                .mapToObj(Integer::valueOf)
+                .collect(Collectors.toSet());
+    }
+
+    private int[] indicesOf(StringColumn column, String search) {
+        return IntStream.range(0, column.size())
+                .filter((i) -> column.get(i).equals(search))
+                .toArray();
+    }
+
+    private int[] unboxSet(Set<Integer> box){
+        return box.stream()
+                .mapToInt(x -> x)
+                .toArray();
     }
 
     private void reportBrokenOneToManyRelation(
@@ -64,32 +121,28 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
             Relation relation,
             String provider
     ){
-        if (bothColumnsPresent(tableSet, relation)) {
-            ColumnReference leftColumn = relation.leftColumnReference();
-            ColumnReference rightColumn = relation.getOtherColumn(leftColumn);
-            StringColumn oneRestrictedColumn = tableSet.get(rightColumn.table()).stringColumn(leftColumn.column());
-            StringColumn manyRestrictedColumn = tableSet.get(leftColumn.table()).stringColumn(rightColumn.column());
-            MultiValuedMap<String, Pair<String, String>> columnPairs = new HashSetValuedHashMap<>();
-            for (int i = 0; i < manyRestrictedColumn.size(); i++) {
-                columnPairs.put(oneRestrictedColumn.get(i), Pair.of(manyRestrictedColumn.get(i), oneRestrictedColumn.get(i)));
-            }
-            List<Pair<String, String>> listOfBrokenPairs = oneRestrictedColumn.asList().stream()
-                    .filter(x -> oneRestrictedColumn.countOccurrences(x) > 1)
-                    .map(columnPairs::get)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
-            Table workingTable = tableSet.get(leftColumn.table());
-            int[] invalidRows = oneRestrictedColumn.asList().stream()
-                    .filter(x -> oneRestrictedColumn.countOccurrences(x) > 1)
-                    .map(oneRestrictedColumn::indexOf)
-                    .mapToInt(x -> x)
-                    .toArray();
-            if (listOfBrokenPairs.size() > 0) {
-                String description = String
-                        .format("in [%s] one-to-many found %s relationships with conflicts %s",
-                                leftColumn.table(), listOfBrokenPairs.size(), listOfBrokenPairs.toString());
-                errors.add(create(leftColumn.table(), relation, workingTable.rows(invalidRows), description, provider));
-            }
+        ColumnReference leftColumn = relation.leftColumnReference();
+        ColumnReference rightColumn = relation.getOtherColumn(leftColumn);
+        StringColumn oneRestrictedColumn = tableSet.get(rightColumn.table()).stringColumn(leftColumn.column());
+        StringColumn manyRestrictedColumn = tableSet.get(leftColumn.table()).stringColumn(rightColumn.column());
+        Table workingTable = tableSet.get(leftColumn.table());
+        MultiValuedMap<String, Pair<String, String>> columnPairs = new HashSetValuedHashMap<>();
+        for (int i = 0; i < manyRestrictedColumn.size(); i++) {
+            columnPairs.put(oneRestrictedColumn.get(i), Pair.of(manyRestrictedColumn.get(i), oneRestrictedColumn.get(i)));
+        }
+        List<Pair<String, String>> listOfBrokenPairs = oneRestrictedColumn.asList().stream()
+                .filter(x -> oneRestrictedColumn.countOccurrences(x) > 1)
+                .map(columnPairs::get)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        if (listOfBrokenPairs.size() > 0) {
+            int[] invalidRows = unboxSet(
+                    getIndexOfDuplicatedColumnValues(oneRestrictedColumn)
+        );
+            String description = String
+                    .format("in [%s] one-to-many found %s relationships with conflicts %s",
+                            leftColumn.table(), listOfBrokenPairs.size(), listOfBrokenPairs.toString());
+            errors.add(create(leftColumn.table(), relation, workingTable.rows(invalidRows), description, provider));
         }
     }
 
@@ -123,10 +176,9 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
         Relation relation,
         String provider
     ) {
-        if (bothColumnsPresent(tableSet, relation)) {
-            reportOrphanRowsFor(tableSet, relation, relation.leftColumnReference(), provider);
-            reportOrphanRowsFor(tableSet, relation, relation.rightColumnReference(), provider);
-        }
+        reportOrphanRowsFor(tableSet, relation, relation.leftColumnReference(), provider);
+        reportOrphanRowsFor(tableSet, relation, relation.rightColumnReference(), provider);
+
     }
 
     private void reportOrphanRowsFor(
