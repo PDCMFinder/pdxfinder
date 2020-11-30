@@ -27,6 +27,8 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "age_at_initial_diagnosis"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-patient.tsv", s)));
         Arrays.asList(
+            "patient_id",
+            "sample_id",
             "collection_date",
             "collection_event",
             "months_since_collection_1",
@@ -43,9 +45,11 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "sharable",
             "treatment_naive_at_collection",
             "treated",
-            "prior_treatment"
+            "prior_treatment",
+            "model_id"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-sample.tsv", s)));
         Arrays.asList(
+            "model_id",
             "host_strain",
             "host_strain_full",
             "engraftment_site",
@@ -56,13 +60,13 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "publications"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-model.tsv", s)));
         Arrays.asList(
-            "model_id",
             "validation_technique",
             "description",
             "passages_tested",
             "validation_host_strain_full"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-model_validation.tsv", s)));
         Arrays.asList(
+            "model_id",
             "provider_type",
             "accessibility",
             "europdx_access_modality",
@@ -92,6 +96,10 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             .collect(Collectors.toSet());
 
         Set<ColumnReference> idColumns = matchingColumnsFromAnyTable(columnReferences, "_id");
+        Set<ColumnReference> uniqIdColumns = new HashSet<>();
+        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-patient.tsv", new String[]{"patient_id"}));
+        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-sharing.tsv", new String[]{"model_id"}));
+
         Set<ColumnReference> hostStrainColumns = matchingColumnsFromAnyTable(columnReferences, "host_strain");
 
         Set<ColumnReference> essentialSampleColumns = matchingColumnsFromTable(columnReferences, "sample",
@@ -119,7 +127,7 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             .addRequiredTables(metadataTables)
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
-            .addUniqueColumns(idColumns)
+            .addUniqueColumns(uniqIdColumns)
             .addRelations(new HashSet<>(Arrays.asList(
                 Relation.betweenTableKeys(
                     ColumnReference.of("metadata-patient.tsv", "patient_id" ),
