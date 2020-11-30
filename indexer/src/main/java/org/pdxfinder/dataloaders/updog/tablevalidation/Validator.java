@@ -22,13 +22,14 @@ public class Validator {
         MissingTableErrorCreator missingTableErrorCreator
     ) {
         this.missingTableErrorCreator = missingTableErrorCreator;
-        this.validationErrors = new ArrayList<>();
+        clearValidationErrors();
     }
 
     public List<ValidationError> validate(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
+        clearValidationErrors();
         checkRequiredTablesPresent(tableSet, tableSetSpecification);
         performColumnValidations(tableSet, tableSetSpecification);
         return validationErrors;
@@ -112,6 +113,10 @@ public class Validator {
             }
         else
             log.info("There were no validation errors raised, great!");
+    }
+
+    private void clearValidationErrors(){
+        this.validationErrors = new ArrayList<>();
     }
 
 }

@@ -27,8 +27,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "age_at_initial_diagnosis"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-patient.tsv", s)));
         Arrays.asList(
-            "patient_id",
-            "sample_id",
             "collection_date",
             "collection_event",
             "months_since_collection_1",
@@ -45,11 +43,9 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "sharable",
             "treatment_naive_at_collection",
             "treated",
-            "prior_treatment",
-            "model_id"
+            "prior_treatment"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-sample.tsv", s)));
         Arrays.asList(
-            "model_id",
             "host_strain",
             "host_strain_full",
             "engraftment_site",
@@ -67,7 +63,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "validation_host_strain_full"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-model_validation.tsv", s)));
         Arrays.asList(
-            "model_id",
             "provider_type",
             "accessibility",
             "europdx_access_modality",
@@ -146,10 +141,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
                         ColumnReference.of("metadata-sample.tsv", "patient_id")
                         ),
-                Relation.betweenTableColumns(
-                        Relation.validityType.one_to_one,
-                        ColumnReference.of("metadata-sample.tsv", "patient_id"),
-                        ColumnReference.of("metadata-sample.tsv", "model_id")),
                 Relation.betweenTableColumns(
                         Relation.validityType.one_to_one,
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
