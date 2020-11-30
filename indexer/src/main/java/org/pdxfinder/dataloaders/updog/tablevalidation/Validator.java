@@ -18,11 +18,13 @@ public class Validator {
     private List<ValidationError> validationErrors;
     private MissingTableErrorCreator missingTableErrorCreator;
 
-    public Validator(
-        MissingTableErrorCreator missingTableErrorCreator
-    ) {
+    public Validator(MissingTableErrorCreator missingTableErrorCreator) {
         this.missingTableErrorCreator = missingTableErrorCreator;
         this.validationErrors = new ArrayList<>();
+    }
+
+    public Validator() {
+        resetErrors();
     }
 
     public List<ValidationError> validate(
@@ -112,6 +114,11 @@ public class Validator {
             }
         else
             log.info("There were no validation errors raised, great!");
+    }
+
+    public void resetErrors(){
+        this.missingTableErrorCreator = new MissingTableErrorCreator();
+        this.validationErrors = new ArrayList<>();
     }
 
 }

@@ -4,30 +4,50 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Relation {
+
+    private validityType validity;
     private String leftTableName;
     private String leftColumnName;
     private String rightTableName;
     private String rightColumnName;
 
+    public enum validityType {
+        table_key,
+        one_to_one,
+        one_to_many,
+    }
+
     private Relation(
-        String leftTableName,
-        String leftColumnName,
-        String rightTableName,
-        String rightColumnName
-    ) {
+            validityType validity,
+            String leftTableName,
+            String leftColumnName,
+            String rightTableName,
+            String rightColumnName
+    ){
+        this.validity = validity;
         this.leftTableName = leftTableName;
         this.leftColumnName = leftColumnName;
         this.rightTableName = rightTableName;
         this.rightColumnName = rightColumnName;
     }
 
-    public static Relation between(ColumnReference left, ColumnReference right) {
+    public static Relation betweenTableKeys(ColumnReference left, ColumnReference right) {
         if (left.equals(right))
             throw new IllegalArgumentException(
                 String.format("Unable to define a relation from a column to itself (%s)", left));
 
-        return new Relation(left.table(), left.column(), right.table(), right.column());
+        return new Relation(validityType.table_key, left.table(), left.column(), right.table(), right.column());
     }
+
+    public static Relation betweenTableColumns(validityType plurality, ColumnReference left,
+                                               ColumnReference right){
+        if (left.equals(right))
+            throw new IllegalArgumentException(
+                    String.format("Unable to define a relation from a column to itself (%s)", left));
+
+        return new Relation(plurality, left.table(), left.column(), right.table(), right.column());
+    }
+
 
     public ColumnReference getOtherColumn(ColumnReference queriedColumn) {
         ColumnReference otherColumn;
@@ -66,6 +86,11 @@ public class Relation {
         return ColumnReference.of(rightTable(), rightColumn());
     }
 
+    public validityType getValidity() { return validity; }
+
+    public void setValidity(validityType validity) { this.validity = validity; }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,6 +110,7 @@ public class Relation {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
+            .append(validity)
             .append(leftTableName)
             .append(leftColumnName)
             .append(rightTableName)
@@ -99,7 +125,8 @@ public class Relation {
             leftTableName,
             leftColumnName,
             rightColumnName,
-            rightTableName);
+            rightTableName
+        );
     }
 
 }

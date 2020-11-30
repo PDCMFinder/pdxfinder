@@ -9,21 +9,14 @@ import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
 import tech.tablesaw.api.Table;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.pdxfinder.dataloaders.updog.TableSetUtilities.concatenate;
@@ -147,19 +140,19 @@ public class UpdogTest {
             .addNonEmptyColumns(columnReference2)
             .addUniqueColumns(columnReference1)
             .addUniqueColumns(columnReference2)
-            .addRelations(Relation.between(columnReference1, columnReference2));
+            .addRelations(Relation.betweenTableKeys(columnReference1, columnReference2));
         TableSetSpecification specification1 =  TableSetSpecification.create().setProvider("provider")
             .addRequiredTables(requiredTables1)
             .addRequiredColumns(columnReference1)
             .addNonEmptyColumns(columnReference1)
             .addUniqueColumns(columnReference1)
-            .addRelations(Relation.between(columnReference1, columnReference2));
+            .addRelations(Relation.betweenTableKeys(columnReference1, columnReference2));
         TableSetSpecification specfication2 =  TableSetSpecification.create().setProvider("provider")
             .addRequiredTables(requiredTables2)
             .addRequiredColumns(columnReference2)
             .addNonEmptyColumns(columnReference2)
             .addUniqueColumns(columnReference2)
-            .addRelations(Relation.between(columnReference1, columnReference2));
+            .addRelations(Relation.betweenTableKeys(columnReference1, columnReference2));
         assertEquals(
             expected,
             Updog.merge(specification1, specfication2)

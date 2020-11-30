@@ -178,7 +178,6 @@ public class DomainObjectCreator {
                 patientSnapshot.setTreatmentNaive(treatmentNaive);
                 patient.addSnapshot(patientSnapshot);
             }
-
             Sample sample = createPatientSample(row);
             sample.setDataSource(providerGroup.getAbbreviation());
             patientSnapshot.addSample(sample);
@@ -250,8 +249,6 @@ public class DomainObjectCreator {
                 log.error("Can't link validation, missing model {}",modelId);
                 //throw new NullPointerException();
             }
-
-
         }
     }
 

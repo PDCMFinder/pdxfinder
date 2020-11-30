@@ -60,7 +60,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "publications"
         ).forEach(s -> tableColumns.add(ColumnReference.of("metadata-model.tsv", s)));
         Arrays.asList(
-            "model_id",
             "validation_technique",
             "description",
             "passages_tested",
@@ -97,6 +96,10 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             .collect(Collectors.toSet());
 
         Set<ColumnReference> idColumns = matchingColumnsFromAnyTable(columnReferences, "_id");
+        Set<ColumnReference> uniqIdColumns = new HashSet<>();
+        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-patient.tsv", new String[]{"patient_id"}));
+        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-sharing.tsv", new String[]{"model_id"}));
+
         Set<ColumnReference> hostStrainColumns = matchingColumnsFromAnyTable(columnReferences, "host_strain");
 
         Set<ColumnReference> essentialSampleColumns = matchingColumnsFromTable(columnReferences, "sample",
@@ -124,24 +127,29 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             .addRequiredTables(metadataTables)
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
-            .addUniqueColumns(idColumns)
+            .addUniqueColumns(uniqIdColumns)
             .addRelations(new HashSet<>(Arrays.asList(
-                Relation.between(
-                    ColumnReference.of("metadata-patient.tsv", "patient_id"),
+                Relation.betweenTableKeys(
+                    ColumnReference.of("metadata-patient.tsv", "patient_id" ),
                     ColumnReference.of("metadata-sample.tsv", "patient_id")),
-                Relation.between(
+                Relation.betweenTableKeys(
                     ColumnReference.of("metadata-sample.tsv", "model_id"),
                     ColumnReference.of("metadata-model.tsv", "model_id")),
-                Relation.between(
-                    ColumnReference.of("metadata-model.tsv", "model_id"),
-                    ColumnReference.of("metadata-model_validation.tsv", "model_id")),
-                Relation.between(
+                Relation.betweenTableKeys(
                     ColumnReference.of("metadata-model.tsv", "model_id"),
                     ColumnReference.of("metadata-sharing.tsv", "model_id")),
-                Relation.between(
+                Relation.betweenTableKeys(
                     ColumnReference.of("metadata-model.tsv", "model_id"),
-                    ColumnReference.of("sampleplatform-data.tsv", "model_id")
-                )
+                    ColumnReference.of("sampleplatform-data.tsv", "model_id")),
+                Relation.betweenTableColumns(
+                        Relation.validityType.one_to_many,
+                        ColumnReference.of("metadata-sample.tsv", "sample_id"),
+                        ColumnReference.of("metadata-sample.tsv", "patient_id")
+                        ),
+                Relation.betweenTableColumns(
+                        Relation.validityType.one_to_one,
+                        ColumnReference.of("metadata-sample.tsv", "sample_id"),
+                        ColumnReference.of("metadata-sample.tsv", "model_id"))
             )))
             .setProvider(provider);
     }

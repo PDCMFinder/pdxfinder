@@ -27,7 +27,7 @@ public class OmicTransformationService {
     private Map<String, String> geneIdCache = new HashMap<>();
 
     public void convertListOfNcbiToHgnc(List<String> geneList){
-        String fileOut = "ncbiToHugoAccesions";
+        String fileOut = "ncbiToHugoAccessions";
 
         FileWriter fstream = null;
         try {

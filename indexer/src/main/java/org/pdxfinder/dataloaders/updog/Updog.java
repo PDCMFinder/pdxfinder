@@ -88,6 +88,7 @@ public class Updog {
             omicSpecifications
         );
         combinedValidationRuleset.setProvider(provider);
+        validator.resetErrors();
         return validator.validate(tableSet, combinedValidationRuleset);
     }
 

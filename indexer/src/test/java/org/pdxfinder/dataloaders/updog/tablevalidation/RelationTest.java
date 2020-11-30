@@ -7,10 +7,10 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class RelationTest {
+public class  RelationTest {
 
     private Relation createRelation() {
-        return (Relation.between(
+        return (Relation.betweenTableKeys(
                 ColumnReference.of("table1", "join_column"),
                 ColumnReference.of("table2", "join_column")));
     }
@@ -33,7 +33,7 @@ public class RelationTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void between_givenSelfRelationCreated_throwException() {
-        Relation.between(
+        Relation.betweenTableKeys(
             ColumnReference.of("x", "x"),
             ColumnReference.of("x", "x"));
     }
@@ -64,7 +64,7 @@ public class RelationTest {
     }
 
     @Test public void toString_returnsExpectedFormat() {
-        Relation relation =  Relation.between(
+        Relation relation =  Relation.betweenTableKeys(
             ColumnReference.of("foo.tsv", "foo_id"),
             ColumnReference.of("bar.tsv", "bar_id")
         );
@@ -76,47 +76,47 @@ public class RelationTest {
 
 
     @Test public void equals_givenIdenticalObjects_symmetricallyEqual() {
-        Relation x = Relation.between(
+        Relation x = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
-        Relation y = Relation.between(
+        Relation y = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
         assertTrue(x.equals(y) && y.equals(x));
     }
 
     @Test public void equals_givenIdenticalObjects_hashCodeIsEqual() {
-        Relation x = Relation.between(
+        Relation x = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
-        Relation y = Relation.between(
+        Relation y = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
         assertEquals(x.hashCode(), y.hashCode());
     }
 
     @Test public void equals_givenSameObject_returnsTrue() {
-        Relation x = Relation.between(
+        Relation x = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
         assertEquals(x, x);
     }
 
     @Test public void equals_givenNonIdenticalObjects_returnsFalse() {
-        Relation x = Relation.between(
+        Relation x = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
-        Relation y = Relation.between(
+        Relation y = Relation.betweenTableKeys(
             ColumnReference.of("a.tsv", "a"),
             ColumnReference.of("b.tsv", "b"));
         assertNotEquals(x, y);
     }
 
     @Test public void hashCode_givenObjectPutInMap_identicalKeyRetrievesTheValue() {
-        Relation x = Relation.between(
+        Relation x = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
-        Relation y = Relation.between(
+        Relation y = Relation.betweenTableKeys(
             ColumnReference.of("x.tsv", "x"),
             ColumnReference.of("y.tsv", "x"));
         Map<Relation, String> map = new HashMap<>();
