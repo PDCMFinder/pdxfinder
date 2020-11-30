@@ -106,7 +106,7 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
 
     private int[] indicesOf(StringColumn column, String search) {
         return IntStream.range(0, column.size())
-                .filter((i) -> column.get(i).equals(search))
+                .filter(i -> column.get(i).equals(search))
                 .toArray();
     }
 
@@ -135,7 +135,7 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
                 .map(columnPairs::get)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-        if (listOfBrokenPairs.size() > 0) {
+        if (!listOfBrokenPairs.isEmpty()) {
             int[] invalidRows = unboxSet(
                     getIndexOfDuplicatedColumnValues(oneRestrictedColumn)
         );

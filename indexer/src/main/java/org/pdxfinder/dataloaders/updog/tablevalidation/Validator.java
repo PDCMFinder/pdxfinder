@@ -18,18 +18,19 @@ public class Validator {
     private List<ValidationError> validationErrors;
     private MissingTableErrorCreator missingTableErrorCreator;
 
-    public Validator(
-        MissingTableErrorCreator missingTableErrorCreator
-    ) {
+    public Validator(MissingTableErrorCreator missingTableErrorCreator) {
         this.missingTableErrorCreator = missingTableErrorCreator;
-        clearValidationErrors();
+        this.validationErrors = new ArrayList<>();
+    }
+
+    public Validator() {
+        resetErrors();
     }
 
     public List<ValidationError> validate(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
     ) {
-        clearValidationErrors();
         checkRequiredTablesPresent(tableSet, tableSetSpecification);
         performColumnValidations(tableSet, tableSetSpecification);
         return validationErrors;
@@ -115,7 +116,8 @@ public class Validator {
             log.info("There were no validation errors raised, great!");
     }
 
-    private void clearValidationErrors(){
+    public void resetErrors(){
+        this.missingTableErrorCreator = new MissingTableErrorCreator();
         this.validationErrors = new ArrayList<>();
     }
 

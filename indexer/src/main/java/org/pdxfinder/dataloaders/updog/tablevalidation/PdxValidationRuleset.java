@@ -137,9 +137,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                     ColumnReference.of("metadata-model.tsv", "model_id")),
                 Relation.betweenTableKeys(
                     ColumnReference.of("metadata-model.tsv", "model_id"),
-                    ColumnReference.of("metadata-model_validation.tsv", "model_id")),
-                Relation.betweenTableKeys(
-                    ColumnReference.of("metadata-model.tsv", "model_id"),
                     ColumnReference.of("metadata-sharing.tsv", "model_id")),
                 Relation.betweenTableKeys(
                     ColumnReference.of("metadata-model.tsv", "model_id"),
