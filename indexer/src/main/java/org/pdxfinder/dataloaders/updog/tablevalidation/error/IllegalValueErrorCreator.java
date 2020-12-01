@@ -61,7 +61,10 @@ public class IllegalValueErrorCreator extends ErrorCreator {
     {
        Table workingTable = tableSet.get(columnReference.table());
        StringColumn column = workingTable.column(columnReference.column()).asStringColumn();
-       Predicate<String> charRestriction = Pattern.compile(valueRestrictions.getRegex()).asPredicate();
+       Predicate<String> charRestriction = Pattern.compile(valueRestrictions
+               .getRegex())
+               .asPredicate()
+               .negate();
        List<String> invalidValues = column.asList().stream()
                .filter(charRestriction)
                .collect(Collectors.toCollection(LinkedList::new));
@@ -72,7 +75,7 @@ public class IllegalValueErrorCreator extends ErrorCreator {
 
        if(!invalidValues.isEmpty()){
            String errorDescriptions = String.format(
-                   "in column [%s] found %s values has characters not contained in [%s] : %s",
+                   "in column [%s] found %s values has characters not contained in %s : %s",
                    columnReference.column(),
                    invalidValues.size(),
                    valueRestrictions.getDescription(),

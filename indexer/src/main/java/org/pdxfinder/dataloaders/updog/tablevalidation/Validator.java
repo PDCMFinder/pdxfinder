@@ -43,6 +43,7 @@ public class Validator {
         if (thereAreErrors(validationErrors, tableSetSpecification)) return;
         checkRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
+        checkForIllegalValues(tableSet, tableSetSpecification);
         checkAllUniqueColumnsForDuplicates(tableSet, tableSetSpecification);
         checkRelationsValid(tableSet, tableSetSpecification);
     }
@@ -95,6 +96,14 @@ public class Validator {
     ) {
         validationErrors.addAll(new BrokenRelationErrorCreator().generateErrors(tableSet, tableSetSpecification));
     }
+
+    private void checkForIllegalValues(
+            Map<String, Table> tableSet,
+            TableSetSpecification tableSetSpecificatio
+    ){
+        validationErrors.addAll(new IllegalValueErrorCreator().generateErrors(tableSet, tableSetSpecificatio));
+    }
+
 
     boolean passesValidation(
         Map<String, Table> tableSet,

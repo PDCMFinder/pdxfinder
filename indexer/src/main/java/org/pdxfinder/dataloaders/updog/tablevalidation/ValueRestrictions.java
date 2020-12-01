@@ -3,12 +3,12 @@ package org.pdxfinder.dataloaders.updog.tablevalidation;
 public class ValueRestrictions {
 
     //ascii punctuation characters are !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-    //URL restriction is for alphanumeric and _-.¬
-    private static final String FREE_TEXT = "[^\\p{Alpha}.,;:?!]+";
-    private static final String FREE_TEXT_DESCRIPTION = "US Alphabet and .,:;?!";
-    private static final String URL_SAFE = "[^\\p{Alpha]._~- ]";
-    private static final String URL_SAFE_DESCRIPTION = "US Alphabet and ._~-";
-    private static final String NUMBER = "[^0-9.,-]+";
+    //URL restriction is for alphanumeric and _-.~
+    private static final String FREE_TEXT = "^[\\p{Alpha}\\{Space}.,:;-]+$";
+    private static final String FREE_TEXT_DESCRIPTION = "US ASCII Alphabet and .,:;-";
+    private static final String URL_SAFE = "^[\\p{Alpha}\\p{Space}._~-]+$";
+    private static final String URL_SAFE_DESCRIPTION = "US ASCII Alphabet and ._~-";
+    private static final String NUMBER = "^[\\p{Digit}.,-]+$";
     private static final String NUMBER_DESCRIPTION = "0-9 and .,-";
 
     private String regex;
