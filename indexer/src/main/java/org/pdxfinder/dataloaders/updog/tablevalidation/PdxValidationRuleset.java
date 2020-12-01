@@ -127,6 +127,7 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             .addRequiredTables(metadataTables)
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
+            .addCharSetRestriction(idColumns, ValueRestrictions.URL_SAFE())
             .addUniqueColumns(uniqIdColumns)
             .addRelations(new HashSet<>(Arrays.asList(
                 Relation.betweenTableKeys(
@@ -152,6 +153,7 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                         ColumnReference.of("metadata-sample.tsv", "model_id"))
             )))
             .setProvider(provider);
+
     }
 
 }
