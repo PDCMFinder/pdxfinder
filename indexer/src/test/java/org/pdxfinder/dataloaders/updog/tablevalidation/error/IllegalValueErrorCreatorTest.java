@@ -10,7 +10,7 @@ import tech.tablesaw.api.Table;
 
 import java.util.*;
 
-public class IllegalValueErrorCreatorTests {
+public class IllegalValueErrorCreatorTest {
 
     private IllegalValueErrorCreator illegalValueErrorCreator = new IllegalValueErrorCreator();
     private static final String PROVIDER = "PROVIDER-BC";
@@ -49,6 +49,12 @@ public class IllegalValueErrorCreatorTests {
 
     @Test public void UrlSafeError_columnWithNoneUrlSafeString_returnError(){
         Map<String, Table> tableSet = makeTableSetWithSingleColumn(Collections.singletonList("T#E/ST"));
+        tableSetSpecification.addCharSetRestriction(columns, ValueRestrictions.URL_SAFE());
+        Assert.assertFalse(illegalValueErrorCreator.generateErrors(tableSet, tableSetSpecification).isEmpty());
+    }
+
+    @Test public void UrlSafeError_columnWithMixOfNoneString_returnError(){
+        Map<String, Table> tableSet = makeTableSetWithSingleColumn(Arrays.asList("T#E/ST", "TEST", "TEES", "TES23#"));
         tableSetSpecification.addCharSetRestriction(columns, ValueRestrictions.URL_SAFE());
         Assert.assertFalse(illegalValueErrorCreator.generateErrors(tableSet, tableSetSpecification).isEmpty());
     }

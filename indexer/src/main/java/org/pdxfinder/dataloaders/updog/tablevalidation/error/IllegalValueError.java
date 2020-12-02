@@ -34,7 +34,7 @@ public class IllegalValueError implements ValidationError{
     @Override
     public String message() {
             return String.format(
-            "Error in [%s] for provider %s: %s",
+            "Error in [%s] for provider [%s]: %s",
             tableName,
             provider,
             description
