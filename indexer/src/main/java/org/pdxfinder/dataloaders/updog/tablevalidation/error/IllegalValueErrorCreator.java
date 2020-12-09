@@ -43,7 +43,7 @@ public class IllegalValueErrorCreator extends ErrorCreator {
             Map<String, Table> tableSet,
             String provider)
     {
-        for( ColumnReference columnReference : columns){
+        for(ColumnReference columnReference : columns){
             if(!tableMissingColumn(tableSet.get(columnReference.table()),
                     columnReference.column(),
                     columnReference.table()))

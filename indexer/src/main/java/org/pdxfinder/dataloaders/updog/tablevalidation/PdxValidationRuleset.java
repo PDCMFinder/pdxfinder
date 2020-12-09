@@ -103,15 +103,15 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
         Set<ColumnReference> hostStrainColumns = matchingColumnsFromAnyTable(columnReferences, "host_strain");
 
         Set<ColumnReference> essentialSampleColumns = matchingColumnsFromTable(columnReferences, "sample",
-            new String[]{"age_in_years", "diagnosis", "tumour", "_site"});
-        Set<ColumnReference> essentialModelColumns = matchingColumnsFromTable(columnReferences, "model.",
-            new String[]{"engraftment_", "sample_type", "passage_number"});
+            new String[]{"age_in_years", "diagnosis", "tumour_type", "primary_site", "collection_site"});
+        Set<ColumnReference> essentialModelColumns = matchingColumnsFromTable(columnReferences, "model",
+            new String[]{"host_strain_full", "engraftment_site","engraftment_type","sample_type", "passage_number"});
         Set<ColumnReference> essentialModelValidationColumns = matchingColumnsFromTable(columnReferences, "model_validation",
-            new String[]{"validation_technique", "description", "passages_tested"});
+            new String[]{"validation_technique", "description", "passages_tested", "validation_host_strain_full"});
         Set<ColumnReference> essentialSharingColumns = matchingColumnsFromTable(columnReferences, "sharing",
-            new String[]{"provider_", "access", "email", "name", "project"});
+            new String[]{"provider_type", "accessibility", "email", "name", "provider_name", "provider_abbreviation", "project"});
         Set<ColumnReference> essentialLoaderColumns = matchingColumnsFromTable(columnReferences, "loader",
-            new String[]{"name", "abbreviation"});
+            new String[]{"name", "abbreviation", "internal_url"});
 
         Set<ColumnReference> essentialColumns = TableSetUtilities.concatenate(
             idColumns,
@@ -123,11 +123,31 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             essentialLoaderColumns
         );
 
+        Set<ColumnReference> patientFreeTextColumns = matchingColumnsFromTable(columnReferences, "patient",
+                new String[]{"history", "ethnicity", "initial_diagnosis" });
+        Set<ColumnReference> sampleFreeTextColumns = matchingColumnsFromTable(columnReferences, "sample",
+                new String[]{"diagnosis" , "primary_site", "collection_site"});
+        Set<ColumnReference> modelFreeTextColumns = matchingColumnsFromTable(columnReferences, "model",
+                new String[]{"diagnosis" , "primary_site", "collection_site", "sample_type", "sample_state"});
+        Set<ColumnReference> modelValidationFreeTextColumns = matchingColumnsFromTable(columnReferences, "model_validation",
+                new String[]{"validation_technique", "description"});
+        Set<ColumnReference> sharingFreeTextColumns = matchingColumnsFromTable(columnReferences, "model_validation",
+                new String[]{"provider_abbreviation", "project"});
+
+        Set<ColumnReference> freeTextColumns = TableSetUtilities.concatenate(
+                patientFreeTextColumns,
+                sampleFreeTextColumns,
+                modelFreeTextColumns,
+                modelValidationFreeTextColumns,
+                sharingFreeTextColumns
+        );
+
         return TableSetSpecification.create()
             .addRequiredTables(metadataTables)
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
             .addCharSetRestriction(idColumns, ValueRestrictions.URL_SAFE())
+            .addCharSetRestriction(freeTextColumns, ValueRestrictions.FREE_TEXT())
             .addUniqueColumns(uniqIdColumns)
             .addRelations(new HashSet<>(Arrays.asList(
                 Relation.betweenTableKeys(
@@ -139,9 +159,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                 Relation.betweenTableKeys(
                     ColumnReference.of("metadata-model.tsv", "model_id"),
                     ColumnReference.of("metadata-sharing.tsv", "model_id")),
-                Relation.betweenTableKeys(
-                    ColumnReference.of("metadata-model.tsv", "model_id"),
-                    ColumnReference.of("sampleplatform-data.tsv", "model_id")),
                 Relation.betweenTableColumns(
                         Relation.validityType.one_to_many,
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
@@ -151,9 +168,7 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                         Relation.validityType.one_to_one,
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
                         ColumnReference.of("metadata-sample.tsv", "model_id"))
-            )))
-            .setProvider(provider);
-
+            )));
     }
 
 }

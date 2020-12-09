@@ -81,6 +81,11 @@ public class TableSetSpecification {
         return this;
     }
 
+    public TableSetSpecification addAllCharSetRestrictions(Map<Set<ColumnReference>, ValueRestrictions> allCharsets){
+        this.charsetRestrictedColumns.putAll(allCharsets);
+        return this;
+    }
+
     public String getProvider() {
         return provider;
     }
@@ -124,7 +129,7 @@ public class TableSetSpecification {
         return missingFiles;
     }
 
-    public TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
+    public static TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
         TableSetSpecification mergedTableSetSpecifications = TableSetSpecification.create();
         for (TableSetSpecification tss : tableSetSpecifications) {
             mergedTableSetSpecifications.setProvider(tss.getProvider());
@@ -133,6 +138,7 @@ public class TableSetSpecification {
             mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
             mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
             mergedTableSetSpecifications.addRelations(tss.getRelations());
+            mergedTableSetSpecifications.addAllCharSetRestrictions(tss.getCharSetRestrictions());
         }
         return mergedTableSetSpecifications;
     }

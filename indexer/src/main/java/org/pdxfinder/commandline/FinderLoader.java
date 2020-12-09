@@ -160,7 +160,7 @@ public class FinderLoader {
     ) {
         List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
-            if (dataProvider.equals(DataProvider.JAX)) {
+            if (dataProvider.equals(DataProvider.JAX) && !validateOnlyRequested) {
                 loadJAXData.run();
             }
             else{

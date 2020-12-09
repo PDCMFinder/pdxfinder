@@ -80,10 +80,10 @@ public class Updog {
     ) {
         TableSetSpecification omicSpecifications = TableSetSpecification.create();
         for (String tableName : omicTables) {
-            omicSpecifications =  omicSpecifications.merge(OmicValidationRuleset.generateFor(tableName, provider));
+            omicSpecifications =  TableSetSpecification.merge(OmicValidationRuleset.generateFor(tableName, provider));
         }
 
-        TableSetSpecification combinedValidationRuleset = merge(
+        TableSetSpecification combinedValidationRuleset = TableSetSpecification.merge(
             new PdxValidationRuleset().generate(provider),
             omicSpecifications
         );
@@ -91,18 +91,4 @@ public class Updog {
         validator.resetErrors();
         return validator.validate(tableSet, combinedValidationRuleset);
     }
-
-    static TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
-        TableSetSpecification mergedTableSetSpecifications = TableSetSpecification.create();
-        for (TableSetSpecification tss : tableSetSpecifications) {
-            mergedTableSetSpecifications.setProvider(tss.getProvider());
-            mergedTableSetSpecifications.addRequiredTables(tss.getRequiredTables());
-            mergedTableSetSpecifications.addRequiredColumns(tss.getRequiredColumns());
-            mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
-            mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
-            mergedTableSetSpecifications.addRelations(tss.getRelations());
-        }
-        return mergedTableSetSpecifications;
-    }
-
 }

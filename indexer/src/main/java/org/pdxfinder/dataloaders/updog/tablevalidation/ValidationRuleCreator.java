@@ -70,7 +70,7 @@ abstract class ValidationRuleCreator {
     }
 
     private static boolean containsAny(String inputStr, String[] patterns) {
-        return Arrays.stream(patterns).parallel().anyMatch(inputStr::contains);
+        return Arrays.stream(patterns).parallel().anyMatch(inputStr::equalsIgnoreCase);
     }
 
 }

@@ -4,10 +4,10 @@ public class ValueRestrictions {
 
     //ascii punctuation characters are !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
     //URL restriction is for alphanumeric and _-.~
-    private static final String FREE_TEXT = "^[\\p{Alpha}\\{Space}.,:;-]+$";
-    private static final String FREE_TEXT_DESCRIPTION = "US ASCII Alphabet and .,:;-";
-    private static final String URL_SAFE = "^[\\p{Alpha}\\p{Space}._~-]+$";
-    private static final String URL_SAFE_DESCRIPTION = "US ASCII Alphabet and ._~-";
+    private static final String FREE_TEXT = "^[\\p{Alpha}\\p{Space}\\p{Digit}().',<>%:;_\\/-]+$";
+    private static final String FREE_TEXT_DESCRIPTION = "US ASCII Alphanumeric and ().',:;-/";
+    private static final String URL_SAFE = "^[\\p{Alpha}\\p{Digit}\\p{Space}._~-]+$";
+    private static final String URL_SAFE_DESCRIPTION = "US ASCII Alphanumeric and ._~-";
     private static final String NUMBER = "^[\\p{Digit}.,-]+$";
     private static final String NUMBER_DESCRIPTION = "0-9 and .,-";
 

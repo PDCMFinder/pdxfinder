@@ -99,9 +99,9 @@ public class Validator {
 
     private void checkForIllegalValues(
             Map<String, Table> tableSet,
-            TableSetSpecification tableSetSpecificatio
+            TableSetSpecification tableSetSpecification
     ){
-        validationErrors.addAll(new IllegalValueErrorCreator().generateErrors(tableSet, tableSetSpecificatio));
+        validationErrors.addAll(new IllegalValueErrorCreator().generateErrors(tableSet, tableSetSpecification));
     }
 
 

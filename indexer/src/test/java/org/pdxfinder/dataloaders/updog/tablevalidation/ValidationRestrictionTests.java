@@ -10,10 +10,10 @@ public class ValidationRestrictionTests {
 
 
     @Test public void UrlSafeRegex_worksAppropriately(){
-        String expectedFail = "TEST";
-        String expectedFail2 = ".T-E S_T~";
+        String expectedFail = "TEST99";
+        String expectedFail2 = " ";
+        String expectedFail3 = ".T90-E S_T~";
         String expectedPass = "/T*J+*^|#@";
-        String expectedPass2 = "0930934.323";
         String regex = ValueRestrictions.URL_SAFE().getRegex();
 
         Predicate<String> urlSafeRegex = Pattern.compile(regex)
@@ -22,13 +22,13 @@ public class ValidationRestrictionTests {
 
         Assert.assertFalse(urlSafeRegex.test(expectedFail));
         Assert.assertFalse(urlSafeRegex.test(expectedFail2));
+        Assert.assertFalse(urlSafeRegex.test(expectedFail3));
         Assert.assertTrue(urlSafeRegex.test(expectedPass));
-        Assert.assertTrue(urlSafeRegex.test(expectedPass2));
     }
 
     @Test public void FreeTextRegex_worksAppropriately(){
         String expectedFail = "TEST";
-        String expectedFail2 = "..,:;-ST";
+        String expectedFail2 = ".', ST";
         String expectedPass = "/T*J+*^|#@";
         String expectedPass2 = "0930934.323";
         String regex = ValueRestrictions.FREE_TEXT().getRegex();
