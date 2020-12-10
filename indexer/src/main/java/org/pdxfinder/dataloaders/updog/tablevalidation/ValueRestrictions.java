@@ -1,5 +1,7 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation;
 
+import java.util.List;
+
 public class ValueRestrictions {
 
     //ascii punctuation characters are !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
@@ -33,6 +35,19 @@ public class ValueRestrictions {
 
     static public ValueRestrictions of(String regexCharset, String charSetDescription){
         return new ValueRestrictions(regexCharset, charSetDescription);
+    }
+
+    static public ValueRestrictions of(List<String> categories, String categoryDescription){
+        return new ValueRestrictions(listToCaseInsensitiveRegex(categories), categoryDescription);
+    }
+
+    static private String listToCaseInsensitiveRegex(List<String> categories){
+        String orRegex = String.join(" | ", categories).replaceAll("\\s+", "");
+        return anchoredNoGroupingCaseInsensitiveRegex(orRegex);
+    }
+
+    static private String anchoredNoGroupingCaseInsensitiveRegex(String orRegex){
+        return String.format("(?i)^(?:%s)$", orRegex);
     }
 
     public String getRegex() { return regex; }

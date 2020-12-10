@@ -3,6 +3,8 @@ package org.pdxfinder.dataloaders.updog.tablevalidation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -60,6 +62,22 @@ public class ValidationRestrictionTests {
         Assert.assertTrue(numberRegex.test(expectedPass3));
     }
 
-
-
+    @Test public void ListToRegex_givenList_regexHasDiscreteCategories(){
+        List<String> categories = Arrays.asList("a", "test", "for", "regex", "categories");
+        String expectedfail = "test";
+        String expectedfail2 = "regex";
+        String expectedpass = "atestfor";
+        String expectedpass2 = " regex ";
+        String expectedpass3 = "pd'x fi;nder !!?!?!";
+        String valueRestrictions = ValueRestrictions.of(categories, "regex test").getRegex();
+        Predicate<String> restrictionPredicate = Pattern.compile(valueRestrictions)
+                .asPredicate()
+                .negate();
+        System.out.println(valueRestrictions);
+        Assert.assertFalse(restrictionPredicate.test(expectedfail));
+        Assert.assertFalse(restrictionPredicate.test(expectedfail2));
+        Assert.assertTrue(restrictionPredicate.test(expectedpass));
+        Assert.assertTrue(restrictionPredicate.test(expectedpass2));
+        Assert.assertTrue(restrictionPredicate.test(expectedpass3));
+    }
 }

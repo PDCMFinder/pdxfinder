@@ -2,14 +2,14 @@ package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import org.pdxfinder.dataloaders.updog.TableSetUtilities;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PdxValidationRuleset extends ValidationRuleCreator {
 
     private Set<ColumnReference> columnReferences;
+    static final String NOTCOLLECTED = "not collected";
+    static final String NOTPROVIDED = " not provided";
 
     public PdxValidationRuleset() {
         this.columnReferences = createColumns();
@@ -87,67 +87,23 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
         return tableColumns;
     }
 
+
     @Override
     public TableSetSpecification generate(String provider) {
-
-        Set<String> metadataTables = columnReferences.stream()
-            .map(ColumnReference::table)
-            .filter(c -> c.contains("metadata"))
-            .collect(Collectors.toSet());
-
+        Set<String> metadataTables = getMetadataTables();
         Set<ColumnReference> idColumns = matchingColumnsFromAnyTable(columnReferences, "_id");
-        Set<ColumnReference> uniqIdColumns = new HashSet<>();
-        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-patient.tsv", new String[]{"patient_id"}));
-        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-sharing.tsv", new String[]{"model_id"}));
-
-        Set<ColumnReference> hostStrainColumns = matchingColumnsFromAnyTable(columnReferences, "host_strain");
-
-        Set<ColumnReference> essentialSampleColumns = matchingColumnsFromTable(columnReferences, "sample",
-            new String[]{"age_in_years", "diagnosis", "tumour_type", "primary_site", "collection_site"});
-        Set<ColumnReference> essentialModelColumns = matchingColumnsFromTable(columnReferences, "model",
-            new String[]{"host_strain_full", "engraftment_site","engraftment_type","sample_type", "passage_number"});
-        Set<ColumnReference> essentialModelValidationColumns = matchingColumnsFromTable(columnReferences, "model_validation",
-            new String[]{"validation_technique", "description", "passages_tested", "validation_host_strain_full"});
-        Set<ColumnReference> essentialSharingColumns = matchingColumnsFromTable(columnReferences, "sharing",
-            new String[]{"provider_type", "accessibility", "email", "name", "provider_name", "provider_abbreviation", "project"});
-        Set<ColumnReference> essentialLoaderColumns = matchingColumnsFromTable(columnReferences, "loader",
-            new String[]{"name", "abbreviation", "internal_url"});
-
-        Set<ColumnReference> essentialColumns = TableSetUtilities.concatenate(
-            idColumns,
-            hostStrainColumns,
-            essentialSampleColumns,
-            essentialModelColumns,
-            essentialModelValidationColumns,
-            essentialSharingColumns,
-            essentialLoaderColumns
-        );
-
-        Set<ColumnReference> patientFreeTextColumns = matchingColumnsFromTable(columnReferences, "patient",
-                new String[]{"history", "ethnicity", "initial_diagnosis" });
-        Set<ColumnReference> sampleFreeTextColumns = matchingColumnsFromTable(columnReferences, "sample",
-                new String[]{"diagnosis" , "primary_site", "collection_site"});
-        Set<ColumnReference> modelFreeTextColumns = matchingColumnsFromTable(columnReferences, "model",
-                new String[]{"diagnosis" , "primary_site", "collection_site", "sample_type", "sample_state"});
-        Set<ColumnReference> modelValidationFreeTextColumns = matchingColumnsFromTable(columnReferences, "model_validation",
-                new String[]{"validation_technique", "description"});
-        Set<ColumnReference> sharingFreeTextColumns = matchingColumnsFromTable(columnReferences, "model_validation",
-                new String[]{"provider_abbreviation", "project"});
-
-        Set<ColumnReference> freeTextColumns = TableSetUtilities.concatenate(
-                patientFreeTextColumns,
-                sampleFreeTextColumns,
-                modelFreeTextColumns,
-                modelValidationFreeTextColumns,
-                sharingFreeTextColumns
-        );
+        Set<ColumnReference> uniqIdColumns = getUniqueColumns();
+        Set<ColumnReference> essentialColumns = getEssentialColumns(idColumns);
+        Set<ColumnReference> freeTextColumns = getFreeTextColumns();
+        Map<Set<ColumnReference>, ValueRestrictions> categoricalRestrictions = getCategoricalRestrictions();
 
         return TableSetSpecification.create()
             .addRequiredTables(metadataTables)
             .addRequiredColumns(essentialColumns)
             .addNonEmptyColumns(essentialColumns)
-            .addCharSetRestriction(idColumns, ValueRestrictions.URL_SAFE())
-            .addCharSetRestriction(freeTextColumns, ValueRestrictions.FREE_TEXT())
+            .addValueRestriction(idColumns, ValueRestrictions.URL_SAFE())
+            .addValueRestriction(freeTextColumns, ValueRestrictions.FREE_TEXT())
+            .addAllValueRestrictions(categoricalRestrictions)
             .addUniqueColumns(uniqIdColumns)
             .addRelations(new HashSet<>(Arrays.asList(
                 Relation.betweenTableKeys(
@@ -169,6 +125,76 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
                         ColumnReference.of("metadata-sample.tsv", "model_id"))
             )));
+    }
+
+    private Set<String> getMetadataTables() {
+        return columnReferences.stream()
+                .map(ColumnReference::table)
+                .filter(c -> c.contains("metadata"))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<ColumnReference> getUniqueColumns() {
+        Set<ColumnReference> uniqIdColumns = new HashSet<>();
+        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-patient.tsv", new String[]{"patient_id"}));
+        uniqIdColumns.addAll(matchingColumnsFromTable(columnReferences, "metadata-sharing.tsv", new String[]{"model_id"}));
+        return uniqIdColumns;
+    }
+
+    private Map<Set<ColumnReference>, ValueRestrictions> getCategoricalRestrictions() {
+        Set<ColumnReference> tumourTypeColumn = matchingColumnsFromTable(columnReferences,
+                "sample", new String[]{"tumour_type"});
+        ValueRestrictions tumourTypeCategories = ValueRestrictions.of(Arrays.asList("primary",
+                "metastatic", "recurrent", "refactory", NOTCOLLECTED, NOTPROVIDED), "Collected Tumour Type");
+
+
+        Map<Set<ColumnReference>, ValueRestrictions> categoricalRestrictions = new HashMap<>();
+        categoricalRestrictions.put(tumourTypeColumn, tumourTypeCategories);
+
+        return categoricalRestrictions;
+    }
+
+    private Set<ColumnReference> getFreeTextColumns() {
+        Set<ColumnReference> patientFreeTextColumns = matchingColumnsFromTable(columnReferences, "patient",
+                new String[]{"history", "ethnicity", "initial_diagnosis" });
+        Set<ColumnReference> sampleFreeTextColumns = matchingColumnsFromTable(columnReferences, "sample",
+                new String[]{"diagnosis" , "primary_site", "collection_site"});
+        Set<ColumnReference> modelFreeTextColumns = matchingColumnsFromTable(columnReferences, "model",
+                new String[]{"diagnosis" , "primary_site", "collection_site", "sample_type", "sample_state"});
+        Set<ColumnReference> modelValidationFreeTextColumns = matchingColumnsFromTable(columnReferences, "model_validation",
+                new String[]{"validation_technique", "description"});
+        Set<ColumnReference> sharingFreeTextColumns = matchingColumnsFromTable(columnReferences, "model_validation",
+                new String[]{"provider_abbreviation", "project"});
+
+        return TableSetUtilities.concatenate(
+                patientFreeTextColumns,
+                sampleFreeTextColumns,
+                modelFreeTextColumns,
+                modelValidationFreeTextColumns,
+                sharingFreeTextColumns
+        );
+    }
+
+    private Set<ColumnReference> getEssentialColumns(Set<ColumnReference> idColumns) {
+        Set<ColumnReference> essentialSampleColumns = matchingColumnsFromTable(columnReferences, "sample",
+                new String[]{"age_in_years", "diagnosis", "tumour_type", "primary_site", "collection_site"});
+        Set<ColumnReference> essentialModelColumns = matchingColumnsFromTable(columnReferences, "model",
+                new String[]{"host_strain_full", "engraftment_site","engraftment_type","sample_type", "passage_number"});
+        Set<ColumnReference> essentialModelValidationColumns = matchingColumnsFromTable(columnReferences, "model_validation",
+                new String[]{"validation_technique", "description", "passages_tested", "validation_host_strain_full"});
+        Set<ColumnReference> essentialSharingColumns = matchingColumnsFromTable(columnReferences, "sharing",
+                new String[]{"provider_type", "accessibility", "email", "name", "provider_name", "provider_abbreviation", "project"});
+        Set<ColumnReference> essentialLoaderColumns = matchingColumnsFromTable(columnReferences, "loader",
+                new String[]{"name", "abbreviation", "internal_url"});
+
+        return TableSetUtilities.concatenate(
+                idColumns,
+                essentialSampleColumns,
+                essentialModelColumns,
+                essentialModelValidationColumns,
+                essentialSharingColumns,
+                essentialLoaderColumns
+        );
     }
 
 }
