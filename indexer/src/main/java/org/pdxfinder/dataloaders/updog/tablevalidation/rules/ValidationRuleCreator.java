@@ -1,4 +1,4 @@
-package org.pdxfinder.dataloaders.updog.tablevalidation;
+package org.pdxfinder.dataloaders.updog.tablevalidation.rules;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,9 +10,9 @@ import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import tech.tablesaw.api.Table;
 
-public abstract class ValidationRuleCreator {
+abstract class ValidationRuleCreator {
 
-    protected abstract TableSetSpecification generate(String provider);
+    abstract TableSetSpecification generate(String provider);
 
     protected static Set<ColumnReference> matchingColumnsFromTable(
         Set<ColumnReference> columns,

@@ -1,15 +1,17 @@
-package org.pdxfinder.dataloaders.updog.tablevalidation;
+package org.pdxfinder.dataloaders.updog.tablevalidation.rules;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.isA;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.hamcrest.CoreMatchers.isA;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
+import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 
 public class TableSetSpecificationTest {
 

@@ -1,13 +1,5 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.*;
-import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import tech.tablesaw.api.Table;
-
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -15,6 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ErrorReporter;
+import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
+import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
+import org.pdxfinder.dataloaders.updog.tablevalidation.rules.OmicValidationRuleset;
+import org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationRuleset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import tech.tablesaw.api.Table;
 
 @Component
 public class Updog {
@@ -80,7 +83,8 @@ public class Updog {
     ) {
         TableSetSpecification omicSpecifications = TableSetSpecification.create();
         for (String tableName : omicTables) {
-            omicSpecifications =  TableSetSpecification.merge(OmicValidationRuleset.generateFor(tableName, provider));
+            omicSpecifications =  TableSetSpecification.merge(
+                OmicValidationRuleset.generateFor(tableName, provider));
         }
 
         TableSetSpecification combinedValidationRuleset = TableSetSpecification.merge(
