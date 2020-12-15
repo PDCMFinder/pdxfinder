@@ -23,10 +23,10 @@ Through its various activities, PDX Finder is increasing model awareness, integr
 
  
 
-PDX Finder is freely available under an Apache 2 license (github.com/pdxfinder). Work supported by NCI U24 CA204781 01, R01 CA089713 and the European Molecular Biology Laboratory.
+PDX Finder is freely available under an Apache 2 license (https://github.com/PDXFinder). Work is supported by NCI U24 CA204781 01, U24 CA253539 01, R01 CA089713 and the European Molecular Biology Laboratory.
 
  
 
-† Conte et al, 2019. PDX Finder: A Portal for Patient-Derived tumor Xenograft Model Discovery. NAR, 2019 Jan.
+† [Conte et al, 2019. PDX Finder: A Portal for Patient-Derived tumor Xenograft Model Discovery. NAR, 2019 Jan](https://pubmed.ncbi.nlm.nih.gov/30535239/) 
 
-†† Meehan, Conte et al, 2017. PDX-MI: Minimal Information for Patient-Derived Tumor Xenograft Models. Cancer Res. 2017 Nov.
+†† [Meehan, Conte et al, 2017. PDX-MI: Minimal Information for Patient-Derived Tumor Xenograft Models. Cancer Res. 2017 Nov](https://pubmed.ncbi.nlm.nih.gov/29092942/)
