@@ -12,9 +12,9 @@ public class Relation {
     private String rightColumnName;
 
     public enum validityType {
-        table_key,
-        one_to_one,
-        one_to_many,
+        TABLE_KEY,
+        ONE_TO_ONE,
+        ONE_TO_MANY,
     }
 
     private Relation(
@@ -36,7 +36,7 @@ public class Relation {
             throw new IllegalArgumentException(
                 String.format("Unable to define a relation from a column to itself (%s)", left));
 
-        return new Relation(validityType.table_key, left.table(), left.column(), right.table(), right.column());
+        return new Relation(validityType.TABLE_KEY, left.table(), left.column(), right.table(), right.column());
     }
 
     public static Relation betweenTableColumns(validityType plurality, ColumnReference left,

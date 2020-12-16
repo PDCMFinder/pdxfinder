@@ -1,5 +1,13 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.tuple.Pair;
@@ -11,10 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Component
 public class BrokenRelationErrorCreator extends ErrorCreator {
@@ -54,11 +58,11 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
 
     private void runAppropriateValidation(Map<String, Table> tableSet, Relation relation, TableSetSpecification tableSetSpecification) {
         Relation.validityType validity = relation.getValidity();
-        if (validity.equals(Relation.validityType.table_key)) {
+        if (validity.equals(Relation.validityType.TABLE_KEY)) {
             reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, tableSetSpecification.getProvider());
-        } else if (validity.equals(Relation.validityType.one_to_one)) {
+        } else if (validity.equals(Relation.validityType.ONE_TO_ONE)) {
             reportBrokenOneToOneRelation(tableSet, relation, tableSetSpecification.getProvider());
-        } else if (validity.equals(Relation.validityType.one_to_many)) {
+        } else if (validity.equals(Relation.validityType.ONE_TO_MANY)) {
             reportBrokenOneToManyRelation(tableSet, relation, tableSetSpecification.getProvider());
         }
     }
