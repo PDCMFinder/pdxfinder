@@ -7,6 +7,7 @@ import org.pdxfinder.dataloaders.updog.TableSetUtilities;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ValidationRuleCreator;
 
 public class OmicValidationRuleset extends ValidationRuleCreator {
 

@@ -30,9 +30,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
 
     private Set<ColumnReference> metadataColumnReferences;
     private Set<ColumnReference> idColumns;
-    static final String NOTCOLLECTED = "not collected";
-    static final String NOTPROVIDED = "not provided";
-
 
     public PdxValidationRuleset() {
         this.metadataColumnReferences = getMetadataColumns();
