@@ -1,11 +1,18 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.rules;
 
-import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationConstants.getCollectionDateFormat;
-import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationConstants.getCollectionEventFormat;
-import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationConstants.getFreeTextCharset;
-import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationConstants.getMetadataColumns;
-import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationConstants.getPmidFormat;
-import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationConstants.getUrlSafeCharset;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getCollectionDateFormat;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getCollectionEventFormat;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getEthnicityAssessmentCategories;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getFreeTextCharset;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getNumericalCharset;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getPmidFormat;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getPriorTreatmentCategories;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getProviderTypeCategories;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getSexCategories;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getShareCategories;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getTreatmentNaiveAtCollectionCategories;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getTumourTypeCategories;
+import static org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions.getUrlSafeCharset;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,12 +73,12 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                     ColumnReference.of("metadata-model.tsv", "model_id"),
                     ColumnReference.of("metadata-sharing.tsv", "model_id")),
                 Relation.betweenTableColumns(
-                        Relation.validityType.one_to_many,
+                        validityType.ONE_TO_MANY,
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
                         ColumnReference.of("metadata-sample.tsv", "patient_id")
                         ),
                 Relation.betweenTableColumns(
-                        Relation.validityType.one_to_one,
+                        validityType.ONE_TO_ONE,
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
                         ColumnReference.of("metadata-sample.tsv", "model_id"))
             )));
@@ -128,14 +135,6 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
         Set<ColumnReference> tumourTypeColumn = matchingColumnFromMetadata(
             "sample",
             "tumour_type");
-        ValueRestrictions tumourTypeCategories = ValueRestrictions.of(Arrays.asList(
-                "primary",
-                "metastatic",
-                "recurrent",
-                "refactory",
-                NOTCOLLECTED,
-                NOTPROVIDED
-            ));
         Set<ColumnReference> sexColumn = matchingColumnFromMetadata(
                 "patient",
             "sex");
