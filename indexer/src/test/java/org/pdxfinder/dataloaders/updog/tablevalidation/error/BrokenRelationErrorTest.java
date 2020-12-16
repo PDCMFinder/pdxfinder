@@ -1,21 +1,20 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
 import org.junit.Test;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
-
 public class BrokenRelationErrorTest {
     private BrokenRelationErrorCreator brokenTableRelationErrorCreator = new BrokenRelationErrorCreator();
 
     @Test public void toString_givenBrokenRelationMissingRightColumn_returnsAppropriateMessage() {
         String expected =
-            "Error in [bar.tsv] for provider [TEST]: Broken table_key relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]" +
+            "Error in [bar.tsv] for provider [TEST]: Broken TABLE_KEY relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]" +
                 ": because [bar.tsv] is missing column [foo_id]:\n" +
                 " not_foo_id  |\n" +
                 "--------------";
@@ -41,7 +40,7 @@ public class BrokenRelationErrorTest {
     @Test public void verboseMessage_givenBrokenRelationOrphanIdsInRightColumn_returnsAppropriateMessage() {
         String expected =
             "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
-                "Broken table_key relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]: " +
+                "Broken TABLE_KEY relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]: " +
                 "2 orphan row(s) found in [bar.tsv]:\n" +
                 " foo_id  |\n" +
                 "----------\n" +
@@ -69,7 +68,7 @@ public class BrokenRelationErrorTest {
     @Test public void message_givenError_returnsAppropriateMessage() {
         String expected =
             "Error in [bar.tsv] for provider [PROVIDER-BC]: " +
-                "Broken table_key relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]: " +
+                "Broken TABLE_KEY relation [(foo.tsv) foo_id -> foo_id (bar.tsv)]: " +
                 "2 orphan row(s) found in [bar.tsv]";
         Relation relation = Relation.betweenTableKeys(
             ColumnReference.of("foo.tsv", "foo_id"),
