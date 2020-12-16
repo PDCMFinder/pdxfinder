@@ -23,7 +23,9 @@ import java.util.stream.Collectors;
 import org.pdxfinder.dataloaders.updog.TableSetUtilities;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation.validityType;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ValidationRuleCreator;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ValueRestrictions;
 
 public class PdxValidationRuleset extends ValidationRuleCreator {
@@ -32,11 +34,11 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
     private Set<ColumnReference> idColumns;
 
     public PdxValidationRuleset() {
-        this.metadataColumnReferences = getMetadataColumns();
+        this.metadataColumnReferences = PdxTableColumns.getMetadataColumns();
     }
 
-    private Set<ColumnReference> matchingColumnFromMetadata(String tableName, String... columnName){
-        return matchingColumnFromMetadata( tableName, columnName);
+    private Set<ColumnReference> matchingColumnFromMetadata(String tableName, String columnName){
+        return matchingColumnFromTable(metadataColumnReferences, tableName, columnName);
     }
 
     private Set<ColumnReference> matchingColumnsFromMetadata(String tableName, String... columns){
@@ -97,20 +99,32 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
             "model",
             "publications");
 
-        Set<ColumnReference> numericalColumn = matchingColumnFromMetadata()
+        Set<ColumnReference> numericalColumn = getNumericalColumns();
 
         regexRestrictions.put(freeTextColumns, getFreeTextCharset());
         regexRestrictions.put(idColumns, getUrlSafeCharset());
         regexRestrictions.put(collectionEventColumn, getCollectionEventFormat());
         regexRestrictions.put(collectionDateColumn, getCollectionDateFormat());
         regexRestrictions.put(pmidColumn, getPmidFormat());
+        regexRestrictions.put(numericalColumn, getNumericalCharset());
         return regexRestrictions;
     }
 
     private Set<ColumnReference> getNumericalColumns(){
-        Set<ColumnReference> columnReferences = new HashSet<>();
-        matchingColumnFromTable()
-
+        Set<ColumnReference> numericalColumns = new HashSet<>();
+        numericalColumns.addAll(
+            matchingColumnFromMetadata("patient", "age_at_initial_diagnosis"
+            ));
+        numericalColumns.addAll(
+            matchingColumnFromMetadata("sample", "age_in_years_at_collection"
+            ));
+        numericalColumns.addAll(
+            matchingColumnFromMetadata("model", "passage_number"
+            ));
+        numericalColumns.addAll(
+            matchingColumnFromMetadata("model_validation", "passages_tested"
+            ));
+        return numericalColumns;
     }
 
 
@@ -135,58 +149,36 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
         Set<ColumnReference> sexColumn = matchingColumnFromMetadata(
                 "patient",
             "sex");
-        ValueRestrictions sexCategories = ValueRestrictions.of(Arrays.asList(
-                "male",
-                "female",
-                "other",
-                NOTCOLLECTED,
-                NOTPROVIDED
-            ));
+
+        Set<ColumnReference> ethnicityAssessmentColumn = matchingColumnFromMetadata(
+            "patient",
+            "ethnicity_assessment_method"
+        );
+
         Set<ColumnReference> shareColumn = matchingColumnFromMetadata(
             "sample",
             "sharable");
-        ValueRestrictions shareColumnCategories = ValueRestrictions.of(Arrays.asList(
-                "yes",
-                "no",
-                NOTPROVIDED
-        ));
+
         Set<ColumnReference> treatmentNaiveAtCollectionColumn = matchingColumnFromMetadata(
             "sample",
             "treatment_naive_at_collection");
-        ValueRestrictions treatementNaiveAtCollectionCategories = ValueRestrictions.of(Arrays.asList(
-                "treatment naive" ,
-                "not treatment naive",
-                NOTCOLLECTED,
-                NOTPROVIDED
-        ));
+
         Set<ColumnReference> priorTreatmentColumn = matchingColumnFromMetadata(
             "sample",
             "prior_treatment");
-        ValueRestrictions priorTreatmentCategories = ValueRestrictions.of(
-            Arrays.asList(
-                "yes",
-                "no",
-                NOTPROVIDED,
-                NOTCOLLECTED));
+
         Set<ColumnReference> providerTypeColumn = matchingColumnFromMetadata(
             "sharing",
             "provider_type");
-        ValueRestrictions providerTypeCategories = ValueRestrictions.of(
-            Arrays.asList(
-                "academia",
-                "industry",
-                "academia and industry",
-                "CRO",
-                "pharma"
-            ));
 
         Map<Set<ColumnReference>, ValueRestrictions> categoricalRestrictions = new HashMap<>();
-        categoricalRestrictions.put(tumourTypeColumn, tumourTypeCategories);
-        categoricalRestrictions.put(sexColumn, sexCategories);
-        categoricalRestrictions.put(shareColumn, shareColumnCategories);
-        categoricalRestrictions.put(treatmentNaiveAtCollectionColumn, treatementNaiveAtCollectionCategories);
-        categoricalRestrictions.put(priorTreatmentColumn,priorTreatmentCategories);
-        categoricalRestrictions.put(providerTypeColumn, providerTypeCategories);
+        categoricalRestrictions.put(tumourTypeColumn, getTumourTypeCategories());
+        categoricalRestrictions.put(sexColumn, getSexCategories());
+        categoricalRestrictions.put(ethnicityAssessmentColumn, getEthnicityAssessmentCategories());
+        categoricalRestrictions.put(shareColumn, getShareCategories());
+        categoricalRestrictions.put(treatmentNaiveAtCollectionColumn, getTreatmentNaiveAtCollectionCategories());
+        categoricalRestrictions.put(priorTreatmentColumn,getPriorTreatmentCategories());
+        categoricalRestrictions.put(providerTypeColumn, getProviderTypeCategories());
         return categoricalRestrictions;
     }
 
