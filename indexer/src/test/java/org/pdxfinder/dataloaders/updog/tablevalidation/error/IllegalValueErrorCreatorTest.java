@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
-import org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValidationConstants;
+import org.pdxfinder.dataloaders.updog.tablevalidation.rules.PdxValueRestrictions;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
@@ -48,19 +48,19 @@ public class IllegalValueErrorCreatorTest {
 
     @Test public void UrlSafeCharTest_columnWithUrlSafeString_returnNoError(){
         Map<String, Table> tableSet = makeTableSetWithSingleColumn(Arrays.asList("TEST", "T.E ST-~_"));
-        tableSetSpecification.addValueRestriction(columns, PdxValidationConstants.getUrlSafeCharset());
+        tableSetSpecification.addValueRestriction(columns, PdxValueRestrictions.getUrlSafeCharset());
         Assert.assertTrue(illegalValueErrorCreator.generateErrors(tableSet, tableSetSpecification).isEmpty());
     }
 
     @Test public void UrlSafeError_columnWithNoneUrlSafeString_returnError(){
         Map<String, Table> tableSet = makeTableSetWithSingleColumn(Collections.singletonList("T#E/ST"));
-        tableSetSpecification.addValueRestriction(columns, PdxValidationConstants.getUrlSafeCharset());
+        tableSetSpecification.addValueRestriction(columns, PdxValueRestrictions.getUrlSafeCharset());
         Assert.assertFalse(illegalValueErrorCreator.generateErrors(tableSet, tableSetSpecification).isEmpty());
     }
 
     @Test public void UrlSafeError_columnWithMixOfNoneString_returnError(){
         Map<String, Table> tableSet = makeTableSetWithSingleColumn(Arrays.asList("T#E/ST", "TEST", "TEES", "TES23#"));
-        tableSetSpecification.addValueRestriction(columns, PdxValidationConstants.getUrlSafeCharset());
+        tableSetSpecification.addValueRestriction(columns, PdxValueRestrictions.getUrlSafeCharset());
         Assert.assertFalse(illegalValueErrorCreator.generateErrors(tableSet, tableSetSpecification).isEmpty());
     }
 

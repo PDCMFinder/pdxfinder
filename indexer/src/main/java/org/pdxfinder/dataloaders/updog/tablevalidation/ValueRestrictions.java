@@ -8,7 +8,7 @@ public class ValueRestrictions {
 
     private Predicate<String> predicate;
     private String errorDescription;
-    private boolean canBeEmpty = false;
+    private boolean canBeEmpty = true;
 
     private ValueRestrictions(String regex, String description){
         this.predicate = regexToPredicate(regex);
@@ -45,8 +45,8 @@ public class ValueRestrictions {
             .asPredicate();
     }
 
-    public ValueRestrictions canBeEmpty() {
-        canBeEmpty = true;
+    public ValueRestrictions cannotBeEmpty() {
+        canBeEmpty = false;
         return this;
     }
 
