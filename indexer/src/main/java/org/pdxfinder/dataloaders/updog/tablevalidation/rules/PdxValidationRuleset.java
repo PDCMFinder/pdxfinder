@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import org.pdxfinder.dataloaders.updog.TableSetUtilities;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
-import org.pdxfinder.dataloaders.updog.tablevalidation.Relation.validityType;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation.ValidityType;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ValidationRuleCreator;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ValueRestrictions;
@@ -72,12 +72,12 @@ public class PdxValidationRuleset extends ValidationRuleCreator {
                     ColumnReference.of("metadata-model.tsv", "model_id"),
                     ColumnReference.of("metadata-sharing.tsv", "model_id")),
                 Relation.betweenTableColumns(
-                        validityType.ONE_TO_MANY,
+                        ValidityType.ONE_TO_MANY,
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
                         ColumnReference.of("metadata-sample.tsv", "patient_id")
                         ),
                 Relation.betweenTableColumns(
-                        validityType.ONE_TO_ONE,
+                        ValidityType.ONE_TO_ONE,
                         ColumnReference.of("metadata-sample.tsv", "sample_id"),
                         ColumnReference.of("metadata-sample.tsv", "model_id"))
             )));

@@ -13,6 +13,7 @@ import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation.ValidityType;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +58,12 @@ public class BrokenRelationErrorCreator extends ErrorCreator {
     }
 
     private void runAppropriateValidation(Map<String, Table> tableSet, Relation relation, TableSetSpecification tableSetSpecification) {
-        Relation.validityType validity = relation.getValidity();
-        if (validity.equals(Relation.validityType.TABLE_KEY)) {
+        ValidityType validity = relation.getValidity();
+        if (validity.equals(ValidityType.TABLE_KEY)) {
             reportOrphanRowsWhenMissingValuesInRelation(tableSet, relation, tableSetSpecification.getProvider());
-        } else if (validity.equals(Relation.validityType.ONE_TO_ONE)) {
+        } else if (validity.equals(ValidityType.ONE_TO_ONE)) {
             reportBrokenOneToOneRelation(tableSet, relation, tableSetSpecification.getProvider());
-        } else if (validity.equals(Relation.validityType.ONE_TO_MANY)) {
+        } else if (validity.equals(ValidityType.ONE_TO_MANY)) {
             reportBrokenOneToManyRelation(tableSet, relation, tableSetSpecification.getProvider());
         }
     }
