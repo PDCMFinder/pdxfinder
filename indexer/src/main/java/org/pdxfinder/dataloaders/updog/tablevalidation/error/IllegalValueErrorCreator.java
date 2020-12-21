@@ -1,5 +1,12 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ValueRestrictions;
@@ -8,15 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Component
 public class IllegalValueErrorCreator extends ErrorCreator {
@@ -43,7 +41,7 @@ public class IllegalValueErrorCreator extends ErrorCreator {
             Map<String, Table> tableSet,
             String provider)
     {
-        for( ColumnReference columnReference : columns){
+        for(ColumnReference columnReference : columns){
             if(!tableMissingColumn(tableSet.get(columnReference.table()),
                     columnReference.column(),
                     columnReference.table()))
@@ -61,12 +59,11 @@ public class IllegalValueErrorCreator extends ErrorCreator {
     {
        Table workingTable = tableSet.get(columnReference.table());
        StringColumn column = workingTable.column(columnReference.column()).asStringColumn();
-       Predicate<String> charRestriction = Pattern.compile(valueRestrictions
-               .getRegex())
-               .asPredicate()
-               .negate();
+       Predicate<String> testValues = valueRestrictions.getInvalidValuePredicate();
+       Predicate<String> testEmptiness =valueRestrictions.getEmptyFilter();
        List<String> invalidValues = column.asList().stream()
-               .filter(charRestriction)
+               .filter(testValues)
+               .filter(testEmptiness)
                .collect(Collectors.toCollection(LinkedList::new));
        int[] indexOfInvalids = invalidValues.stream()
                .map(column::indexOf)
@@ -75,10 +72,10 @@ public class IllegalValueErrorCreator extends ErrorCreator {
 
        if(!invalidValues.isEmpty()){
            String errorDescriptions = String.format(
-                   "in column [%s] found %s values has characters not contained in %s : %s",
+                   "in column [%s] found %s values %s : %s",
                    columnReference.column(),
                    invalidValues.size(),
-                   valueRestrictions.getDescription(),
+                   valueRestrictions.getErrorDescription(),
                    invalidValues.toString()
            );
            errors.add(create(columnReference.table(), errorDescriptions, workingTable.rows(indexOfInvalids), provider));

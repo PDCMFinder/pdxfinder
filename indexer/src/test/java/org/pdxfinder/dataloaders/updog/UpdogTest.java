@@ -6,9 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.pdxfinder.dataloaders.updog.domainobjectcreation.DomainObjectCreator;
-import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
-import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
-import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Validator;
 import org.pdxfinder.dataloaders.updog.tablevalidation.error.ValidationError;
 import tech.tablesaw.api.Table;
@@ -88,90 +85,4 @@ public class UpdogTest {
             concatenate(listOne, listTwo, listThree)
         );
     }
-
-    @Test public void merge_givenOneSpecification_returnsEqualSpecification() {
-        Set<String> requiredTables = new HashSet<>(Collections.singletonList("table1.tsv"));
-        TableSetSpecification expected =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables);
-        assertEquals(
-            expected,
-            Updog.merge(expected)
-        );
-    }
-
-    @Test public void merge_givenTwoDifferentSpecifications_returnsCombinedSpecification() {
-        Set<String> requiredTables = new HashSet<>(Collections.singletonList("table1.tsv"));
-        Set<String> requiredTables2 = new HashSet<>(Collections.singletonList("table2.tsv"));
-        TableSetSpecification expected =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables)
-            .addRequiredTables(requiredTables2);
-        TableSetSpecification specfication1 =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables);
-        TableSetSpecification specfication2 =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables2);
-        assertEquals(
-            expected,
-            Updog.merge(specfication1, specfication2)
-        );
-    }
-
-    @Test public void merge_givenTwoIdenticalSpecification_returnsEqualSpecification() {
-        Set<String> requiredTables = new HashSet<>(Collections.singletonList("table1.tsv"));
-        TableSetSpecification expected =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables);
-        assertEquals(
-            expected,
-            Updog.merge(expected, expected)
-        );
-    }
-
-    @Test public void merge_givenTwoDifferentSpecificationsWithAllValidations_returnsCombinedSpecification() {
-        Set<String> requiredTables1 = new HashSet<>(Collections.singletonList("table1.tsv"));
-        Set<String> requiredTables2 = new HashSet<>(Collections.singletonList("table2.tsv"));
-        ColumnReference columnReference1 = ColumnReference.of("table1", "column1");
-        ColumnReference columnReference2 = ColumnReference.of("table1", "column2");
-
-        TableSetSpecification expected =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables1)
-            .addRequiredTables(requiredTables2)
-            .addRequiredColumns(columnReference1)
-            .addRequiredColumns(columnReference2)
-            .addNonEmptyColumns(columnReference1)
-            .addNonEmptyColumns(columnReference2)
-            .addUniqueColumns(columnReference1)
-            .addUniqueColumns(columnReference2)
-            .addRelations(Relation.betweenTableKeys(columnReference1, columnReference2));
-        TableSetSpecification specification1 =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables1)
-            .addRequiredColumns(columnReference1)
-            .addNonEmptyColumns(columnReference1)
-            .addUniqueColumns(columnReference1)
-            .addRelations(Relation.betweenTableKeys(columnReference1, columnReference2));
-        TableSetSpecification specfication2 =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables2)
-            .addRequiredColumns(columnReference2)
-            .addNonEmptyColumns(columnReference2)
-            .addUniqueColumns(columnReference2)
-            .addRelations(Relation.betweenTableKeys(columnReference1, columnReference2));
-        assertEquals(
-            expected,
-            Updog.merge(specification1, specfication2)
-        );
-    }
-
-    @Test public void merge_givenTwoIdenticalSpecificationWithAllValidations_returnsEqualSpecification() {
-        Set<String> requiredTables = new HashSet<>(Collections.singletonList("table1.tsv"));
-        Set<ColumnReference> requiredColumns = new HashSet<>(
-            Collections.singletonList(ColumnReference.of("table1", "column1")));
-        TableSetSpecification expected =  TableSetSpecification.create().setProvider("provider")
-            .addRequiredTables(requiredTables)
-            .addRequiredColumns(requiredColumns)
-            .addNonEmptyColumns(requiredColumns)
-            .addUniqueColumns(requiredColumns);
-        assertEquals(
-            expected,
-            Updog.merge(expected, expected)
-        );
-    }
-
 }

@@ -1,41 +1,61 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation;
 
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+
 public class ValueRestrictions {
 
-    //ascii punctuation characters are !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-    //URL restriction is for alphanumeric and _-.~
-    private static final String FREE_TEXT = "^[\\p{Alpha}\\{Space}.,:;-]+$";
-    private static final String FREE_TEXT_DESCRIPTION = "US ASCII Alphabet and .,:;-";
-    private static final String URL_SAFE = "^[\\p{Alpha}\\p{Space}._~-]+$";
-    private static final String URL_SAFE_DESCRIPTION = "US ASCII Alphabet and ._~-";
-    private static final String NUMBER = "^[\\p{Digit}.,-]+$";
-    private static final String NUMBER_DESCRIPTION = "0-9 and .,-";
-
-    private String regex;
-    private String description;
+    private Predicate<String> predicate;
+    private String errorDescription;
+    private boolean canBeEmpty = true;
 
     private ValueRestrictions(String regex, String description){
-        this.regex = regex;
-        this.description = description;
+        this.predicate = regexToPredicate(regex);
+        this.errorDescription = description;
     }
 
-    static public ValueRestrictions URL_SAFE(){
-        return new ValueRestrictions(URL_SAFE, URL_SAFE_DESCRIPTION);
+    private ValueRestrictions(Predicate<String> predicate, String errorDescription){
+        this.predicate = predicate;
+        this.errorDescription = errorDescription;
     }
 
-    static public ValueRestrictions FREE_TEXT(){
-        return new ValueRestrictions(FREE_TEXT, FREE_TEXT_DESCRIPTION);
-    }
-
-    static public ValueRestrictions NUMBER(){
-        return new ValueRestrictions(NUMBER, NUMBER_DESCRIPTION);
-    }
-
-    static public ValueRestrictions of(String regexCharset, String charSetDescription){
+    public static ValueRestrictions of(String regexCharset, String charSetDescription){
         return new ValueRestrictions(regexCharset, charSetDescription);
     }
 
-    public String getRegex() { return regex; }
+    public static ValueRestrictions of(List<String> categories){
+        String errorDescription = String.format("not in a required category. "
+                + "Required Categories: [%s] Value found", String.join(",", categories));
+        return new ValueRestrictions(listToCaseInsensitivePredicate(categories), errorDescription);
+    }
 
-    public String getDescription() { return description; }
+    private static Predicate<String> listToCaseInsensitivePredicate(List<String> categories){
+       String orRegex = String.join("|", categories);
+       String builtRegex = anchoredNoGroupingCaseInsensitiveRegex(orRegex);
+       return regexToPredicate(builtRegex);
+    }
+
+    private static String anchoredNoGroupingCaseInsensitiveRegex(String orRegex){
+        return String.format("(?i)^(?:%s)$", orRegex);
+    }
+
+    private static Predicate<String> regexToPredicate(String regex){
+        return Pattern.compile(regex)
+            .asPredicate();
+    }
+
+    public ValueRestrictions cannotBeEmpty() {
+        canBeEmpty = false;
+        return this;
+    }
+
+    public Predicate<String> getEmptyFilter(){
+        Predicate<String> emptyFilter = String::isEmpty;
+        return (canBeEmpty) ? emptyFilter.negate() : emptyFilter;
+    }
+
+    public Predicate<String> getInvalidValuePredicate() { return predicate.negate(); }
+
+    public String getErrorDescription() { return errorDescription; }
 }

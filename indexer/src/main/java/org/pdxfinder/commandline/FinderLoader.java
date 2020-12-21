@@ -1,5 +1,9 @@
 package org.pdxfinder.commandline;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
@@ -21,11 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 
 @Component
 public class FinderLoader {
@@ -97,8 +96,10 @@ public class FinderLoader {
 
         loadCache(loadCacheRequested);
         loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
-        postLoad(dataProviders, postLoadRequested);
-        initializeMappingDb(initializeMappingDb);
+        if(!validateOnlyRequested) {
+            postLoad(dataProviders, postLoadRequested);
+            initializeMappingDb(initializeMappingDb);
+        }
     }
 
     private void loadCache(boolean loadCacheRequested) {
@@ -160,7 +161,7 @@ public class FinderLoader {
     ) {
         List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
-            if (dataProvider.equals(DataProvider.JAX)) {
+            if (dataProvider.equals(DataProvider.JAX) && !validateOnlyRequested) {
                 loadJAXData.run();
             }
             else{

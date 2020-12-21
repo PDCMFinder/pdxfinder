@@ -1,10 +1,13 @@
-package org.pdxfinder.dataloaders.updog.tablevalidation;
-
-import org.pdxfinder.dataloaders.updog.TableSetUtilities;
+package org.pdxfinder.dataloaders.updog.tablevalidation.rules;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import org.pdxfinder.dataloaders.updog.TableSetUtilities;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
+import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ValidationRuleCreator;
 
 public class OmicValidationRuleset extends ValidationRuleCreator {
 

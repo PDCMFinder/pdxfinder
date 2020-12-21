@@ -5,20 +5,20 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Relation {
 
-    private validityType validity;
+    private ValidityType validity;
     private String leftTableName;
     private String leftColumnName;
     private String rightTableName;
     private String rightColumnName;
 
-    public enum validityType {
-        table_key,
-        one_to_one,
-        one_to_many,
+    public enum ValidityType {
+        TABLE_KEY,
+        ONE_TO_ONE,
+        ONE_TO_MANY,
     }
 
     private Relation(
-            validityType validity,
+            ValidityType validity,
             String leftTableName,
             String leftColumnName,
             String rightTableName,
@@ -36,10 +36,10 @@ public class Relation {
             throw new IllegalArgumentException(
                 String.format("Unable to define a relation from a column to itself (%s)", left));
 
-        return new Relation(validityType.table_key, left.table(), left.column(), right.table(), right.column());
+        return new Relation(ValidityType.TABLE_KEY, left.table(), left.column(), right.table(), right.column());
     }
 
-    public static Relation betweenTableColumns(validityType plurality, ColumnReference left,
+    public static Relation betweenTableColumns(ValidityType plurality, ColumnReference left,
                                                ColumnReference right){
         if (left.equals(right))
             throw new IllegalArgumentException(
@@ -86,9 +86,9 @@ public class Relation {
         return ColumnReference.of(rightTable(), rightColumn());
     }
 
-    public validityType getValidity() { return validity; }
+    public ValidityType getValidity() { return validity; }
 
-    public void setValidity(validityType validity) { this.validity = validity; }
+    public void setValidity(ValidityType validity) { this.validity = validity; }
 
 
     @Override

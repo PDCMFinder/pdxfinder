@@ -11,7 +11,7 @@ public class TableSetSpecification {
     private Set<ColumnReference> requiredColumns;
     private Set<ColumnReference> nonEmptyColumns;
     private Set<ColumnReference> uniqueColumns;
-    private Map<Set<ColumnReference>, ValueRestrictions> charsetRestrictedColumns;
+    private Map<Set<ColumnReference>, ValueRestrictions> valueRestrictedColumns;
     private Set<Relation> relations;
     private String provider = "Not Specified";
 
@@ -20,7 +20,7 @@ public class TableSetSpecification {
         this.requiredColumns = new HashSet<>();
         this.nonEmptyColumns = new HashSet<>();
         this.uniqueColumns = new HashSet<>();
-        this.charsetRestrictedColumns = new HashMap<>();
+        this.valueRestrictedColumns = new HashMap<>();
         this.relations = new HashSet<>();
     }
 
@@ -73,11 +73,16 @@ public class TableSetSpecification {
         return this;
     }
 
-    public TableSetSpecification addCharSetRestriction(
+    public TableSetSpecification addValueRestriction(
             Set<ColumnReference> columnReferences,
             ValueRestrictions valueRestrictions )
     {
-        this.charsetRestrictedColumns.put(columnReferences, valueRestrictions);
+        this.valueRestrictedColumns.put(columnReferences, valueRestrictions);
+        return this;
+    }
+
+    public TableSetSpecification addAllValueRestrictions(Map<Set<ColumnReference>, ValueRestrictions> allvalues){
+        this.valueRestrictedColumns.putAll(allvalues);
         return this;
     }
 
@@ -115,7 +120,7 @@ public class TableSetSpecification {
     }
 
     public Map<Set<ColumnReference>, ValueRestrictions> getCharSetRestrictions() {
-        return this.charsetRestrictedColumns;
+        return this.valueRestrictedColumns;
     }
 
     public Set<String> getMissingTablesFrom(Map<String, Table> fileList) {
@@ -124,7 +129,7 @@ public class TableSetSpecification {
         return missingFiles;
     }
 
-    public TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
+    public static TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
         TableSetSpecification mergedTableSetSpecifications = TableSetSpecification.create();
         for (TableSetSpecification tss : tableSetSpecifications) {
             mergedTableSetSpecifications.setProvider(tss.getProvider());
@@ -133,6 +138,7 @@ public class TableSetSpecification {
             mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
             mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
             mergedTableSetSpecifications.addRelations(tss.getRelations());
+            mergedTableSetSpecifications.addAllValueRestrictions(tss.getCharSetRestrictions());
         }
         return mergedTableSetSpecifications;
     }

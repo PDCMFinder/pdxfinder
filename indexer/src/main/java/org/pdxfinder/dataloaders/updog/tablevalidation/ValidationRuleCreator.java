@@ -1,17 +1,18 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation;
 
-import org.apache.commons.lang3.tuple.Pair;
-import tech.tablesaw.api.Table;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
+import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
+import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
+import tech.tablesaw.api.Table;
 
-abstract class ValidationRuleCreator {
+public abstract class ValidationRuleCreator {
 
-    abstract TableSetSpecification generate(String provider);
+    protected abstract TableSetSpecification generate(String provider);
 
     protected static Set<ColumnReference> matchingColumnsFromTable(
         Set<ColumnReference> columns,
@@ -23,6 +24,16 @@ abstract class ValidationRuleCreator {
             .filter(c -> containsAny(c.column(), columnNamePatterns))
             .collect(Collectors.toSet());
     }
+
+    protected static Set<ColumnReference> matchingColumnFromTable(
+            Set<ColumnReference> columns,
+            String tableName,
+            String columnName
+    )
+    {
+        return matchingColumnsFromTable(columns, tableName, new String[]{columnName});
+    }
+
 
     protected static Set<ColumnReference> matchingColumnsFromAnyTable(
         Set<ColumnReference> columns,
@@ -70,7 +81,7 @@ abstract class ValidationRuleCreator {
     }
 
     private static boolean containsAny(String inputStr, String[] patterns) {
-        return Arrays.stream(patterns).parallel().anyMatch(inputStr::contains);
+        return Arrays.stream(patterns).parallel().anyMatch(inputStr::equalsIgnoreCase);
     }
 
 }

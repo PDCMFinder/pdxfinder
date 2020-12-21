@@ -1,18 +1,22 @@
 package org.pdxfinder.dataloaders.updog.tablevalidation.error;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.pdxfinder.dataloaders.updog.tablevalidation.ColumnReference;
 import org.pdxfinder.dataloaders.updog.tablevalidation.Relation;
+import org.pdxfinder.dataloaders.updog.tablevalidation.Relation.ValidityType;
 import org.pdxfinder.dataloaders.updog.tablevalidation.TableSetSpecification;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
-
-import java.util.*;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 public class BrokenRelationErrorCreatorTest {
 
@@ -26,13 +30,13 @@ public class BrokenRelationErrorCreatorTest {
     );
 
     private final Relation INTRA_TABLE_ONE_TO_MANY = Relation.betweenTableColumns(
-            Relation.validityType.one_to_many,
+            ValidityType.ONE_TO_MANY,
             ColumnReference.of(LEFT_TABLE, "id"),
             ColumnReference.of(LEFT_TABLE, "table_1_id")
     );
 
     private final Relation INTRA_TABLE_ONE_TO_ONE = Relation.betweenTableColumns(
-            Relation.validityType.one_to_one,
+            ValidityType.ONE_TO_ONE,
             ColumnReference.of(LEFT_TABLE, "id"),
             ColumnReference.of(LEFT_TABLE, "table_1_id")
     );

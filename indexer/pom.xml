@@ -48,7 +48,7 @@
         <dependency>
             <groupId>tech.tablesaw</groupId>
             <artifactId>tablesaw-core</artifactId>
-            <version>LATEST</version>
+            <version>0.38.1</version>
         </dependency>
 
         <dependency>
