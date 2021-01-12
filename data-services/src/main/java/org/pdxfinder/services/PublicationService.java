@@ -38,6 +38,7 @@ public class PublicationService {
     public List<String> sanitizePubMedIds(List<String> pubMedIds){
         List<String> cleanedPubMedIds = new ArrayList<>();
         pubMedIds.forEach(pubMedId -> {
+            pubMedId = pubMedId.toUpperCase();
             pubMedId = pubMedId.replace(PUBLICATION_PREFIX, EMPTY_STRING);
             pubMedId = pubMedId.replaceAll("\\s+",EMPTY_STRING);
             if (pubMedId.contains(";")){
