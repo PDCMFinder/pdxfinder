@@ -55,7 +55,7 @@ public class PublicationServiceTest extends BaseTest {
 
         // given
         String pubMedId = "29245952";
-        String apiUrl = String.format("%s?query=%s&resultType=core&format=json", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
+        String apiUrl = String.format("%s?query=ext_id:%s&resultType=core&format=json", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
 
         String expectedTitle= "The humanized anti-human AMHRII mAb 3C23K exerts an anti-tumor activity against human ovarian cancer through tumor-associated macrophages.";
         String expectedAuthors= "Bougherara H, Némati F, Nicolas A, Massonnet G, Pugnière M, Ngô C, Le Frère-Belda MA";
