@@ -26,7 +26,7 @@ public class PublicationService {
         pubMedIds = sanitizePubMedIds(pubMedIds);
         List<Publication> publications = new ArrayList<>();
         pubMedIds.forEach(pubMedId->{
-            String api = String.format("%s?query=%s&resultType=core&format=json", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
+            String api = String.format("%s?query=ext_id:%s&resultType=core&format=json", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
             publications.add(restTemplate.getForObject(api, Publication.class));
         });
 
@@ -38,6 +38,7 @@ public class PublicationService {
     public List<String> sanitizePubMedIds(List<String> pubMedIds){
         List<String> cleanedPubMedIds = new ArrayList<>();
         pubMedIds.forEach(pubMedId -> {
+            pubMedId = pubMedId.toUpperCase();
             pubMedId = pubMedId.replace(PUBLICATION_PREFIX, EMPTY_STRING);
             pubMedId = pubMedId.replaceAll("\\s+",EMPTY_STRING);
             if (pubMedId.contains(";")){
