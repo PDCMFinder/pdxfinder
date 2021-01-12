@@ -26,7 +26,7 @@ public class PublicationService {
         pubMedIds = sanitizePubMedIds(pubMedIds);
         List<Publication> publications = new ArrayList<>();
         pubMedIds.forEach(pubMedId->{
-            String api = String.format("%s?query=%s&resultType=core&format=json", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
+            String api = String.format("%s?query=ext_id:%s&resultType=core&format=json", DataUrl.EUROPE_PMC_URL.get(), pubMedId);
             publications.add(restTemplate.getForObject(api, Publication.class));
         });
 
