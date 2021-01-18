@@ -386,8 +386,9 @@ public class DomainObjectCreator {
         if(!StringUtils.isBlank(publications)){
             String[] publicationArr = publications.split(",");
             for(String publication:publicationArr){
-                if(!StringUtils.isBlank(publication)){
-                    Group publicationGroup = dataImportService.getPublicationGroup(publication);
+                if(!StringUtils.isBlank(publication) &&
+                        !publication.equalsIgnoreCase("not specified")){
+                    Group publicationGroup = dataImportService.getPublicationGroup(publication.trim());
                     modelCreation.addGroup(publicationGroup);
                 }
             }
