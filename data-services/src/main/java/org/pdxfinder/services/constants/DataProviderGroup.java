@@ -9,8 +9,7 @@ public enum DataProviderGroup {
     All,
     EurOPDX,
     PDXNet,
-    UPDOG,
-    CustomLoaders;
+    UPDOG;
 
 
     public static List<DataProvider> getProvidersFrom(DataProviderGroup group) {
@@ -51,7 +50,7 @@ public enum DataProviderGroup {
                 DataProvider.DFCI_CPDM,
                 DataProvider.NKI,
                 DataProvider.PDMR,
-                DataProvider.JAX_XDOG,
+                DataProvider.JAX,
                 DataProvider.SJCRH,
                 DataProvider.UMCG,
                 DataProvider.VHIO_PC,
@@ -68,10 +67,6 @@ public enum DataProviderGroup {
                 DataProvider.MDAnderson,
                 DataProvider.Wistar_MDAnderson_Penn,
                 DataProvider.HCI_BCM
-        ));
-
-        map.put(DataProviderGroup.CustomLoaders, Collections.singletonList(
-                DataProvider.JAX
         ));
 
         return map.get(group);
