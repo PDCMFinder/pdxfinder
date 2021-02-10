@@ -30,8 +30,7 @@ public enum DataProviderGroup {
                 DataProvider.NKI,
                 DataProvider.UMCG,
                 DataProvider.VHIO_PC,
-                DataProvider.LIH,
-                DataProvider.PPTC
+                DataProvider.LIH
         ));
 
         map.put(DataProviderGroup.UPDOG, Arrays.asList(
