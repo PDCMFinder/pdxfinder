@@ -1790,3 +1790,44 @@ th,td {
         width: 100px;
     }
 }
+
+.tooltip-cell {
+    visibility: visible;
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip-cell .tooltiptext-cell {
+    visibility: hidden;
+    position: absolute;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    z-index: 1;
+    opacity: 1;
+    transition: opacity 0.3s;
+    padding: 5px 10px;
+}
+
+.tooltip-cell:hover .tooltiptext-cell {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-right {
+    top: -5px;
+    left: 125%;
+}
+
+.tooltip-right::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #555 transparent transparent;
+}

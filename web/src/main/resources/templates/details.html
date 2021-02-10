@@ -226,7 +226,11 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="pdxModel, iter : ${data.pdxModelList}">
-                                            <td th:text="${pdxModel.strainName}"></td>
+                                            <td>
+                                                <div class="tooltip-cell"><span th:text="${pdxModel.strainName}"></span>
+                                                    <span class="tooltiptext-cell tooltip-right" th:utext="${pdxModel.strainSymbol}">12</span>
+                                                </div>
+                                            </td>
                                             <td th:text="${pdxModel.engraftmentSite}" class="capt-text"></td>
                                             <td th:text="${pdxModel.engraftmentType}" class="capt-text"></td>
                                             <td th:text="${pdxModel.engraftmentMaterial}" class="capt-text"></td>

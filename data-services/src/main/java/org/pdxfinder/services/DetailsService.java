@@ -200,9 +200,17 @@ public class DetailsService {
 
                     EngraftmentDataDTO edto = new EngraftmentDataDTO();
 
-                    edto.setStrainName(
-                            (sp.getHostStrain() != null) ? notEmpty(sp.getHostStrain().getName()) : "Not Specified"
-                    );
+                    String strainSymbol =
+                        sp.getHostStrain() != null ? notEmpty(sp.getHostStrain().getSymbol()) :
+                            "Not Specified";
+
+                    String strainName =
+                        sp.getHostStrain() != null ? notEmpty(sp.getHostStrain().getName()) :
+                            strainSymbol;
+
+                    edto.setStrainName(strainName);
+
+                    edto.setStrainSymbol(strainSymbol);
 
                     edto.setEngraftmentSite(
                             (sp.getEngraftmentSite() != null) ? notEmpty(sp.getEngraftmentSite().getName()) : "Not Specified"
