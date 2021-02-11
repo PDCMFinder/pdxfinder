@@ -8,7 +8,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.LoadDiseaseOntology;
-import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
 import org.pdxfinder.mapping.LinkTreatmentsToNCITTerms;
@@ -36,7 +35,6 @@ public class FinderLoaderTest extends BaseTest {
     @Mock private LoadNCIT loadNCIT;
     @Mock private LoadNCITDrugs loadNCITDrugs;
     @Mock private DataImportService dataImportService;
-    @Mock private LoadJAXData loadJAXData;
     @Mock private Updog updog;
 
     private DataProvider dataProvider;
@@ -58,7 +56,6 @@ public class FinderLoaderTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        doNothing().when(this.loadJAXData).run();
         doNothing().when(this.loadDiseaseOntology).run();
         doNothing().when(this.loadMarkers).loadGenes(anyString());
         doNothing().when(this.loadNCIT).loadOntology(anyString());
@@ -73,18 +70,6 @@ public class FinderLoaderTest extends BaseTest {
         this.updogDataProvider = DataProvider.UOC_BC;
     }
 
-
-
-    @Test public void run_givenSingleProvider_callsRelevantCustomLoader() throws Exception {
-        finderLoader.run(
-            Collections.singletonList(dataProvider),
-            dataDirectory,
-            NO_VALIDATION_ONLY,
-            isFalse, isFalse, isFalse);
-        verify(this.loadJAXData).run();
-        verifyNoMoreInteractions(this.loadJAXData);
-    }
-
     @Test public void run_givenSingleProvider_callsRelevantUpdogLoader() throws Exception {
         finderLoader.run(
             Collections.singletonList(updogDataProvider),
@@ -95,24 +80,11 @@ public class FinderLoaderTest extends BaseTest {
         verifyNoMoreInteractions(this.updog);
     }
 
-    @Test public void run_givenTwoProviders_callsRelevantLoaderForEach() throws Exception {
-        finderLoader.run(
-            Arrays.asList(dataProvider, updogDataProvider),
-            dataDirectory,
-            NO_VALIDATION_ONLY,
-            isFalse, isFalse, isFalse);
-        verify(this.loadJAXData).run();
-        verify(this.updog).run(any(Path.class), anyString(), anyBoolean());
-        verifyNoMoreInteractions(this.loadJAXData);
-        verifyNoMoreInteractions(this.updog);
-    }
-
     @Test public void run_givenZeroProviders_callNoLoaders() throws Exception {
         finderLoader.run(Arrays.asList(),
             dataDirectory,
             NO_VALIDATION_ONLY,
             isFalse, isFalse, isFalse);
-        verify(this.loadJAXData, never()).run();
         verify(this.updog, never()).run(any(Path.class), anyString(), anyBoolean());
     }
 

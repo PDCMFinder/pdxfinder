@@ -23,7 +23,6 @@ public enum DataProvider {
     VHIO_CRC("VHIO-CRC"),
     DFCI_CPDM("DFCI-CPDM"),
     NKI("NKI"),
-    JAX_XDOG("JAX-XDOG"),
     SJCRH("SJCRH"),
     UMCG("UMCG"),
     VHIO_PC("VHIO-PC"),

@@ -1051,6 +1051,8 @@ public class DomainObjectCreator {
                 return Integer.toString(row.getInt(columnName));
             } else if (row.getColumnType(columnName) == ColumnType.LOCAL_DATE) {
                 return row.getDate(columnName).toString();
+            } else if (row.getColumnType(columnName) == ColumnType.BOOLEAN) {
+                return row.getBoolean(columnName).toString();
             }
             else {
                 throw new IllegalArgumentException(
