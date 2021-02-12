@@ -20,7 +20,6 @@
         <module>indexer</module>
         <module>web</module>
         <module>data-services</module>
-        <module>admin</module>
     </modules>
 
     <properties>
