@@ -505,7 +505,7 @@ public class DomainObjectCreator {
             log.error(sampleOrigin);
             throw new NullPointerException();}
 
-        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "Not Available");
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "");
     }
 
     private Set getMarkers(MarkerAssociation markerAssociation) {
