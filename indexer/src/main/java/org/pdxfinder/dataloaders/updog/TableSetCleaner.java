@@ -1,11 +1,10 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.springframework.stereotype.Service;
-import tech.tablesaw.api.Table;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
+import tech.tablesaw.api.Table;
 
 @Service
 public class TableSetCleaner {
@@ -16,9 +15,13 @@ public class TableSetCleaner {
                 "sample_id",
                 "patient_id",
                 "name",
+                "host_strain",
+                "host_strain_full",
+                "host_strain_nomenclature",
                 "validation_host_strain_full",
                 "provider_name",
                 "provider_abbreviation",
+                "abbreviation",
                 "project",
                 "internal_url",
                 "internal_dosing_url"

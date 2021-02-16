@@ -356,10 +356,8 @@
                                             <td th:text="${data.patient.gender}"></td>
                                         </tr>
                                         <tr>
-                                            <th class="text-left medium-4">Race / Ethnicity</th>
+                                            <th class="text-left medium-4">Ethnicity</th>
                                             <td>
-                                                <span th:text="${data.race}"></span>
-                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
                                                 <span th:text="${data.ethnicity}"></span>
                                             </td>
                                         </tr>
