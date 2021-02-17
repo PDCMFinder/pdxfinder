@@ -1831,3 +1831,7 @@ th,td {
     border-style: solid;
     border-color: transparent #555 transparent transparent;
 }
+
+.uppercase {
+    text-transform: uppercase;
+}
