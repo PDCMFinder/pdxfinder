@@ -89,7 +89,7 @@ public class Reader {
     }
 
     public Table readOmicTable(Path path) {
-        return TableUtilities.readVariantTsvOrReturnEmpty(path.toFile());
+        return TableUtilities.readTsvOrReturnEmpty(path.toFile());
     }
 
     public String getOmicDataType(Path path) {
