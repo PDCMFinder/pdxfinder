@@ -24,7 +24,8 @@ public class TableSetCleaner {
                 "abbreviation",
                 "project",
                 "internal_url",
-                "internal_dosing_url"
+                "internal_dosing_url",
+                "platform"
         );
         pdxTableSet = TableSetUtilities.removeProviderNameFromFilename(pdxTableSet);
         pdxTableSet.remove("metadata-checklist.tsv");
