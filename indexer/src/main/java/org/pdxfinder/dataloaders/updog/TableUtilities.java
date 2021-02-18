@@ -1,19 +1,20 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tech.tablesaw.api.StringColumn;
-import tech.tablesaw.api.Table;
-import tech.tablesaw.columns.Column;
-import tech.tablesaw.io.csv.CsvReadOptions;
-import tech.tablesaw.selection.Selection;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tech.tablesaw.api.ColumnType;
+import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.columns.Column;
+import tech.tablesaw.io.csv.CsvReadOptions;
+import tech.tablesaw.selection.Selection;
 
 public final class TableUtilities {
 
@@ -33,6 +34,15 @@ public final class TableUtilities {
         return dataTable;
     }
 
+    public static Table readVariantTsvOrReturnEmpty(File file) {
+        Table dataTable = Table.create();
+        log.trace("Reading tsv file {}", file);
+        System.out.print(String.format("Reading tsv file %s\r", file));
+        try { dataTable = readVariantTsv(file); }
+        catch (IOException e) { log.error("There was an error reading the tsv file" , e); }
+        return dataTable;
+    }
+
     public static Table readTsv(File file) throws IOException {
         CsvReadOptions.Builder builder = CsvReadOptions
             .builder(file)
@@ -40,6 +50,25 @@ public final class TableUtilities {
             .separator('\t');
         CsvReadOptions options = builder.build();
         return Table.read().usingOptions(options);
+    }
+
+    private static Table readUsingStringTypesTsv(File file, int columnCount) throws IOException {
+        ColumnType[] types = IntStream.range(0, columnCount)
+            .mapToObj(x -> ColumnType.STRING)
+            .toArray(ColumnType[]::new);
+        CsvReadOptions.Builder builder = CsvReadOptions
+            .builder(file)
+            .sample(false)
+            .separator('\t')
+            .columnTypes(types);
+        CsvReadOptions options = builder.build();
+        return Table.read().usingOptions(options);
+    }
+
+    public static Table readVariantTsv(File file) throws IOException {
+        Table testTable = readTsv(file);
+        int columnCount = testTable.columnCount();
+        return readUsingStringTypesTsv(file, columnCount);
     }
 
     public static Table removeHeaderRows(Table table, int numberOfRows) {

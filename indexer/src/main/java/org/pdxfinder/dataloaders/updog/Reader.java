@@ -1,18 +1,22 @@
 package org.pdxfinder.dataloaders.updog;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import tech.tablesaw.api.Table;
-
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import tech.tablesaw.api.Table;
 
 @Component
 public class Reader {
@@ -85,7 +89,7 @@ public class Reader {
     }
 
     public Table readOmicTable(Path path) {
-        return TableUtilities.readTsvOrReturnEmpty(path.toFile());
+        return TableUtilities.readVariantTsvOrReturnEmpty(path.toFile());
     }
 
     public String getOmicDataType(Path path) {

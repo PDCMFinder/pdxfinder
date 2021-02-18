@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.InitMappingDatabase;
@@ -94,7 +93,7 @@ public class FinderLoader {
             boolean initializeMappingDb
     ) {
 
-        loadCache(loadCacheRequested);
+       // loadCache(loadCacheRequested);
         loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
         if (!validateOnlyRequested) {
             postLoad(dataProviders, postLoadRequested);
