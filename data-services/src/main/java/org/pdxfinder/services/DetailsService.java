@@ -511,13 +511,13 @@ public class DetailsService {
                     .setAminoAcidChange(aminoAcid)
                     .setConsequence(md.getConsequence())
                     .setNucleotideChange(md.getNucleotideChange())
-                    .setReadDepth(md.getReadDepth() == null ? "" : md.getReadDepth())
-                    .setAlleleFrequency(md.getAlleleFrequency())
-                    .setProbeIdAffymetrix(md.getProbeIDAffymetrix())
-                    .setCnaLog10rCna(md.getCnaLog10RCNA())
-                    .setCnaLog2rCna(md.getCnaLog2RCNA())
+                    .setReadDepth(cleanIntegerStringsNulls(md.getReadDepth()))
+                    .setAlleleFrequency(cleanIntegerStringsNulls(md.getAlleleFrequency()))
+                    .setProbeIdAffymetrix(cleanIntegerStringsNulls(md.getProbeIDAffymetrix()))
+                    .setCnaLog10rCna(cleanIntegerStringsNulls(md.getCnaLog10RCNA()))
+                    .setCnaLog2rCna(cleanIntegerStringsNulls(md.getCnaLog2RCNA()))
                     .setCnaCopyNumberStatus(md.getCnaCopyNumberStatus())
-                    .setCnaGisticValue(md.getCnaGisticValue())
+                    .setCnaGisticValue(cleanIntegerStringsNulls(md.getCnaGisticValue()))
                     .setChromosome(md.getChromosome())
                     .setSeqStartPosition(md.getSeqStartPosition())
                     .setSeqEndPosition(md.getSeqEndPosition())
@@ -529,11 +529,11 @@ public class DetailsService {
                     .setEnsemblTranscriptId(md.getEnsemblGeneId())
                     .setUcscTranscriptId(md.getUcscGeneId())
                     .setNcbiTranscriptId( md.getNcbiGeneId())
-                    .setRnaSeqCount( md.getRnaSeqCount())
-                    .setZscore(md.getZscore())
+                    .setRnaSeqCount(cleanIntegerStringsNulls(md.getRnaSeqCount()))
+                    .setZscore(cleanIntegerStringsNulls(md.getZscore()))
                     .setGenomeAssembly(md.getGenomeAssembly())
                     .setCytogeneticsResult(md.getCytogeneticsResult())
-                    .setIlluminaHGEAExp(md.getIlluminaHGEAExpressionValue())
+                    .setIlluminaHGEAExp(cleanIntegerStringsNulls(md.getIlluminaHGEAExpressionValue()))
                     .build();
 
             tableData.add(dataRow);
@@ -542,17 +542,8 @@ public class DetailsService {
         return tableData;
     }
 
-    /**
-     * Return a formatted string representing the host and passage
-     *
-     * @param hostStrain    the key to the map of host strains
-     * @param hostStrainMap the map containing all the host strains associated to the model
-     * @return a formatted string representing the host strains
-     */
-    private String getHostStrainString(String hostStrain, Map<String, String> hostStrainMap) {
-        String passage = hostStrainMap.get(hostStrain).equals("Not Specified") ? "" : "(" + hostStrainMap.get(hostStrain) + ")";
-        String formatted = String.format("%s%s", hostStrain, passage);
-        return formatted;
+    private String cleanIntegerStringsNulls(String stringOfInteger){
+        return (stringOfInteger == null || stringOfInteger.equals("-2147483648")) ? "" : stringOfInteger;
     }
 
 
