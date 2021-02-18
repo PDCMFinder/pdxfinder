@@ -93,7 +93,7 @@ public class FinderLoader {
             boolean initializeMappingDb
     ) {
 
-       // loadCache(loadCacheRequested);
+        loadCache(loadCacheRequested);
         loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
         if (!validateOnlyRequested) {
             postLoad(dataProviders, postLoadRequested);
