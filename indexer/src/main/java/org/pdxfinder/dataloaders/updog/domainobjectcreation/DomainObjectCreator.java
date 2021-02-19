@@ -370,8 +370,14 @@ public class DomainObjectCreator {
             log.info("Creating drug dosing data");
             for(Row row : drugdosingTable){
                 String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
+                String treatmentProtocolUrl = getCellAsText(row, TSV.Treatment.internal_treatment_url.name());
                 ModelCreation model = (ModelCreation) getDomainObject(MODELS, modelId);
                 if(model == null) throw new NullPointerException();
+                if (model.getTreatmentSummary()== null){
+                    TreatmentSummary ts = new TreatmentSummary();
+                    ts.setUrl(treatmentProtocolUrl);
+                    model.setTreatmentSummary(ts);
+                }
                 TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
                 model.addTreatmentProtocol(treatmentProtocol);
             }

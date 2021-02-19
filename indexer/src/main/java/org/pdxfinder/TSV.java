@@ -164,7 +164,8 @@ public class TSV {
         elapsed_time,
         treatment_response,
         response_classification,
-        model_id
+        model_id,
+        internal_treatment_url
     }
 
     public enum providerFileNames{
