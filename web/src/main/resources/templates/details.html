@@ -285,10 +285,18 @@
                                         <tbody>
                                         <tr>
                                             <th class="text-left medium-2"> Title </th>
-                                            <td><a th:text="${#strings.capitalizeWords(pub.resultList.result[0].title)}"
-                                                   th:href="| https://europepmc.org/article/MED/${pub.resultList.result[0].id} |"
-                                                   target="_blank"
-                                                   style="white-space: normal;"> Title Text <i class="icon icon-generic" data-icon="x"> </i> </a>
+                                            <td>
+                                                <span th:text="${#strings.capitalizeWords(pub.resultList.result[0].title)}"></span>
+                                                <div>
+                                                    <a th:href="| https://europepmc.org/article/MED/${pub.resultList.result[0].id} |"
+                                                       target="_blank"
+                                                       style="white-space: normal; margin-right: 10px;"> View in Europe PMC <i class="icon icon-generic" data-icon="x"> </i>  </a>
+
+                                                    <a th:href="| https://pubmed.ncbi.nlm.nih.gov/${pub.resultList.result[0].id} |"
+                                                       target="_blank"
+                                                       style="white-space: normal;"> View in PubMed <i class="icon icon-generic" data-icon="x"> </i> </a>
+                                                </div>
+
                                             </td>
                                         </tr>
                                         <tr>
