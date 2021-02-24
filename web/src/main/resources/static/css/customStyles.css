@@ -1835,3 +1835,7 @@ th,td {
 .uppercase {
     text-transform: uppercase;
 }
+
+.capitalize {
+    text-transform: capitalize;
+}
