@@ -530,7 +530,8 @@
                                             </td>
                                             <td th:if="${not ( #strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified') ) }">
                                                 <span class="capitalize" th:utext="${data.stage}"></span>
-                                                <span th:utext="${'(<b> Classification: </b>'+data.stageClassification+')'}"></span>
+                                                <span th:utext="${'(<b> Classification: </b>'}"></span>
+                                                <span class="uppercase" th:utext="${data.stageClassification+')'}"></span>
                                             </td>
                                         </tr>
                                         </tbody>
