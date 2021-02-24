@@ -275,11 +275,11 @@
                                 <td scope="row"><a th:text="${model.externalId}"
                                        th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a> <br> <span class="small" th:text="${model.datasource}">center</span>
                                 </td>
-                                <td class="uppercase" data-title="HISTOLOGY"><h1 th:remove="tag" th:text="${model.mappedOntologyTerm}">ontology term</h1>
+                                <td class="capitalize" data-title="HISTOLOGY"><h1 th:remove="tag" th:text="${model.mappedOntologyTerm}">ontology term</h1>
                                 </td>
-                                <td class="uppercase" th:text="${model.sampleOriginTissue}">origin tissue</td>
-                                <td class="uppercase" data-title="COLLECTION" th:text="${model.sampleSampleSite}">sample site</td>
-                                <td class="uppercase" data-title="TYPE" th:text="${model.sampleTumorType}">Metastatic</td>
+                                <td class="capitalize" th:text="${model.sampleOriginTissue}">origin tissue</td>
+                                <td class="capitalize" data-title="COLLECTION" th:text="${model.sampleSampleSite}">sample site</td>
+                                <td class="capitalize" data-title="TYPE" th:text="${model.sampleTumorType}">Metastatic</td>
 
                                 <td data-title="AGE" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'AGE')}" th:text="${model.patientAge}"> Age </td>
                                 <td data-title="SEX" th:if="${#lists.contains(websearch.additionalResultTableHeaders, 'SEX')}" th:text="${model.patientGender}">Sex</td>
