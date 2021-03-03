@@ -2,10 +2,7 @@ package org.pdxfinder.dataloaders.updog.tablevalidation;
 
 import tech.tablesaw.api.Table;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TableSetSpecification {
@@ -14,6 +11,7 @@ public class TableSetSpecification {
     private Set<ColumnReference> requiredColumns;
     private Set<ColumnReference> nonEmptyColumns;
     private Set<ColumnReference> uniqueColumns;
+    private Map<Set<ColumnReference>, ValueRestrictions> valueRestrictedColumns;
     private Set<Relation> relations;
     private String provider = "Not Specified";
 
@@ -22,6 +20,7 @@ public class TableSetSpecification {
         this.requiredColumns = new HashSet<>();
         this.nonEmptyColumns = new HashSet<>();
         this.uniqueColumns = new HashSet<>();
+        this.valueRestrictedColumns = new HashMap<>();
         this.relations = new HashSet<>();
     }
 
@@ -74,6 +73,19 @@ public class TableSetSpecification {
         return this;
     }
 
+    public TableSetSpecification addValueRestriction(
+            Set<ColumnReference> columnReferences,
+            ValueRestrictions valueRestrictions )
+    {
+        this.valueRestrictedColumns.put(columnReferences, valueRestrictions);
+        return this;
+    }
+
+    public TableSetSpecification addAllValueRestrictions(Map<Set<ColumnReference>, ValueRestrictions> allvalues){
+        this.valueRestrictedColumns.putAll(allvalues);
+        return this;
+    }
+
     public String getProvider() {
         return provider;
     }
@@ -107,13 +119,17 @@ public class TableSetSpecification {
         return this.relations;
     }
 
+    public Map<Set<ColumnReference>, ValueRestrictions> getCharSetRestrictions() {
+        return this.valueRestrictedColumns;
+    }
+
     public Set<String> getMissingTablesFrom(Map<String, Table> fileList) {
         Set<String> missingFiles = requiredTables;
         missingFiles.removeAll(fileList.keySet());
         return missingFiles;
     }
 
-    public TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
+    public static TableSetSpecification merge(TableSetSpecification ...tableSetSpecifications) {
         TableSetSpecification mergedTableSetSpecifications = TableSetSpecification.create();
         for (TableSetSpecification tss : tableSetSpecifications) {
             mergedTableSetSpecifications.setProvider(tss.getProvider());
@@ -122,6 +138,7 @@ public class TableSetSpecification {
             mergedTableSetSpecifications.addNonEmptyColumns(tss.getNonEmptyColumns());
             mergedTableSetSpecifications.addUniqueColumns(tss.getUniqueColumns());
             mergedTableSetSpecifications.addRelations(tss.getRelations());
+            mergedTableSetSpecifications.addAllValueRestrictions(tss.getCharSetRestrictions());
         }
         return mergedTableSetSpecifications;
     }

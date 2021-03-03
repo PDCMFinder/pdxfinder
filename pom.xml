@@ -17,16 +17,14 @@
     <modules>
         <module>parent</module>
         <module>dependencies</module>
-        <module>data-model</module>
         <module>indexer</module>
         <module>web</module>
         <module>data-services</module>
-        <module>admin</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
     </properties>
 
 </project>

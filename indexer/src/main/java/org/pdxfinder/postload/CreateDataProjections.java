@@ -1101,8 +1101,8 @@ public class CreateDataProjections implements ApplicationContextAware{
             //TODO: Remove regex after drug harmonization is done
             String drug = drugName.replaceAll("[^a-zA-Z0-9 _-]","");
             String response = responseVal.replaceAll("[^a-zA-Z0-9 _-]","");
-
-            addToDrugDosingDp(drug, modelId);
+            //Do not include saline in the projection as per #256
+            if (!drug.equalsIgnoreCase("saline")) addToDrugDosingDp(drug, modelId);
 
             if(modelDrugResponseDP.containsKey(drug)){
 

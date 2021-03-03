@@ -18,11 +18,13 @@ public class Validator {
     private List<ValidationError> validationErrors;
     private MissingTableErrorCreator missingTableErrorCreator;
 
-    public Validator(
-        MissingTableErrorCreator missingTableErrorCreator
-    ) {
+    public Validator(MissingTableErrorCreator missingTableErrorCreator) {
         this.missingTableErrorCreator = missingTableErrorCreator;
         this.validationErrors = new ArrayList<>();
+    }
+
+    public Validator() {
+        resetErrors();
     }
 
     public List<ValidationError> validate(
@@ -41,6 +43,7 @@ public class Validator {
         if (thereAreErrors(validationErrors, tableSetSpecification)) return;
         checkRequiredColumnsPresent(tableSet, tableSetSpecification);
         checkAllNonEmptyValuesPresent(tableSet, tableSetSpecification);
+        checkForIllegalValues(tableSet, tableSetSpecification);
         checkAllUniqueColumnsForDuplicates(tableSet, tableSetSpecification);
         checkRelationsValid(tableSet, tableSetSpecification);
     }
@@ -94,6 +97,14 @@ public class Validator {
         validationErrors.addAll(new BrokenRelationErrorCreator().generateErrors(tableSet, tableSetSpecification));
     }
 
+    private void checkForIllegalValues(
+            Map<String, Table> tableSet,
+            TableSetSpecification tableSetSpecification
+    ){
+        validationErrors.addAll(new IllegalValueErrorCreator().generateErrors(tableSet, tableSetSpecification));
+    }
+
+
     boolean passesValidation(
         Map<String, Table> tableSet,
         TableSetSpecification tableSetSpecification
@@ -112,6 +123,11 @@ public class Validator {
             }
         else
             log.info("There were no validation errors raised, great!");
+    }
+
+    public void resetErrors(){
+        this.missingTableErrorCreator = new MissingTableErrorCreator();
+        this.validationErrors = new ArrayList<>();
     }
 
 }

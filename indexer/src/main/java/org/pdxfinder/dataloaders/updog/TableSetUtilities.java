@@ -3,8 +3,12 @@ package org.pdxfinder.dataloaders.updog;
 import org.apache.commons.lang3.StringUtils;
 import tech.tablesaw.api.Table;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TableSetUtilities {
 
@@ -58,6 +62,15 @@ public class TableSetUtilities {
                 e -> e.getValue().setName(substringAfterIfContainsSeparator(e.getKey(), "_"))
             ));
     }
+
+    static Map<String, Table> cleanValues(Map<String, Table> tableSet, List<String> exceptionColumns) {
+        return tableSet.entrySet().stream().collect(
+                Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> TableUtilities.cleanTableValues(e.getValue(), e.getValue().name(), exceptionColumns)
+                ));
+    }
+
 
     static String substringAfterIfContainsSeparator(String string, String separator) {
         return string.contains(separator)

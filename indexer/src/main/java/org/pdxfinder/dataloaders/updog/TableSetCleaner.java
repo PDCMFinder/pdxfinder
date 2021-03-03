@@ -1,19 +1,38 @@
 package org.pdxfinder.dataloaders.updog;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 import tech.tablesaw.api.Table;
-
-import java.util.Map;
 
 @Service
 public class TableSetCleaner {
 
     public Map<String, Table> cleanPdxTables(Map<String, Table> pdxTableSet) {
+        List<String> columnsExceptFromLowercasing = Arrays.asList(
+                "model_id",
+                "sample_id",
+                "patient_id",
+                "name",
+                "host_strain",
+                "host_strain_full",
+                "host_strain_nomenclature",
+                "validation_host_strain_full",
+                "provider_name",
+                "provider_abbreviation",
+                "abbreviation",
+                "project",
+                "internal_url",
+                "internal_dosing_url",
+                "platform"
+        );
         pdxTableSet = TableSetUtilities.removeProviderNameFromFilename(pdxTableSet);
         pdxTableSet.remove("metadata-checklist.tsv");
         TableSetUtilities.removeDescriptionColumn(pdxTableSet);
         pdxTableSet = TableSetUtilities.removeHeaderRows(pdxTableSet);
         pdxTableSet = TableSetUtilities.removeBlankRows(pdxTableSet);
+        pdxTableSet = TableSetUtilities.cleanValues(pdxTableSet, columnsExceptFromLowercasing);
         return pdxTableSet;
     }
 

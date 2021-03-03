@@ -226,12 +226,16 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="pdxModel, iter : ${data.pdxModelList}">
-                                            <td th:text="${pdxModel.strainName}"></td>
-                                            <td th:text="${pdxModel.engraftmentSite}" class="capt-text"></td>
-                                            <td th:text="${pdxModel.engraftmentType}" class="capt-text"></td>
-                                            <td th:text="${pdxModel.engraftmentMaterial}" class="capt-text"></td>
-                                            <td th:text="${pdxModel.engraftmentMaterialState}" class="capt-text"></td>
-                                            <td th:text="${pdxModel.passage}" class="capt-text"></td>
+                                            <td>
+                                                <div class="tooltip-cell"><span th:classappend="${pdxModel.strainName=='Not Specified'} ? capitalize : ''" th:text="${pdxModel.strainName}"></span>
+                                                    <span class="tooltiptext-cell tooltip-right" th:utext="${pdxModel.strainSymbol}">12</span>
+                                                </div>
+                                            </td>
+                                            <td th:text="${pdxModel.engraftmentSite}" class="capt-text capitalize"></td>
+                                            <td th:text="${pdxModel.engraftmentType}" class="capt-text capitalize"></td>
+                                            <td th:text="${pdxModel.engraftmentMaterial}" class="capt-text capitalize"></td>
+                                            <td th:text="${pdxModel.engraftmentMaterialState}" class="capt-text capitalize"></td>
+                                            <td th:text="${pdxModel.passage}" class="capt-text capitalize"></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -256,8 +260,8 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="qa, iter : ${data.modelQualityControl}">
-                                            <td th:text="${qa.technique}" class="capt-text"></td>
-                                            <td th:text="${qa.description}" class="capt-text"></td>
+                                            <td th:text="${qa.technique}" class="capt-text capitalize"></td>
+                                            <td th:text="${qa.description}" class="capt-text capitalize"></td>
                                             <td th:text="${qa.passage}" class="capt-text"></td>
                                         </tr>
                                         </tbody>
@@ -281,10 +285,18 @@
                                         <tbody>
                                         <tr>
                                             <th class="text-left medium-2"> Title </th>
-                                            <td><a th:text="${#strings.capitalizeWords(pub.resultList.result[0].title)}"
-                                                   th:href="| https://europepmc.org/article/MED/${pub.resultList.result[0].id} |"
-                                                   target="_blank"
-                                                   style="white-space: normal;"> Title Text <i class="icon icon-generic" data-icon="x"> </i> </a>
+                                            <td>
+                                                <span th:text="${#strings.capitalizeWords(pub.resultList.result[0].title)}"></span>
+                                                <div>
+                                                    <a th:href="| https://europepmc.org/article/MED/${pub.resultList.result[0].id} |"
+                                                       target="_blank"
+                                                       style="white-space: normal; margin-right: 10px;"> View in Europe PMC <i class="icon icon-generic" data-icon="x"> </i>  </a>
+
+                                                    <a th:href="| https://pubmed.ncbi.nlm.nih.gov/${pub.resultList.result[0].id} |"
+                                                       target="_blank"
+                                                       style="white-space: normal;"> View in PubMed <i class="icon icon-generic" data-icon="x"> </i> </a>
+                                                </div>
+
                                             </td>
                                         </tr>
                                         <tr>
@@ -349,14 +361,12 @@
 
                                         <tr>
                                             <th class="text-left medium-4">Sex</th>
-                                            <td th:text="${data.patient.gender}"></td>
+                                            <td class="capitalize" th:text="${data.patient.gender}"></td>
                                         </tr>
                                         <tr>
-                                            <th class="text-left medium-4">Race / Ethnicity</th>
+                                            <th class="text-left medium-4">Ethnicity</th>
                                             <td>
-                                                <span th:text="${data.race}"></span>
-                                                <span th:if="${not ( #strings.isEmpty(data.race) || #strings.isEmpty(data.ethnicity) ) }"> / </span>
-                                                <span th:text="${data.ethnicity}"></span>
+                                                <span class="capitalize" th:text="${data.ethnicity}"></span>
                                             </td>
                                         </tr>
 
@@ -443,7 +453,8 @@
                                                 <th:block
                                                         th:each="event : ${data.patient.collectionEvents}">
                                                     <td th:text="${event.diagnosis}"
-                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' "
+                                                        th:classappend="capitalize">
                                                         ... DIAGNOSIS ...
                                                     </td>
                                                 </th:block>
@@ -454,7 +465,8 @@
 
                                                 <th:block th:each="event : ${data.patient.collectionEvents}">
                                                     <td th:text="${event.type}"
-                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' "
+                                                        th:classappend="capitalize">
                                                         ... TYPE ...
                                                     </td>
                                                 </th:block>
@@ -486,7 +498,8 @@
                                                 <th:block
                                                         th:each="event : ${data.patient.collectionEvents}">
                                                     <td th:text="${event.collectionSite}"
-                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' ">
+                                                        th:class="${#strings.equals(event.pdxMouse, data.modelId) } ? 'highlight-bg' : 'table-focus' "
+                                                        th:classappend="capitalize">
                                                         ... COLLECTION SITE ...
                                                     </td>
                                                 </th:block>
@@ -502,10 +515,10 @@
                                         <tr>
                                             <th class="text-left medium-4"> Grade</th>
                                             <td th:if="${#strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified')}">
-                                                <span th:utext="${data.grade}"></span>
+                                                <span class="capitalize" th:utext="${data.grade}"></span>
                                             </td>
                                             <td th:if="${not ( #strings.equalsIgnoreCase(data.grade, 'Not Specified') || #strings.equalsIgnoreCase(data.gradeClassification, 'Not Specified') ) }">
-                                                <span th:utext="${data.grade}"></span>
+                                                <span class="capitalize" th:utext="${data.grade}"></span>
                                                 <span th:utext="${'(<b> Classification: </b>'+data.gradeClassification+')'}"></span>
                                             </td>
                                         </tr>
@@ -513,11 +526,12 @@
                                         <tr>
                                             <th class="text-left medium-4"> Stage</th>
                                             <td th:if="${#strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified')}">
-                                                <span th:utext="${data.stage}"></span>
+                                                <span class="capitalize" th:utext="${data.stage}"></span>
                                             </td>
                                             <td th:if="${not ( #strings.equalsIgnoreCase(data.stage, 'Not Specified') || #strings.equalsIgnoreCase(data.stageClassification, 'Not Specified') ) }">
-                                                <span th:utext="${data.stage}"></span>
-                                                <span th:utext="${'(<b> Classification: </b>'+data.stageClassification+')'}"></span>
+                                                <span class="capitalize" th:utext="${data.stage}"></span>
+                                                <span th:utext="${'(<b> Classification: </b>'}"></span>
+                                                <span class="uppercase" th:utext="${data.stageClassification+')'}"></span>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -646,9 +660,9 @@
                                                                 th:text="${treatment.treatmentDate}"> ...DATE...
                                                             </th>
 
-                                                            <td th:text="${treatment.drugNames}"></td>
+                                                            <td class="capitalize" th:text="${treatment.drugNames}"></td>
                                                             <td th:text="${treatment.dose}"></td>
-                                                            <td th:text="${treatment.response}"></td>
+                                                            <td class="capitalize" th:text="${treatment.response}"></td>
                                                             <td th:text="${treatment.duration}"></td>
 
                                                         </tr>
@@ -732,9 +746,9 @@
                                                     th:classappend="( ${iter.index} == 0 ) ? 'is-active' : '' ">
 
                                                     <td th:text="${dataRow.sampleId}"> ...</td>
-                                                    <td th:text="${dataRow.sampleType}"> ...</td>
-                                                    <td th:text="${'Passage '+dataRow.engraftedTumorPassage}"> ...</td>
-                                                    <td th:text="${dataRow.molcharType}"> ...</td>
+                                                    <td class="capitalize" th:text="${dataRow.sampleType}"> ...</td>
+                                                    <td class="capitalize" th:text="${'Passage '+dataRow.engraftedTumorPassage}"> ...</td>
+                                                    <td class="capitalize" th:text="${dataRow.molcharType}"> ...</td>
 
                                                     <td>
                                                         <span th:if="${dataRow.isVisible == 'YES' and dataRow.dataAssociated != 'YES'}" th:text="'Data is not available in the Finder'"></span>
@@ -765,7 +779,7 @@
                                                            th:attr="onclick=|window.open('${dataRow.rawDataLink}')|">
                                                             ...
                                                         </a>
-                                                        <span th:if="${dataRow.rawDataLink == ''} " th:text="'Not Available'" ></span>
+                                                        <span class="capitalize" th:if="${dataRow.rawDataLink == ''} " th:text="'Not Available'" ></span>
                                                     </td>
                                                 </tr>
 
@@ -894,9 +908,9 @@
                                         </thead>
                                         <tbody>
                                         <tr th:each="drugData, iter : ${data.dosingStudy}">
-                                            <td th:text="${drugData.drugName}"></td>
+                                            <td class="capitalize" th:text="${drugData.drugName}"></td>
                                             <td th:text="${drugData.dose}"></td>
-                                            <td th:text="${drugData.response}"></td>
+                                            <td class="capitalize" th:text="${drugData.response}"></td>
                                         </tr>
                                         </tbody>
                                     </table>

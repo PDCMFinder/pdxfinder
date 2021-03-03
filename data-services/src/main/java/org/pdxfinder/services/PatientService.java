@@ -1,6 +1,15 @@
 package org.pdxfinder.services;
 
-import org.pdxfinder.graph.dao.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import org.pdxfinder.graph.dao.MarkerAssociation;
+import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.MolecularData;
+import org.pdxfinder.graph.dao.Patient;
+import org.pdxfinder.graph.dao.PatientSnapshot;
+import org.pdxfinder.graph.dao.Sample;
+import org.pdxfinder.graph.dao.TreatmentProtocol;
 import org.pdxfinder.graph.repositories.PatientRepository;
 import org.pdxfinder.services.dto.CollectionEventsDTO;
 import org.pdxfinder.services.dto.PatientDTO;
@@ -8,10 +17,6 @@ import org.pdxfinder.services.dto.TreatmentSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 
 @Service
@@ -42,7 +47,7 @@ public class PatientService {
             patientDTO.setDiseaseBodyLocation("Not Available");
             patientDTO.setCTEPSDCCode("Not Available");
             patientDTO.setDiagnosisSubtype("Not Available");
-            patientDTO.setRaceAndEthnicity(patient.getRace()+"/"+patient.getEthnicity());
+            patientDTO.setEthnicity(patient.getEthnicity());
 
             List<String> geneticMutations = new ArrayList<>();
             List<TreatmentSummaryDTO> treatmentSummaries = new ArrayList<>();
