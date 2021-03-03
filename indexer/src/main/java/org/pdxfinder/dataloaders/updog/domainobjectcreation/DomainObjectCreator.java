@@ -104,9 +104,9 @@ public class DomainObjectCreator {
         log.info("Creating provider");
         Table finderRelatedTable = pdxDataTables.get("metadata-loader.tsv");
         Row row = finderRelatedTable.row(0);
-        String providerName = row.getString(TSV.Metadata.name.name());
-        String abbrev = row.getString(TSV.Metadata.abbreviation.name());
-        String internalUrl = row.getString(TSV.Metadata.internal_url.name());
+        String providerName = getCellAsText(row,TSV.Metadata.name.name());
+        String abbrev = getCellAsText(row,TSV.Metadata.abbreviation.name());
+        String internalUrl = getCellAsText(row,TSV.Metadata.internal_url.name());
         Group providerGroup = dataImportService.getProviderGroup(
                 providerName, abbrev, "", "", "", internalUrl);
         addDomainObject(PROVIDER_GROUPS, FIRST, providerGroup);
@@ -118,15 +118,15 @@ public class DomainObjectCreator {
         for (Row row : patientTable) {
             try {
                 Patient patient = dataImportService.createPatient(
-                        row.getText(TSV.Metadata.patient_id.name()),
+                        getCellAsText(row,TSV.Metadata.patient_id.name()),
                         (Group) getDomainObject(TSV.Metadata.provider_group.name(), FIRST),
-                        row.getText(TSV.Metadata.sex.name()),
+                        getCellAsText(row,TSV.Metadata.sex.name()),
                         "",
-                        row.getText(TSV.Metadata.ethnicity.name()));
+                        getCellAsText(row,TSV.Metadata.ethnicity.name()));
 
-                patient.setCancerRelevantHistory(row.getText(TSV.Metadata.history.name()));
-                patient.setFirstDiagnosis(row.getText(TSV.Metadata.initial_diagnosis.name()));
-                patient.setAgeAtFirstDiagnosis(row.getText(TSV.Metadata.age_at_initial_diagnosis.name()));
+                patient.setCancerRelevantHistory(getCellAsText(row, TSV.Metadata.history.name()));
+                patient.setFirstDiagnosis(getCellAsText(row,TSV.Metadata.initial_diagnosis.name()));
+                patient.setAgeAtFirstDiagnosis(getCellAsText(row, TSV.Metadata.age_at_initial_diagnosis.name()));
 
                 addDomainObject(
                     PATIENTS,
@@ -148,13 +148,13 @@ public class DomainObjectCreator {
         for (Row row : sampleTable) {
             String patientId = getCellAsText(row, TSV.Metadata.patient_id.name());
             String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
-            String dateOfCollection = row.getString(TSV.Metadata.collection_date.name());
+            String dateOfCollection = getCellAsText(row, TSV.Metadata.collection_date.name());
             String ageAtCollection = getCellAsText(row, TSV.Metadata.age_in_years_at_collection.name());
             String collectionEvent = getCellAsText(row, TSV.Metadata.collection_event.name());
             String elapsedTime = getCellAsText(row, TSV.Metadata.months_since_collection_1.name());
-            String primarySiteName = row.getString(TSV.Metadata.primary_site.name());
-            String virologyStatus = row.getString(TSV.Metadata.virology_status.name());
-            String treatmentNaive = row.getString(TSV.Metadata.treatment_naive_at_collection.name());
+            String primarySiteName = getCellAsText(row,TSV.Metadata.primary_site.name());
+            String virologyStatus = getCellAsText(row,TSV.Metadata.virology_status.name());
+            String treatmentNaive = getCellAsText(row,TSV.Metadata.treatment_naive_at_collection.name());
 
             Patient patient = (Patient) getDomainObject(PATIENTS, patientId);
             if (patient == null) {
@@ -178,7 +178,6 @@ public class DomainObjectCreator {
                 patientSnapshot.setTreatmentNaive(treatmentNaive);
                 patient.addSnapshot(patientSnapshot);
             }
-
             Sample sample = createPatientSample(row);
             sample.setDataSource(providerGroup.getAbbreviation());
             patientSnapshot.addSample(sample);
@@ -199,7 +198,7 @@ public class DomainObjectCreator {
         Group providerGroup = (Group) domainObjects.get(PROVIDER_GROUPS).get(FIRST);
         for (Row row : modelTable) {
             String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
-            String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
+            String hostStrainNomenclature = getCellAsText(row,TSV.Metadata.host_strain_full.name());
             String passageString = getCellAsText(row, TSV.Metadata.passage_number.name());
             String publications = getCellAsText(row, TSV.Metadata.publications.name());
 
@@ -230,10 +229,10 @@ public class DomainObjectCreator {
         Table modelValidationTable = pdxDataTables.get("metadata-model_validation.tsv");
         for (Row row : modelValidationTable) {
             String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
-            String validationTechnique = row.getString(TSV.Metadata.validation_technique.name());
-            String description = row.getString(TSV.Metadata.description.name());
+            String validationTechnique = getCellAsText(row,TSV.Metadata.validation_technique.name());
+            String description = getCellAsText(row,TSV.Metadata.description.name());
             String passagesTested = getCellAsText(row, TSV.Metadata.passages_tested.name());
-            String hostStrainFull = row.getString(TSV.Metadata.validation_host_strain_full.name());
+            String hostStrainFull = getCellAsText(row,TSV.Metadata.validation_host_strain_full.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
             if (modelCreation != null)
@@ -250,8 +249,6 @@ public class DomainObjectCreator {
                 log.error("Can't link validation, missing model {}",modelId);
                 //throw new NullPointerException();
             }
-
-
         }
     }
 
@@ -263,13 +260,13 @@ public class DomainObjectCreator {
 
         for (Row row : sharingTable) {
             String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
-            String providerType = row.getString(TSV.Metadata.provider_type.name());
-            String accessibility = row.getString(TSV.Metadata.accessibility.name());
-            String europdxAccessModality = row.getString(TSV.Metadata.europdx_access_modality.name());
-            String email = row.getString(TSV.Metadata.email.name());
-            String formUrl = row.getString(TSV.Metadata.form_url.name());
-            String databaseUrl = row.getString(TSV.Metadata.database_url.name());
-            String project = row.getString(TSV.Metadata.project.name());
+            String providerType = getCellAsText(row,TSV.Metadata.provider_type.name());
+            String accessibility = getCellAsText(row,TSV.Metadata.accessibility.name());
+            String europdxAccessModality = getCellAsText(row,TSV.Metadata.europdx_access_modality.name());
+            String email = getCellAsText(row,TSV.Metadata.email.name());
+            String formUrl = getCellAsText(row,TSV.Metadata.form_url.name());
+            String databaseUrl = getCellAsText(row,TSV.Metadata.database_url.name());
+            String project = getCellAsText(row,TSV.Metadata.project.name());
 
             ModelCreation modelCreation = (ModelCreation) getDomainObject(MODELS, modelId);
             if (modelCreation == null) throw new NullPointerException();
@@ -301,11 +298,11 @@ public class DomainObjectCreator {
         for (Row row : samplePlatformTable) {
 
             String sampleId = getCellAsText(row, TSV.SamplePlatform.sample_id.name());
-            String sampleOrigin = row.getString(TSV.SamplePlatform.sample_origin.name());
-            String platformName = row.getString(TSV.SamplePlatform.platform.name());
-            String molCharType = row.getString(TSV.SamplePlatform.molecular_characterisation_type.name());
-            String rawDataUrl = formatAccessionToURL(row.getString(TSV.SamplePlatform.raw_data_file.name()));
-            String platformUrl = row.getString(TSV.SamplePlatform.internal_protocol_url.name());
+            String sampleOrigin = getCellAsText(row,TSV.SamplePlatform.sample_origin.name());
+            String platformName = getCellAsText(row,TSV.SamplePlatform.platform.name());
+            String molCharType = getCellAsText(row,TSV.SamplePlatform.molecular_characterisation_type.name());
+            String rawDataUrl = formatAccessionToURL(getCellAsText(row,TSV.SamplePlatform.raw_data_file.name()));
+            String platformUrl = getCellAsText(row,TSV.SamplePlatform.internal_protocol_url.name());
 
             Sample sample = null;
 
@@ -373,8 +370,14 @@ public class DomainObjectCreator {
             log.info("Creating drug dosing data");
             for(Row row : drugdosingTable){
                 String modelId = getCellAsText(row, TSV.Metadata.model_id.name());
+                String treatmentProtocolUrl = getCellAsText(row, TSV.Treatment.internal_treatment_url.name());
                 ModelCreation model = (ModelCreation) getDomainObject(MODELS, modelId);
                 if(model == null) throw new NullPointerException();
+                if (model.getTreatmentSummary()== null){
+                    TreatmentSummary ts = new TreatmentSummary();
+                    ts.setUrl(treatmentProtocolUrl);
+                    model.setTreatmentSummary(ts);
+                }
                 TreatmentProtocol treatmentProtocol = getTreatmentProtocol(row);
                 model.addTreatmentProtocol(treatmentProtocol);
             }
@@ -386,8 +389,9 @@ public class DomainObjectCreator {
         if(!StringUtils.isBlank(publications)){
             String[] publicationArr = publications.split(",");
             for(String publication:publicationArr){
-                if(!StringUtils.isBlank(publication)){
-                    Group publicationGroup = dataImportService.getPublicationGroup(publication);
+                if(!StringUtils.isBlank(publication) &&
+                        !publication.equalsIgnoreCase("not specified")){
+                    Group publicationGroup = dataImportService.getPublicationGroup(publication.trim());
                     modelCreation.addGroup(publicationGroup);
                 }
             }
@@ -490,8 +494,8 @@ public class DomainObjectCreator {
     private MolecularCharacterization getMolcharByType(Row row, String molCharType) {
 
         String sampleId = getCellAsText(row, "sample_id");
-        String sampleOrigin = row.getString("sample_origin");
-        String platformName = row.getString(PLATFORMS);
+        String sampleOrigin = getCellAsText(row,"sample_origin");
+        String platformName = getCellAsText(row,PLATFORMS);
         Sample sample = null;
 
         if (sampleOrigin.equalsIgnoreCase("patient")) {
@@ -507,7 +511,7 @@ public class DomainObjectCreator {
             log.error(sampleOrigin);
             throw new NullPointerException();}
 
-        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "Not Available");
+        return getOrCreateMolecularCharacterization(sample, platformName, molCharType, "");
     }
 
     private Set getMarkers(MarkerAssociation markerAssociation) {
@@ -534,7 +538,7 @@ public class DomainObjectCreator {
     private Specimen getOrCreateSpecimen(Row row) {
         // For Mutation
         String modelId = getCellAsText(row, TSV.Mutation.model_id.name());
-        String hostStrainSymbol = row.getString(TSV.Mutation.host_strain_nomenclature.name());
+        String hostStrainSymbol = getCellAsText(row,TSV.Mutation.host_strain_nomenclature.name());
         String passage = getCellAsText(row, TSV.Mutation.passage.name());
         if(hostStrainSymbol.equals("")) hostStrainSymbol = NOT_SPECIFIED;
         String sampleId = getCellAsText(row, TSV.Mutation.sample_id.name());
@@ -738,11 +742,11 @@ public class DomainObjectCreator {
 
     private Specimen createSpecimen(Row row, String passage) {
 
-        String hostStrainName = row.getString(TSV.Metadata.host_strain.name());
-        String hostStrainNomenclature = row.getString(TSV.Metadata.host_strain_full.name());
-        String engraftmentSiteName = row.getString(TSV.Metadata.engraftment_site.name());
-        String engraftmentTypeName = row.getString(TSV.Metadata.engraftment_type.name());
-        String sampleType = row.getString(TSV.Metadata.sample_type.name());
+        String hostStrainName = getCellAsText(row,TSV.Metadata.host_strain.name());
+        String hostStrainNomenclature = getCellAsText(row,TSV.Metadata.host_strain_full.name());
+        String engraftmentSiteName = getCellAsText(row,TSV.Metadata.engraftment_site.name());
+        String engraftmentTypeName = getCellAsText(row,TSV.Metadata.engraftment_type.name());
+        String sampleType = getCellAsText(row,TSV.Metadata.sample_type.name());
         String passageNum = passage.trim();
 
         HostStrain hostStrain = getOrCreateHostStrain(hostStrainName, hostStrainNomenclature);
@@ -805,15 +809,15 @@ public class DomainObjectCreator {
 
     private Sample createPatientSample(Row row) {
 
-        String diagnosis = row.getString(TSV.Metadata.diagnosis.name());
+        String diagnosis = getCellAsText(row,TSV.Metadata.diagnosis.name());
         String sampleId = getCellAsText(row, TSV.Metadata.sample_id.name());
-        String tumorTypeName = row.getString(TSV.Metadata.tumour_type.name());
-        String primarySiteName = row.getString(TSV.Metadata.primary_site.name());
-        String collectionSiteName = row.getString(TSV.Metadata.collection_site.name());
+        String tumorTypeName = getCellAsText(row,TSV.Metadata.tumour_type.name());
+        String primarySiteName = getCellAsText(row,TSV.Metadata.primary_site.name());
+        String collectionSiteName = getCellAsText(row,TSV.Metadata.collection_site.name());
         String stage = getCellAsText(row, TSV.Metadata.stage.name());
-        String stagingSystem = row.getString(TSV.Metadata.staging_system.name());
+        String stagingSystem = getCellAsText(row,TSV.Metadata.staging_system.name());
         String grade = getCellAsText(row, TSV.Metadata.grade.name());
-        String gradingSystem = row.getString(TSV.Metadata.grading_system.name());
+        String gradingSystem = getCellAsText(row,TSV.Metadata.grading_system.name());
 
         Tissue primarySite = getOrCreateTissue(primarySiteName);
         Tissue collectionSite = getOrCreateTissue(collectionSiteName);
@@ -1001,10 +1005,10 @@ public class DomainObjectCreator {
 
     private TreatmentProtocol getTreatmentProtocol(Row row){
 
-        String drugString = row.getString(TSV.Treatment.treatment_name.name());
+        String drugString = getCellAsText(row,TSV.Treatment.treatment_name.name());
         String doseString = getCellAsText(row, TSV.Treatment.treatment_dose.name());
-        String responseString = row.getString(TSV.Treatment.treatment_response.name());
-        String responseClassificationString = row.getString(TSV.Treatment.response_classification.name());
+        String responseString = getCellAsText(row,TSV.Treatment.treatment_response.name());
+        String responseClassificationString = getCellAsText(row,TSV.Treatment.response_classification.name());
         String[] drugArray = drugString.split("\\+");
         String[] doseArray = doseString.split(";");
 
@@ -1051,6 +1055,10 @@ public class DomainObjectCreator {
                 return Double.toString(row.getDouble(columnName));
             } else if (row.getColumnType(columnName) == ColumnType.INTEGER) {
                 return Integer.toString(row.getInt(columnName));
+            } else if (row.getColumnType(columnName) == ColumnType.LOCAL_DATE) {
+                return row.getDate(columnName).toString();
+            } else if (row.getColumnType(columnName) == ColumnType.BOOLEAN) {
+                return row.getBoolean(columnName).toString();
             }
             else {
                 throw new IllegalArgumentException(

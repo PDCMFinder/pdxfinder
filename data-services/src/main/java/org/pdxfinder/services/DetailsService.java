@@ -1,19 +1,54 @@
 package org.pdxfinder.services;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.pdxfinder.graph.dao.*;
-import org.pdxfinder.graph.repositories.*;
-import org.pdxfinder.services.dto.*;
+import org.pdxfinder.graph.dao.ExternalUrl;
+import org.pdxfinder.graph.dao.Group;
+import org.pdxfinder.graph.dao.MarkerAssociation;
+import org.pdxfinder.graph.dao.ModelCreation;
+import org.pdxfinder.graph.dao.MolecularCharacterization;
+import org.pdxfinder.graph.dao.MolecularData;
+import org.pdxfinder.graph.dao.Patient;
+import org.pdxfinder.graph.dao.PatientSnapshot;
+import org.pdxfinder.graph.dao.Platform;
+import org.pdxfinder.graph.dao.QualityAssurance;
+import org.pdxfinder.graph.dao.Sample;
+import org.pdxfinder.graph.dao.Specimen;
+import org.pdxfinder.graph.dao.TreatmentComponent;
+import org.pdxfinder.graph.dao.TreatmentProtocol;
+import org.pdxfinder.graph.dao.TreatmentSummary;
+import org.pdxfinder.graph.repositories.ModelCreationRepository;
+import org.pdxfinder.graph.repositories.MolecularCharacterizationRepository;
+import org.pdxfinder.graph.repositories.PatientRepository;
+import org.pdxfinder.graph.repositories.PlatformRepository;
+import org.pdxfinder.graph.repositories.SampleRepository;
+import org.pdxfinder.graph.repositories.SpecimenRepository;
+import org.pdxfinder.graph.repositories.TreatmentSummaryRepository;
+import org.pdxfinder.services.dto.DetailsDTO;
+import org.pdxfinder.services.dto.DrugSummaryDTO;
+import org.pdxfinder.services.dto.EngraftmentDataDTO;
+import org.pdxfinder.services.dto.MolecularDataEntryDTO;
+import org.pdxfinder.services.dto.MolecularDataRowDTO;
+import org.pdxfinder.services.dto.MolecularDataTableDTO;
+import org.pdxfinder.services.dto.PatientDTO;
+import org.pdxfinder.services.dto.QualityControlDTO;
 import org.pdxfinder.services.dto.pdxgun.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.join;
 
 /*
  * Created by abayomi on 09/05/2018.
@@ -112,12 +147,6 @@ public class DetailsService {
             dto.setAgeAtTimeOfCollection("Not specified");
         }
 
-        if (patient.getRace() != null && !patient.getRace().isEmpty()) {
-            dto.setRace(patient.getRace());
-        } else {
-            dto.setRace("Not specified");
-        }
-
         if (patient.getEthnicity() != null && !patient.getEthnicity().isEmpty()) {
 
             dto.setEthnicity(patient.getEthnicity());
@@ -200,9 +229,17 @@ public class DetailsService {
 
                     EngraftmentDataDTO edto = new EngraftmentDataDTO();
 
-                    edto.setStrainName(
-                            (sp.getHostStrain() != null) ? notEmpty(sp.getHostStrain().getName()) : "Not Specified"
-                    );
+                    String strainSymbol =
+                        sp.getHostStrain() != null ? notEmpty(sp.getHostStrain().getSymbol()) :
+                            "Not Specified";
+
+                    String strainName =
+                        sp.getHostStrain() != null ? notEmpty(sp.getHostStrain().getName()) :
+                            strainSymbol;
+
+                    edto.setStrainName(strainName);
+
+                    edto.setStrainSymbol(strainSymbol);
 
                     edto.setEngraftmentSite(
                             (sp.getEngraftmentSite() != null) ? notEmpty(sp.getEngraftmentSite().getName()) : "Not Specified"
@@ -474,13 +511,13 @@ public class DetailsService {
                     .setAminoAcidChange(aminoAcid)
                     .setConsequence(md.getConsequence())
                     .setNucleotideChange(md.getNucleotideChange())
-                    .setReadDepth(md.getReadDepth() == null ? "" : md.getReadDepth())
-                    .setAlleleFrequency(md.getAlleleFrequency())
-                    .setProbeIdAffymetrix(md.getProbeIDAffymetrix())
-                    .setCnaLog10rCna(md.getCnaLog10RCNA())
-                    .setCnaLog2rCna(md.getCnaLog2RCNA())
+                    .setReadDepth(cleanIntegerStringsNulls(md.getReadDepth()))
+                    .setAlleleFrequency(cleanIntegerStringsNulls(md.getAlleleFrequency()))
+                    .setProbeIdAffymetrix(cleanIntegerStringsNulls(md.getProbeIDAffymetrix()))
+                    .setCnaLog10rCna(cleanIntegerStringsNulls(md.getCnaLog10RCNA()))
+                    .setCnaLog2rCna(cleanIntegerStringsNulls(md.getCnaLog2RCNA()))
                     .setCnaCopyNumberStatus(md.getCnaCopyNumberStatus())
-                    .setCnaGisticValue(md.getCnaGisticValue())
+                    .setCnaGisticValue(cleanIntegerStringsNulls(md.getCnaGisticValue()))
                     .setChromosome(md.getChromosome())
                     .setSeqStartPosition(md.getSeqStartPosition())
                     .setSeqEndPosition(md.getSeqEndPosition())
@@ -492,11 +529,11 @@ public class DetailsService {
                     .setEnsemblTranscriptId(md.getEnsemblGeneId())
                     .setUcscTranscriptId(md.getUcscGeneId())
                     .setNcbiTranscriptId( md.getNcbiGeneId())
-                    .setRnaSeqCount( md.getRnaSeqCount())
-                    .setZscore(md.getZscore())
+                    .setRnaSeqCount(cleanIntegerStringsNulls(md.getRnaSeqCount()))
+                    .setZscore(cleanIntegerStringsNulls(md.getZscore()))
                     .setGenomeAssembly(md.getGenomeAssembly())
                     .setCytogeneticsResult(md.getCytogeneticsResult())
-                    .setIlluminaHGEAExp(md.getIlluminaHGEAExpressionValue())
+                    .setIlluminaHGEAExp(cleanIntegerStringsNulls(md.getIlluminaHGEAExpressionValue()))
                     .build();
 
             tableData.add(dataRow);
@@ -505,17 +542,8 @@ public class DetailsService {
         return tableData;
     }
 
-    /**
-     * Return a formatted string representing the host and passage
-     *
-     * @param hostStrain    the key to the map of host strains
-     * @param hostStrainMap the map containing all the host strains associated to the model
-     * @return a formatted string representing the host strains
-     */
-    private String getHostStrainString(String hostStrain, Map<String, String> hostStrainMap) {
-        String passage = hostStrainMap.get(hostStrain).equals("Not Specified") ? "" : "(" + hostStrainMap.get(hostStrain) + ")";
-        String formatted = String.format("%s%s", hostStrain, passage);
-        return formatted;
+    private String cleanIntegerStringsNulls(String stringOfInteger){
+        return (stringOfInteger == null || stringOfInteger.equals("-2147483648")) ? "" : stringOfInteger;
     }
 
 

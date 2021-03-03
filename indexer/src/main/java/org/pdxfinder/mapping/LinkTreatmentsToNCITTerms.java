@@ -114,9 +114,7 @@ public class LinkTreatmentsToNCITTerms {
         for(Treatment treatment : treatments){
             MappingEntity me = mappingService.getTreatmentMapping(dataSource, treatment.getName());
             if(me == null){
-                //TODO: deal with missing mapping rules here
                 log.warn("No mapping rule found for "+dataSource+" "+treatment.getName());
-                mappingService.saveUnmappedTreatment(dataSource, treatment.getName());
             }
             else{
                 OntologyTerm ontologyTerm = dataImportService.findOntologyTermByUrl(me.getMappedTermUrl());

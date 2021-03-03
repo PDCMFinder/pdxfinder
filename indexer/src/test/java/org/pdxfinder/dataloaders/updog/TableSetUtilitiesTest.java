@@ -3,13 +3,11 @@ package org.pdxfinder.dataloaders.updog;
 import org.junit.Test;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
+import tech.tablesaw.columns.Column;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.pdxfinder.dataloaders.updog.TableSetUtilities.*;
 
 public class TableSetUtilitiesTest {
@@ -128,6 +126,33 @@ public class TableSetUtilitiesTest {
             expected.toString(),
             removeProviderNameFromFilename(expected).toString()
         );
+    }
+
+    @Test public void cleanSpacesAndLowerCase_givenTable_clean() {
+        String exceptionColumn = "exception_column";
+        List<Column<?>> tableColumns = Arrays.asList(
+                StringColumn.create("column_1", Arrays.asList(" PADDEDSTRING ", " PADDEDSTRING_1 ")),
+                StringColumn.create(exceptionColumn, Arrays.asList(" PADDEDSTRING ", " PADDEDSTRING_1 "))
+        );
+        List<Column<?>> expectedTableColumns = Arrays.asList(
+                StringColumn.create("column_1", Arrays.asList("paddedstring", "paddedstring_1")),
+                StringColumn.create(exceptionColumn, Arrays.asList("PADDEDSTRING", "PADDEDSTRING_1"))
+        );
+        Map<String, Table> tableSet = new HashMap<>();
+        Map<String, Table> expectedTableSet = new HashMap<>();
+        Arrays.asList("table_1.tsv", "table_2.tsv").forEach(
+                s -> tableSet.put(s, Table.create(s, tableColumns
+                        )));
+        Arrays.asList("table_1.tsv", "table_2.tsv").forEach(
+                s -> expectedTableSet.put(s, Table.create(s, expectedTableColumns
+                )));
+
+        assertEquals(
+                expectedTableSet.toString(),
+                cleanValues(tableSet, Collections.singletonList(exceptionColumn)).toString()
+
+        );
+
     }
 
 }

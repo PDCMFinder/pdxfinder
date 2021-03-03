@@ -1,7 +1,10 @@
 package org.pdxfinder.commandline;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
-import org.pdxfinder.dataloaders.LoadJAXData;
 import org.pdxfinder.dataloaders.updog.Updog;
 import org.pdxfinder.mapping.InitMappingDatabase;
 import org.pdxfinder.mapping.LinkSamplesToNCITTerms;
@@ -22,11 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
 @Component
 public class FinderLoader {
 
@@ -36,7 +34,6 @@ public class FinderLoader {
     private LoadNCIT loadNCIT;
 
     // DataProvider Loading Components
-    private LoadJAXData loadJAXData;
     private Updog updog;
 
     // PostLoad Components
@@ -53,7 +50,6 @@ public class FinderLoader {
     public FinderLoader(LoadMarkers loadMarkers,
                         LoadNCITDrugs loadNCITDrugs,
                         LoadNCIT loadNCIT,
-                        LoadJAXData loadJAXData,
                         Updog updog,
 
                         LinkSamplesToNCITTerms linkSamplesToNCITTerms,
@@ -68,7 +64,6 @@ public class FinderLoader {
         this.loadNCITDrugs = loadNCITDrugs;
         this.loadNCIT = loadNCIT;
 
-        this.loadJAXData = loadJAXData;
         this.updog = updog;
 
         this.linkSamplesToNCITTerms = linkSamplesToNCITTerms;
@@ -82,23 +77,28 @@ public class FinderLoader {
     }
 
     private Logger log = LoggerFactory.getLogger(FinderLoader.class);
-    @Value("${data-dir}") private String predefDataDirectory;
-    @Value("${spring.data.neo4j.uri}") private File databaseURI;
-    @Value("${ncitpredef.file}") private String ncitFile;
+    @Value("${data-dir}")
+    private String predefDataDirectory;
+    @Value("${spring.data.neo4j.uri}")
+    private File databaseURI;
+    @Value("${ncitpredef.file}")
+    private String ncitFile;
 
     void run(
-        List<DataProvider> dataProviders,
-        File dataDirectory,
-        boolean validateOnlyRequested,
-        boolean loadCacheRequested,
-        boolean postLoadRequested,
-        boolean initializeMappingDb
+            List<DataProvider> dataProviders,
+            File dataDirectory,
+            boolean validateOnlyRequested,
+            boolean loadCacheRequested,
+            boolean postLoadRequested,
+            boolean initializeMappingDb
     ) {
 
         loadCache(loadCacheRequested);
         loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
-        postLoad(dataProviders, postLoadRequested);
-        initializeMappingDb(initializeMappingDb);
+        if (!validateOnlyRequested) {
+            postLoad(dataProviders, postLoadRequested);
+            initializeMappingDb(initializeMappingDb);
+        }
     }
 
     private void loadCache(boolean loadCacheRequested) {
@@ -139,9 +139,9 @@ public class FinderLoader {
     }
 
     private void loadRequestedPdxData(
-        List<DataProvider> providers,
-        File dataDirectory,
-        boolean validateOnlyRequested
+            List<DataProvider> providers,
+            File dataDirectory,
+            boolean validateOnlyRequested
     ) {
         if (providers.isEmpty()) {
             log.info("Skipping PDX dataset loading - No providers requested");
@@ -154,24 +154,21 @@ public class FinderLoader {
 
 
     private void callRelevantLoader(
-        DataProvider dataProvider,
-        File dataDirectory,
-        boolean validateOnlyRequested
+            DataProvider dataProvider,
+            File dataDirectory,
+            boolean validateOnlyRequested
     ) {
         List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
-            if (dataProvider.equals(DataProvider.JAX)) {
-                loadJAXData.run();
+
+            if (updogProviders.contains(dataProvider)) {
+                Path updogDirectory = Paths.get(
+                        dataDirectory.toString(),
+                        "/data/UPDOG",
+                        dataProvider.toString());
+                updog.run(updogDirectory, dataProvider.toString(), validateOnlyRequested);
             }
-            else{
-                    if (updogProviders.contains(dataProvider)) {
-                        Path updogDirectory = Paths.get(
-                            dataDirectory.toString(),
-                            "/data/UPDOG",
-                            dataProvider.toString());
-                        updog.run(updogDirectory, dataProvider.toString(), validateOnlyRequested);
-                    }
-            }
+
 
         } catch (Exception e) {
             log.error("Error calling the loader for {}:", dataProvider, e);
@@ -190,8 +187,8 @@ public class FinderLoader {
             setDataVisibility.run();
         }
     }
-    
-    private void initializeMappingDb(boolean initMappingDb){
+
+    private void initializeMappingDb(boolean initMappingDb) {
         if (initMappingDb)
             initMappingDatabase.run();
     }

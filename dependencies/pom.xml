@@ -17,7 +17,7 @@
 
     <properties>
         <pdxfinder.version>${project.version}</pdxfinder.version>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <neo4j.version>3.1.8</neo4j.version>
         <thymeleaf-layout-dialect.version>2.1.1</thymeleaf-layout-dialect.version>
     </properties>
@@ -31,6 +31,16 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
+            <repository>
+                <id>oss_sonatype</id>
+                <name>oss-sonatype</name>
+                <url> https://oss.sonatype.org/content/repositories/snapshots/ </url>
+                <snapshots>
+                    <enabled>true</enabled>
+                </snapshots>
+            </repository>
+
     </repositories>
 
     <name>dependencies</name>
@@ -179,5 +189,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

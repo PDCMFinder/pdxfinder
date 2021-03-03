@@ -10,7 +10,7 @@ public class PatientDTO {
     private String diseaseBodyLocation;
     private String CTEPSDCCode;
     private String diagnosisSubtype;
-    private String raceAndEthnicity;
+    private String ethnicity;
     private List<TreatmentSummaryDTO> treatmentSummaries;
 
     private Boolean treatmentExists = false;
@@ -30,7 +30,7 @@ public class PatientDTO {
                       String diseaseBodyLocation,
                       String CTEPSDCCode,
                       String diagnosisSubtype,
-                      String raceAndEthnicity,
+                      String ethnicity,
                       List<TreatmentSummaryDTO> treatmentSummaries,
                       Boolean treatmentExists,
                       Boolean currentTreatmentExists,
@@ -41,7 +41,7 @@ public class PatientDTO {
         this.diseaseBodyLocation = diseaseBodyLocation;
         this.CTEPSDCCode = CTEPSDCCode;
         this.diagnosisSubtype = diagnosisSubtype;
-        this.raceAndEthnicity = raceAndEthnicity;
+        this.ethnicity = ethnicity;
         this.treatmentSummaries = treatmentSummaries;
         this.treatmentExists = treatmentExists;
         this.currentTreatmentExists = currentTreatmentExists;
@@ -89,12 +89,12 @@ public class PatientDTO {
         this.diagnosisSubtype = diagnosisSubtype;
     }
 
-    public String getRaceAndEthnicity() {
-        return raceAndEthnicity;
+    public String getEthnicity() {
+        return ethnicity;
     }
 
-    public void setRaceAndEthnicity(String raceAndEthnicity) {
-        this.raceAndEthnicity = raceAndEthnicity;
+    public void setEthnicity(String ethnicity) {
+        this.ethnicity = ethnicity;
     }
 
     public List<String> getKnownGeneticMutations() {

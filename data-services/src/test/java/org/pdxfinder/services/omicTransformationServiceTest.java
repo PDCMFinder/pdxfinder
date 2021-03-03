@@ -1,5 +1,6 @@
 package org.pdxfinder.services;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +9,7 @@ import org.mockito.Mock;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.graph.dao.Marker;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,12 @@ public class omicTransformationServiceTest extends BaseTest {
     public void init(){
         marker = new Marker();
         marker.setHgncSymbol("TEST");
+    }
+
+    @After
+    public void clean(){
+      File resultingFile = new File("ncbiToHugoAccessions");
+      resultingFile.delete();
     }
 
     @Test

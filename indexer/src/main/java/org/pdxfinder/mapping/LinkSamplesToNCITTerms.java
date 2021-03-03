@@ -148,7 +148,6 @@ public class LinkSamplesToNCITTerms {
 
             MissingMapping mm = entry.getValue();
             System.out.println("Datasource: " + mm.getDataSource() + ", Diagnosis: " + mm.getDiagnosis() + ", Origin Tissue: " + mm.getOriginTissue() + ", Tumor Type: " + mm.getTumorType());
-            mappingService.saveUnmappedDiagnosis(mm.getDataSource(), mm.getDiagnosis(), mm.getOriginTissue(), mm.getTumorType());
         }
 
 
