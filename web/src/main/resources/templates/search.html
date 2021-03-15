@@ -273,7 +273,10 @@
                             <tr th:each="model, iter : ${websearch.results}">
 
                                 <td scope="row"><a th:text="${model.externalId}"
-                                       th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a> <br> <span class="small" th:text="${model.datasource}">center</span>
+                                       th:href="@{'/pdx/'+${model.datasource}+'/'+${model.externalId}}"></a> <br>
+                                    <a th:if="${websearch.providerLinksEnabled == true}" th:text="${model.datasource}"
+                                       th:href="@{'~/source/'+${model.datasource}+'/'}"></a>
+                                    <span th:if="${websearch.providerLinksEnabled == false}" class="small" th:text="${model.datasource}">center</span>
                                 </td>
                                 <td class="capitalize" data-title="HISTOLOGY"><h1 th:remove="tag" th:text="${model.mappedOntologyTerm}">ontology term</h1>
                                 </td>

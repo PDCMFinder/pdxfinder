@@ -1,22 +1,18 @@
 package org.pdxfinder.services;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.pdxfinder.graph.dao.MarkerAssociation;
 import org.pdxfinder.graph.dao.ModelCreation;
 import org.pdxfinder.graph.dao.MolecularCharacterization;
-import org.pdxfinder.graph.dao.Sample;
 import org.pdxfinder.graph.repositories.ModelCreationRepository;
 import org.pdxfinder.graph.repositories.OntologyTermRepository;
-import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 import org.pdxfinder.services.ds.SearchDS;
 import org.pdxfinder.services.ds.SearchFacetName;
 import org.pdxfinder.services.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -35,6 +31,8 @@ public class SearchService {
     private MolCharService molCharService;
     private PlatformService platformService;
     private DrugService drugService;
+
+
 
     private SearchDS searchDS;
 
@@ -178,7 +176,6 @@ public class SearchService {
 
         //Update results table headers
         wsDTO.setAdditionalResultTableHeaders(getNewResultHeaders(configuredFacets));
-
 
         return wsDTO;
     }
