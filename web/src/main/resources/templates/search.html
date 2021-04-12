@@ -418,11 +418,11 @@
                             </div>
 
                             <div class="columns medium-5 text-right">
-                                <select style="font-size: 12px;" onchange="window.open(this.options[this.selectedIndex].value,'_top')">
-                                    <option th:value="'?'+${websearch.facetString} + '&size=10'">  10 Models Per Page </option>
-                                    <option th:value="'?'+${websearch.facetString} + '&size=50'">  50 Models Per Page </option>
-                                    <option th:value="'?'+${websearch.facetString} + '&size=200'">  200 Models Per Page </option>
-                                    <option th:value="'?'+${websearch.facetString} + '&size='+${websearch.totalResults}"> ALL Models </option>
+                                <select style="font-size: 12px;" id="size_select">
+                                    <option value="10" th:selected="${websearch.size} eq 10">  10 Models Per Page </option>
+                                    <option value="50" th:selected="${websearch.size} eq 50">  50 Models Per Page </option>
+                                    <option value="200" th:selected="${websearch.size} eq 200">  200 Models Per Page </option>
+                                    <option th:value="${websearch.totalResults}" th:selected="${websearch.size} eq ${websearch.totalResults}"> ALL Models </option>
                                 </select>
 
                             </div>
@@ -584,6 +584,11 @@
 
         //Add eventlistener to search field's button
         jQuery('#search_submit').click(function () {
+            redirectPage(webFacetSections);
+        });
+
+        //Add eventlistener to size selector
+        jQuery('#size_select').change(function () {
             redirectPage(webFacetSections);
         });
     });
