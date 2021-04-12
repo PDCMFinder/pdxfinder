@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.pdxfinder.dataloaders.updog.TableSetUtilities.concatenate;
 
@@ -43,26 +42,22 @@ public class UpdogTest {
     }
 
     @Test public void run_whenCalled_readInAllPdxFiles() {
-        updog.run(Paths.get("provider/dir"), "Provider", false);
+        updog.run(Paths.get("provider/dir"), "Provider");
         verify(this.reader).readAllTsvFilesIn(any(), any());
     }
 
     @Test public void run_whenCalled_readInAllTreatmentFiles() {
-        updog.run(Paths.get("provider/dir"), "Provider", false);
+        updog.run(Paths.get("provider/dir"), "Provider");
         verify(this.reader).readAllTreatmentFilesIn(any(), any());
     }
 
 
     @Test public void run_whenCalled_objectsCreated() {
-        updog.run(Paths.get("provider/dir"), "Provider", false);
+        updog.run(Paths.get("provider/dir"), "Provider");
         verify(this.domainObjectCreator).loadDomainObjects(any(), any());
         verifyNoMoreInteractions(this.domainObjectCreator);
     }
 
-    @Test public void run_whenValidationOnlyRequested_doNotRunObjectCreation() {
-        updog.run(Paths.get("provider/dir"), "Provider", true);
-        verifyZeroInteractions(this.domainObjectCreator);
-    }
 
     @Test public void concatenate_whenGivenTwoEmptyLists_returnsEmptyList() {
         List<String> emptyList = Collections.emptyList();

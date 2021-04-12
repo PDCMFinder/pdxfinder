@@ -29,7 +29,7 @@ public class Updog {
         this.domainObjectCreator = domainObjectCreator;
     }
 
-    public void run(Path updogProviderDirectory, String provider, boolean validateOnly) {
+    public void run(Path updogProviderDirectory, String provider) {
         Map<String, Table> pdxTableSet;
         Map<String, Table> omicsTableSet;
         Map<String, Table> treatmentTableSet;
