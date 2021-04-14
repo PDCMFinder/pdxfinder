@@ -130,7 +130,7 @@ public class SearchService {
         wsDTO.setWebFacetsContainer(searchDS.getUpdatedSelectedFilters(configuredFacets));
 
         //UPDATE FACET STRING
-        String facetString = getFacetString(configuredFacets);
+        String facetString = getFacetString(configuredFacets, size);
         wsDTO.setFacetString(facetString);
 
 
@@ -400,7 +400,7 @@ public class SearchService {
      * @param allSelectedFacetOptions
      * @return
      */
-    private String getFacetString(Map<SearchFacetName, List<String>> allSelectedFacetOptions) {
+    private String getFacetString(Map<SearchFacetName, List<String>> allSelectedFacetOptions, Integer size) {
 
         List<String> pieces = new ArrayList<>();
 
@@ -410,7 +410,9 @@ public class SearchService {
 
                 pieces.add(facet.getKey().getName() + "=" +filterVal);
             }
-
+        }
+        if(size != null && size != 10){
+            pieces.add("size="+size);
         }
         return pieces.stream().filter(x -> !x.isEmpty()).collect(Collectors.joining("&"));
     }
