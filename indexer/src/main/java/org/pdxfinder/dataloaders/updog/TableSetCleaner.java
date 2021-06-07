@@ -11,7 +11,7 @@ import java.util.Map;
 public class TableSetCleaner {
 
     public Map<String, Table> cleanPdxTables(Map<String, Table> pdxTableSet) {
-        List<String> columnsExceptFromLowercasing = Arrays.asList(
+        List<String> columnsExemptFromLowercasing = Arrays.asList(
                 "model_id",
                 "sample_id",
                 "patient_id",
@@ -34,7 +34,7 @@ public class TableSetCleaner {
         TableSetUtilities.removeDescriptionColumn(pdxTableSet);
         pdxTableSet = TableSetUtilities.removeHeaderRows(pdxTableSet);
         pdxTableSet = TableSetUtilities.removeBlankRows(pdxTableSet);
-        pdxTableSet = TableSetUtilities.cleanValues(pdxTableSet, columnsExceptFromLowercasing);
+        pdxTableSet = TableSetUtilities.cleanValues(pdxTableSet, columnsExemptFromLowercasing);
         return pdxTableSet;
     }
 
