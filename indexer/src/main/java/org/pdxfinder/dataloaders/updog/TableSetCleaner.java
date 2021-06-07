@@ -1,10 +1,11 @@
 package org.pdxfinder.dataloaders.updog;
 
+import org.springframework.stereotype.Service;
+import tech.tablesaw.api.Table;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
-import tech.tablesaw.api.Table;
 
 @Service
 public class TableSetCleaner {
@@ -25,7 +26,8 @@ public class TableSetCleaner {
                 "project",
                 "internal_url",
                 "internal_dosing_url",
-                "platform"
+                "platform",
+                "raw_data_file"
         );
         pdxTableSet = TableSetUtilities.removeProviderNameFromFilename(pdxTableSet);
         pdxTableSet.remove("metadata-checklist.tsv");
