@@ -9,12 +9,12 @@ public enum DataUrl {
     DISEASES_BRANCH_URL("http://purl.obolibrary.org/obo/NCIT_C3262"),
     ONTOLOGY_URL("https://www.ebi.ac.uk/ols/api/ontologies/ncit/terms/"),
     EUROPE_PMC_URL("https://www.ebi.ac.uk/europepmc/webservices/rest/search"),
-    K8_SERVICE_URL("http://193.62.55.22:80/pdx-gun/v1/graphql"),
+    K8_SERVICE_URL("www.ebi.ac.uk/pdxfinder/pdx-gun/v1/graphql"),
     COSMIC_URL("https://cancer.sanger.ac.uk/cosmic/mutation/overview?id"),
     CRAVAT_URL("https://run.opencravat.org/result/nocache/variant.html");
 
 
-    private String value;
+    private final String value;
 
     DataUrl(String val) {
         value = val;
