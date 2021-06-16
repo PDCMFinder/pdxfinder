@@ -165,6 +165,10 @@ function redirectPage(webFacetSections) {
         }
     });
 
+    //Get the size parameter and save it in the url
+    var select_size = jQuery("#size_select").children("option:selected").val();
+    url = url + "&size="+select_size;
+
     window.location.replace(url);
 
 

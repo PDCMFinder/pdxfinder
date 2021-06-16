@@ -6,6 +6,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.pdxfinder.services.SearchService;
 import org.pdxfinder.services.ds.ModelForQueryExport;
 import org.pdxfinder.services.dto.ExportDTO;
+import org.pdxfinder.services.dto.WebSearchDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,9 @@ import java.util.stream.Collectors;
 public class SearchController {
 
     private SearchService searchService;
+
+    @Value("${provider-links-enabled}")
+    private String providerLinksEnabled;
 
     public SearchController(SearchService searchService) {
 
@@ -113,10 +118,13 @@ public class SearchController {
                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                    @RequestParam(value = "size", defaultValue = "10") Integer size){
 
-        model.addAttribute("websearch", searchService.webSearch(query, datasource,
+        WebSearchDTO webSearchDTO = searchService.webSearch(query, datasource,
                 diagnosis, patient_age, patient_treatment, patient_treatment_status, patient_gender, sample_origin_tissue, cancer_system,
                 sample_tumor_type, mutation, drug, project, data_available, breast_cancer_markers, copy_number_alteration, gene_expression,
-                cytogenetics, model_id, page, size));
+                cytogenetics, model_id, page, size);
+
+        webSearchDTO.setProviderLinksEnabled(Boolean.valueOf(providerLinksEnabled));
+        model.addAttribute("websearch", webSearchDTO);
 
         return "search";
     }

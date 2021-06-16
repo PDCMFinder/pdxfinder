@@ -87,19 +87,17 @@ public class FinderLoader {
     void run(
             List<DataProvider> dataProviders,
             File dataDirectory,
-            boolean validateOnlyRequested,
             boolean loadCacheRequested,
             boolean postLoadRequested,
             boolean initializeMappingDb
     ) {
 
         loadCache(loadCacheRequested);
-        loadRequestedPdxData(dataProviders, dataDirectory, validateOnlyRequested);
-        if (!validateOnlyRequested) {
-            postLoad(dataProviders, postLoadRequested);
-            initializeMappingDb(initializeMappingDb);
+        loadRequestedPdxData(dataProviders, dataDirectory);
+        postLoad(dataProviders, postLoadRequested);
+        initializeMappingDb(initializeMappingDb);
         }
-    }
+
 
     private void loadCache(boolean loadCacheRequested) {
         log.info("Loading cache ...");
@@ -140,23 +138,21 @@ public class FinderLoader {
 
     private void loadRequestedPdxData(
             List<DataProvider> providers,
-            File dataDirectory,
-            boolean validateOnlyRequested
+            File dataDirectory
     ) {
         if (providers.isEmpty()) {
             log.info("Skipping PDX dataset loading - No providers requested");
         } else {
             log.info("Running requested PDX dataset loaders {}...", providers);
             for (DataProvider i : providers)
-                callRelevantLoader(i, dataDirectory, validateOnlyRequested);
+                callRelevantLoader(i, dataDirectory);
         }
     }
 
 
     private void callRelevantLoader(
             DataProvider dataProvider,
-            File dataDirectory,
-            boolean validateOnlyRequested
+            File dataDirectory
     ) {
         List<DataProvider> updogProviders = DataProviderGroup.getProvidersFrom(DataProviderGroup.UPDOG);
         try {
@@ -166,7 +162,7 @@ public class FinderLoader {
                         dataDirectory.toString(),
                         "/data/UPDOG",
                         dataProvider.toString());
-                updog.run(updogDirectory, dataProvider.toString(), validateOnlyRequested);
+                updog.run(updogDirectory, dataProvider.toString());
             }
 
 
