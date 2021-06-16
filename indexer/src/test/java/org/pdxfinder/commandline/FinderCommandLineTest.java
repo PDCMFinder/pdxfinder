@@ -1,5 +1,18 @@
 package org.pdxfinder.commandline;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyListOf;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+import java.io.File;
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -8,13 +21,6 @@ import org.mockito.MockitoAnnotations;
 import org.pdxfinder.BaseTest;
 import org.pdxfinder.services.constants.DataProvider;
 import picocli.CommandLine;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Mockito.*;
 
 
 public class FinderCommandLineTest extends BaseTest {
@@ -31,7 +37,7 @@ public class FinderCommandLineTest extends BaseTest {
         doNothing().when(this.finderLoader).run(
                 anyListOf(DataProvider.class),
                 any(File.class),
-                anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
+                anyBoolean(), anyBoolean(), anyBoolean()
         );
     }
 
@@ -42,7 +48,7 @@ public class FinderCommandLineTest extends BaseTest {
         verify(this.finderLoader).run(
                 anyList(),
                 any(File.class),
-                anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
+                anyBoolean(), anyBoolean(), anyBoolean()
         );
         verifyNoMoreInteractions(this.finderLoader);
     }
@@ -54,7 +60,7 @@ public class FinderCommandLineTest extends BaseTest {
         verify(this.finderLoader).run(
                 anyList(),
                 any(File.class),
-                anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean()
+                anyBoolean(), anyBoolean(), anyBoolean()
         );
         verifyNoMoreInteractions(this.finderLoader);
     }

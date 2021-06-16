@@ -1,5 +1,14 @@
 package org.pdxfinder.commandline;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.concurrent.Callable;
 import org.pdxfinder.services.constants.DataProvider;
 import org.pdxfinder.services.constants.DataProviderGroup;
 import org.pdxfinder.utils.CbpTransformer;
@@ -12,11 +21,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.Callable;
 
 @Component
 @Command(name = "indexer",
@@ -71,10 +75,6 @@ public class FinderCommandLine implements Callable<Integer> {
                 description = "Delete mapping database content, and reload from mapping file")
         private boolean initializeMappingDB;
 
-        @Option(names = {"--validate-only"},
-                description = "Don't load the PDX data, only perform validation and report errors.")
-        private boolean validateOnlyRequested;
-
         @Option(names = {"-p", "--post-load"},
                 description = "Implement Post data loading Steps")
         private boolean postLoadRequested;
@@ -122,7 +122,6 @@ public class FinderCommandLine implements Callable<Integer> {
             finderLoader.run(
                     providersRequested,
                     dataDirectory,
-                    validateOnlyRequested,
                     loadCacheRequested,
                     postLoadRequested,
                     initializeMappingDB
@@ -154,7 +153,6 @@ public class FinderCommandLine implements Callable<Integer> {
             return new StringJoiner(", ", Load.class.getSimpleName() + "[", "]")
                 .add("dataDirectory=" + dataDirectory)
                 .add("initializeMappingDB=" + initializeMappingDB)
-                .add("validateOnlyRequested=" + validateOnlyRequested)
                 .add("postLoadRequested=" + postLoadRequested)
                 .add("springDataNeo4jUri='" + springDataNeo4jUri + "'")
                 .add("debReload='" + debReload + "'")

@@ -37,6 +37,8 @@ public class WebSearchDTO {
 
     private List<ModelForQuery> results;
 
+    private boolean providerLinksEnabled;
+
 
     public WebSearchDTO() {
     }
@@ -160,6 +162,14 @@ public class WebSearchDTO {
 
     public void setTextSearchDescription(String textSearchDescription) {
         this.textSearchDescription = textSearchDescription;
+    }
+
+    public boolean isProviderLinksEnabled() {
+        return providerLinksEnabled;
+    }
+
+    public void setProviderLinksEnabled(boolean providerLinksEnabled) {
+        this.providerLinksEnabled = providerLinksEnabled;
     }
 
     public List<String> getMainSearchFieldOptions() {
