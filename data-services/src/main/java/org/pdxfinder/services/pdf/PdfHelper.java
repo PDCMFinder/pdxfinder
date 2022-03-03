@@ -689,10 +689,11 @@ public class PdfHelper {
                 leftDataBorder = Arrays.asList(true, true, false, true);
                 rightDataBorder = Arrays.asList(false, true, true, true);
             }
-
+            // Null values will cause an error when creating the pdf
+            String value = entry.getValue() == null ? "" : entry.getValue();
             row = Arrays.asList(
                     tdText(entry.getKey(), true, null, leftDataBorder),
-                    tdText(entry.getValue(), false, null, rightDataBorder)
+                    tdText(value, false, null, rightDataBorder)
             );
 
             tableBody.add(row);
