@@ -53,7 +53,7 @@ public class PdfService {
 
         patient.put(Label.TXT_SEX, data.getPatientSex());
         patient.put(Label.TXT_COLLECTION_AGE, data.getAgeAtTimeOfCollection());
-        patient.put(Label.TXT_RACE, data.getRace());  /////
+        patient.put(Label.TXT_RACE, data.getEthnicity());
 
         row1Column1Contents.add(
                 pdf.pdxFinderTable(patient, Label.TXT_PATIENT)
