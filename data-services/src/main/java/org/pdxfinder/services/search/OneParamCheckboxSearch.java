@@ -35,7 +35,7 @@ public class OneParamCheckboxSearch extends GeneralSearch{
             for(String param: searchParams){
                 for(FacetOption fo :replacementStrings){
                     if(param.equals(fo.getLabelId())){
-                        decodedSearchParams.add(fo.getLabel());
+                        decodedSearchParams.add(fo.getLabel().toLowerCase());
                     }
                 }
             }
@@ -47,6 +47,9 @@ public class OneParamCheckboxSearch extends GeneralSearch{
         for(ModelForQuery mfq: mfqSet){
 
             String mfqValue = searchFunc.apply(mfq);
+            if (mfqValue != null) {
+                mfqValue = mfqValue.toLowerCase();
+            }
 
             if(decodedSearchParams.contains(mfqValue)){
                 results.add(mfq);
@@ -78,7 +81,7 @@ public class OneParamCheckboxSearch extends GeneralSearch{
             for(String param: searchParams){
                 for(FacetOption fo :replacementStrings){
                     if(param.equals(fo.getLabelId())){
-                        decodedSearchParams.add(fo.getLabel());
+                        decodedSearchParams.add(fo.getLabel().toLowerCase());
                     }
                 }
             }
@@ -94,6 +97,9 @@ public class OneParamCheckboxSearch extends GeneralSearch{
             if(mfqValues != null){
 
                 for(String mfqValue : mfqValues){
+                    if (mfqValue != null) {
+                        mfqValue = mfqValue.toLowerCase();
+                    }
 
                     if(decodedSearchParams.contains(mfqValue)){
                         results.add(mfq);
