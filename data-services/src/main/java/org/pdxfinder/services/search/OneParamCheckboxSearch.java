@@ -1,5 +1,6 @@
 package org.pdxfinder.services.search;
 
+import java.util.stream.Collectors;
 import org.pdxfinder.services.ds.FacetOption;
 import org.pdxfinder.services.ds.ModelForQuery;
 
@@ -35,12 +36,15 @@ public class OneParamCheckboxSearch extends GeneralSearch{
             for(String param: searchParams){
                 for(FacetOption fo :replacementStrings){
                     if(param.equals(fo.getLabelId())){
-                        decodedSearchParams.add(fo.getLabel().toLowerCase());
+                        decodedSearchParams.add(fo.getLabel());
                     }
                 }
             }
         }
 
+        decodedSearchParams = decodedSearchParams.stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
 
         Set<ModelForQuery> results = new HashSet<>();
 
@@ -81,12 +85,15 @@ public class OneParamCheckboxSearch extends GeneralSearch{
             for(String param: searchParams){
                 for(FacetOption fo :replacementStrings){
                     if(param.equals(fo.getLabelId())){
-                        decodedSearchParams.add(fo.getLabel().toLowerCase());
+                        decodedSearchParams.add(fo.getLabel());
                     }
                 }
             }
         }
 
+        decodedSearchParams = decodedSearchParams.stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
 
         Set<ModelForQuery> results = new HashSet<>();
 
@@ -111,6 +118,5 @@ public class OneParamCheckboxSearch extends GeneralSearch{
 
         return results;
     }
-
 
 }
